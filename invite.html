@@ -242,10 +242,12 @@ setInterval(updateClock, 1000);
 updateClock();
 
 function formatPhone(e){
-  let v = e.target.value.replace(/[^0-9-]/g, "");
-  if(v.length >= 3 && v.indexOf("-") === -1) v = v.substring(0,3) + "-" + v.substring(3);
-  if(v.length >= 8 && v.indexOf("-",4) === -1) v = v.substring(0,8) + "-" + v.substring(8);
-  if(v.length > 13) v = v.substring(0,13);
+  if(e.inputType && e.inputType.startsWith("delete")) return;
+  let nums = e.target.value.replace(/[^0-9]/g, "");
+  if(nums.length > 11) nums = nums.substring(0,11);
+  let v = nums;
+  if(nums.length > 7) v = nums.substring(0,3) + "-" + nums.substring(3,7) + "-" + nums.substring(7);
+  else if(nums.length > 3) v = nums.substring(0,3) + "-" + nums.substring(3);
   e.target.value = v;
 }
 document.getElementById("myContact").addEventListener("input", formatPhone);
