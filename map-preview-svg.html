@@ -21,30 +21,30 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .main{display:flex;height:calc(100vh - 46px);}
 
 /* LEFT SIDEBAR */
-.sidebar-left{width:220px;background:#111;border-right:1px solid #1a1a1a;display:flex;flex-direction:column;overflow:hidden;}
-.profile-card{padding:14px 16px;border-bottom:1px solid #1a1a1a;display:flex;align-items:center;gap:10px;}
-.profile-avatar{width:32px;height:32px;background:#c41a2e;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;}
+.sidebar-left{width:380px;background:#111;border-right:1px solid #1a1a1a;display:flex;flex-direction:column;overflow:hidden;}
+.profile-card{padding:20px 24px;border-bottom:1px solid #1a1a1a;display:flex;align-items:center;gap:14px;}
+.profile-avatar{width:44px;height:44px;background:#c41a2e;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0;}
 .profile-info{display:flex;flex-direction:column;}
-.profile-name{font-size:12px;font-weight:700;color:#eee;letter-spacing:0.5px;}
-.profile-sub{font-size:9px;color:#555;letter-spacing:0.5px;margin-top:1px;}
+.profile-name{font-size:16px;font-weight:700;color:#eee;letter-spacing:0.5px;}
+.profile-sub{font-size:12px;color:#555;letter-spacing:0.5px;margin-top:3px;}
 .tabs{display:flex;border-bottom:1px solid #1a1a1a;}
-.tab-btn{flex:1;padding:9px 0;text-align:center;font-size:9px;font-weight:700;letter-spacing:1.5px;color:#555;background:transparent;border:none;cursor:pointer;text-transform:uppercase;transition:all .2s;border-bottom:2px solid transparent;}
+.tab-btn{flex:1;padding:14px 0;text-align:center;font-size:13px;font-weight:700;letter-spacing:1.5px;color:#555;background:transparent;border:none;cursor:pointer;text-transform:uppercase;transition:all .2s;border-bottom:2px solid transparent;}
 .tab-btn.active{color:#ccc;border-bottom-color:#c41a2e;background:rgba(196,26,46,0.05);}
 .tab-btn:hover{color:#888;}
-.section-header{padding:12px 16px 8px;font-size:9px;font-weight:700;letter-spacing:2px;color:#444;text-transform:uppercase;}
-.region-list{flex:1;overflow-y:auto;padding:0 8px 8px;}
+.section-header{padding:16px 24px 10px;font-size:12px;font-weight:700;letter-spacing:2px;color:#444;text-transform:uppercase;}
+.region-list{flex:1;overflow-y:auto;padding:0 14px 14px;}
 .region-list::-webkit-scrollbar{width:3px;}
 .region-list::-webkit-scrollbar-track{background:transparent;}
 .region-list::-webkit-scrollbar-thumb{background:#333;border-radius:2px;}
-.region-item{display:flex;align-items:center;padding:7px 10px;margin-bottom:1px;border-radius:4px;cursor:pointer;transition:all .15s;border-left:2px solid transparent;gap:8px;}
+.region-item{display:flex;align-items:center;padding:11px 16px;margin-bottom:3px;border-radius:5px;cursor:pointer;transition:all .15s;border-left:3px solid transparent;gap:12px;}
 .region-item:hover{background:rgba(255,255,255,0.03);}
 .region-item.active{background:rgba(196,26,46,0.08);border-left-color:#c41a2e;}
-.region-dot{width:6px;height:6px;background:#c41a2e;border-radius:50%;flex-shrink:0;}
-.region-name{flex:1;font-size:12px;color:#bbb;font-weight:500;}
+.region-dot{width:8px;height:8px;background:#c41a2e;border-radius:50%;flex-shrink:0;}
+.region-name{flex:1;font-size:16px;color:#bbb;font-weight:500;}
 .region-item.active .region-name{color:#fff;}
-.region-count{font-size:10px;color:#666;font-weight:600;background:#1a1a1a;padding:1px 7px;border-radius:8px;min-width:24px;text-align:center;}
+.region-count{font-size:14px;color:#666;font-weight:600;background:#1a1a1a;padding:3px 10px;border-radius:8px;min-width:32px;text-align:center;}
 .region-item.active .region-count{background:rgba(196,26,46,0.2);color:#e88;}
-.deploy-btn{margin:10px 12px;padding:10px;background:#c41a2e;color:#fff;border:none;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:2px;cursor:pointer;text-transform:uppercase;transition:all .2s;}
+.deploy-btn{margin:14px 18px;padding:14px;background:#c41a2e;color:#fff;border:none;border-radius:5px;font-size:13px;font-weight:700;letter-spacing:2px;cursor:pointer;text-transform:uppercase;transition:all .2s;}
 .deploy-btn:hover{background:#d42a3e;}
 
 /* CENTER MAP */
@@ -69,32 +69,33 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 /* Connector line (SVG) */
 .connector-line{position:absolute;inset:0;pointer-events:none;z-index:9;}
 /* Info box */
-.info-box{position:absolute;pointer-events:auto;cursor:pointer;z-index:10;background:rgba(10,10,14,0.85);border:1px solid rgba(196,26,46,0.3);border-radius:4px;padding:8px 12px;min-width:90px;backdrop-filter:blur(6px);transition:all .25s;}
+.info-box{position:absolute;pointer-events:auto;cursor:pointer;z-index:10;background:rgba(10,10,14,0.85);border:1px solid rgba(196,26,46,0.3);border-radius:5px;padding:10px 14px;min-width:110px;backdrop-filter:blur(6px);transition:all .25s;}
 .info-box:hover{border-color:rgba(196,26,46,0.7);background:rgba(20,15,18,0.92);}
 .info-box.active{border-color:#c41a2e;background:rgba(42,16,21,0.9);box-shadow:0 0 12px rgba(196,26,46,0.3);}
-.info-box .ib-header{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
-.info-box .ib-dot{width:6px;height:6px;background:#c41a2e;border-radius:50%;flex-shrink:0;}
-.info-box .ib-name{font-size:11px;font-weight:800;color:#ddd;letter-spacing:0.5px;}
+.info-box .ib-header{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.info-box .ib-dot{width:8px;height:8px;background:#c41a2e;border-radius:50%;flex-shrink:0;}
+.info-box .ib-name{font-size:15px;font-weight:800;color:#ddd;letter-spacing:0.5px;}
 .info-box.active .ib-name{color:#fff;}
-.info-box .ib-en{font-size:7px;color:#555;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;}
-.info-box .ib-count{font-size:18px;font-weight:800;color:#c41a2e;line-height:1.1;}
-.info-box .ib-label{font-size:7px;color:#555;letter-spacing:1px;text-transform:uppercase;}
-.info-box .ib-chapters{margin-top:4px;border-top:1px solid rgba(255,255,255,0.06);padding-top:4px;}
-.info-box .ib-ch{font-size:8px;color:#777;display:flex;justify-content:space-between;gap:8px;line-height:1.6;}
+.info-box .ib-en{font-size:10px;color:#555;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;}
+.info-box .ib-count{font-size:24px;font-weight:800;color:#c41a2e;line-height:1.1;}
+.info-box .ib-label{font-size:9px;color:#555;letter-spacing:1px;text-transform:uppercase;}
+.info-box .ib-chapters{margin-top:5px;border-top:1px solid rgba(255,255,255,0.06);padding-top:5px;}
+.info-box .ib-ch{font-size:11px;color:#777;display:flex;justify-content:space-between;gap:10px;line-height:1.6;}
 .info-box .ib-ch span{color:#999;font-weight:600;}
 /* Detail map markers (old style for Seoul/Gyeonggi detail modals) */
 .marker-group{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:10;pointer-events:auto;display:flex;flex-direction:column;align-items:center;}
-.marker-group .dot{width:8px;height:8px;background:#c41a2e;border-radius:50%;box-shadow:0 0 6px rgba(196,26,46,0.5);transition:all .2s;}
+.marker-group .dot{width:10px;height:10px;background:#c41a2e;border-radius:50%;box-shadow:0 0 6px rgba(196,26,46,0.5);transition:all .2s;}
 .marker-group:hover .dot{transform:scale(1.4);box-shadow:0 0 12px rgba(196,26,46,0.8);}
 .marker-group.active .dot{animation:pulse 1.5s ease-in-out infinite;}
-.marker-group .label{margin-top:3px;font-size:9px;font-weight:700;color:#999;letter-spacing:0.5px;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,0.8);}
+.marker-group .label{margin-top:4px;font-size:15px;font-weight:700;color:#999;letter-spacing:0.5px;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,0.8);}
 .marker-group.active .label{color:#fff;}
-.marker-group .count{font-size:10px;font-weight:800;color:#c41a2e;text-shadow:0 1px 3px rgba(0,0,0,0.8);}
+.marker-group .count{font-size:24px;font-weight:800;color:#c41a2e;text-shadow:0 1px 3px rgba(0,0,0,0.8);}
+.marker-group.active .count{color:#fff;}
 /* Province label (for clickable provinces like Seoul/Gyeonggi) */
-.province-label{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;cursor:pointer;z-index:10;background:rgba(10,10,14,0.85);border:1px solid rgba(100,200,100,0.3);border-radius:4px;padding:6px 12px;backdrop-filter:blur(6px);display:flex;flex-direction:column;align-items:center;transition:all .25s;}
+.province-label{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;cursor:pointer;z-index:10;background:rgba(10,10,14,0.85);border:1px solid rgba(100,200,100,0.3);border-radius:5px;padding:8px 14px;backdrop-filter:blur(6px);display:flex;flex-direction:column;align-items:center;transition:all .25s;}
 .province-label:hover{border-color:rgba(100,200,100,0.6);background:rgba(15,20,15,0.92);}
-.province-label .name{font-size:10px;font-weight:800;color:#6c6;letter-spacing:1px;}
-.province-label .sub{font-size:7px;color:#585;letter-spacing:0.5px;margin-top:1px;}
+.province-label .name{font-size:14px;font-weight:800;color:#6c6;letter-spacing:1px;}
+.province-label .sub{font-size:9px;color:#585;letter-spacing:0.5px;margin-top:2px;}
 
 .zoom-controls{position:absolute;left:14px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:2px;z-index:20;}
 .zoom-btn{width:28px;height:28px;background:#1a1a1a;border:1px solid #333;color:#888;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:all .2s;}
@@ -102,38 +103,38 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .zoom-btn:last-child{border-radius:0 0 4px 4px;}
 .zoom-btn:hover{background:#252525;color:#ccc;}
 
-.bottom-stats{height:60px;display:flex;align-items:center;justify-content:center;gap:60px;border-top:1px solid #1a1a1a;background:#0d0d0d;}
+.bottom-stats{height:76px;display:flex;align-items:center;justify-content:center;gap:80px;border-top:1px solid #1a1a1a;background:#0d0d0d;}
 .stat-big{display:flex;flex-direction:column;align-items:center;}
-.stat-big .val{font-size:28px;font-weight:800;color:#fff;letter-spacing:1px;}
-.stat-big .label{font-size:8px;color:#555;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;}
+.stat-big .val{font-size:36px;font-weight:800;color:#fff;letter-spacing:1px;}
+.stat-big .label{font-size:10px;color:#555;letter-spacing:1.5px;text-transform:uppercase;margin-top:3px;}
 
 /* RIGHT PANEL */
-.sidebar-right{width:300px;background:#111;border-left:1px solid #1a1a1a;display:flex;flex-direction:column;overflow-y:auto;}
+.sidebar-right{width:460px;background:#111;border-left:1px solid #1a1a1a;display:flex;flex-direction:column;overflow-y:auto;}
 .sidebar-right::-webkit-scrollbar{width:3px;}
 .sidebar-right::-webkit-scrollbar-track{background:transparent;}
 .sidebar-right::-webkit-scrollbar-thumb{background:#333;border-radius:2px;}
-.right-header{padding:16px 20px 6px;font-size:9px;font-weight:600;letter-spacing:2px;color:#444;text-transform:uppercase;}
-.right-region-name{padding:0 20px;font-size:26px;font-weight:800;color:#fff;letter-spacing:1px;}
-.right-big-number{padding:12px 20px 0;display:flex;align-items:baseline;gap:10px;}
-.right-big-number .num{font-size:42px;font-weight:800;color:#c41a2e;}
-.right-big-number .badge{font-size:11px;font-weight:700;color:#4caf50;background:rgba(76,175,80,0.1);padding:3px 8px;border-radius:10px;}
-.right-label{padding:2px 20px 0;font-size:9px;color:#555;letter-spacing:1.5px;text-transform:uppercase;}
-.quota-section{padding:16px 20px 0;}
-.quota-title{font-size:9px;font-weight:700;letter-spacing:2px;color:#444;text-transform:uppercase;margin-bottom:8px;}
-.quota-bar-bg{height:6px;background:#1a1a1a;border-radius:3px;overflow:hidden;}
-.quota-bar-fill{height:100%;background:#c41a2e;border-radius:3px;transition:width .5s;}
-.quota-pct{font-size:11px;color:#888;margin-top:4px;text-align:right;font-weight:600;}
-.chapters-section{padding:16px 20px 0;}
-.chapters-title{font-size:9px;font-weight:700;letter-spacing:2px;color:#444;text-transform:uppercase;margin-bottom:10px;}
-.chapter-item{display:flex;align-items:center;margin-bottom:8px;gap:8px;}
-.chapter-name{width:50px;font-size:11px;color:#999;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.chapter-bar-bg{flex:1;height:8px;background:#1a1a1a;border-radius:2px;overflow:hidden;}
-.chapter-bar-fill{height:100%;background:#c41a2e;border-radius:2px;transition:width .5s;}
-.chapter-count{font-size:10px;color:#666;font-weight:600;width:24px;text-align:right;flex-shrink:0;}
-.spotlight-section{margin-top:auto;padding:14px 20px;border-top:1px solid #1a1a1a;display:flex;align-items:center;justify-content:space-between;}
-.spotlight-label{font-size:8px;color:#444;letter-spacing:1.5px;text-transform:uppercase;}
-.spotlight-name{font-size:12px;color:#ccc;font-weight:600;margin-top:2px;}
-.spotlight-avatar{width:32px;height:32px;background:#c41a2e;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
+.right-header{padding:22px 28px 8px;font-size:12px;font-weight:600;letter-spacing:2px;color:#444;text-transform:uppercase;}
+.right-region-name{padding:0 28px;font-size:38px;font-weight:800;color:#fff;letter-spacing:1px;}
+.right-big-number{padding:16px 28px 0;display:flex;align-items:baseline;gap:14px;}
+.right-big-number .num{font-size:56px;font-weight:800;color:#c41a2e;}
+.right-big-number .badge{font-size:14px;font-weight:700;color:#4caf50;background:rgba(76,175,80,0.1);padding:5px 12px;border-radius:10px;}
+.right-label{padding:2px 28px 0;font-size:11px;color:#555;letter-spacing:1.5px;text-transform:uppercase;}
+.quota-section{padding:22px 28px 0;}
+.quota-title{font-size:12px;font-weight:700;letter-spacing:2px;color:#444;text-transform:uppercase;margin-bottom:12px;}
+.quota-bar-bg{height:8px;background:#1a1a1a;border-radius:4px;overflow:hidden;}
+.quota-bar-fill{height:100%;background:#c41a2e;border-radius:4px;transition:width .5s;}
+.quota-pct{font-size:14px;color:#888;margin-top:6px;text-align:right;font-weight:600;}
+.chapters-section{padding:22px 28px 0;}
+.chapters-title{font-size:12px;font-weight:700;letter-spacing:2px;color:#444;text-transform:uppercase;margin-bottom:14px;}
+.chapter-item{display:flex;align-items:center;margin-bottom:12px;gap:12px;}
+.chapter-name{width:70px;font-size:14px;color:#999;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.chapter-bar-bg{flex:1;height:10px;background:#1a1a1a;border-radius:3px;overflow:hidden;}
+.chapter-bar-fill{height:100%;background:#c41a2e;border-radius:3px;transition:width .5s;}
+.chapter-count{font-size:13px;color:#666;font-weight:600;width:32px;text-align:right;flex-shrink:0;}
+.spotlight-section{margin-top:auto;padding:16px 24px;border-top:1px solid #1a1a1a;display:flex;align-items:center;justify-content:space-between;}
+.spotlight-label{font-size:11px;color:#444;letter-spacing:1.5px;text-transform:uppercase;}
+.spotlight-name{font-size:16px;color:#ccc;font-weight:600;margin-top:3px;}
+.spotlight-avatar{width:42px;height:42px;background:#c41a2e;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;}
 
 /* ── DETAIL MODAL ── */
 .detail-modal{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;}
@@ -148,13 +149,13 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .detail-map svg{height:85%;width:auto;}
 .district{fill:#1e1e1e;stroke:#333;stroke-width:1.5;transition:fill .15s, stroke .15s;cursor:pointer;}
 .district:hover{fill:#2a2a2a;}
-.district.highlight{fill:#2a1015 !important;stroke:#c41a2e !important;stroke-width:2 !important;}
-#detailSvg .district.highlight{stroke-width:6 !important;}
+.district.highlight{fill:#2a1015 !important;stroke:#c41a2e !important;stroke-width:2 !important;filter:drop-shadow(0 0 8px rgba(196,26,46,0.8)) drop-shadow(0 0 16px rgba(196,26,46,0.5));}
+#detailSvg .district.highlight{stroke-width:6 !important;filter:drop-shadow(0 0 8px rgba(196,26,46,0.8)) drop-shadow(0 0 16px rgba(196,26,46,0.5)) !important;}
 /* Gyeonggi detail map */
 #gyeonggiDetailSvg polygon[fill="#B9B9B9"]{fill:#1e1e1e !important;stroke:#444 !important;stroke-width:0.8 !important;transition:fill .15s;cursor:pointer;}
 #gyeonggiDetailSvg polygon[fill="#B9B9B9"]:hover{fill:#2a2a2a !important;}
 #gyeonggiDetailSvg polygon[fill="#7FB1CC"]{fill:#111 !important;stroke:none !important;}
-#gyeonggiDetailSvg polygon[fill="#1e1e1e"].district.highlight{fill:#2a1015 !important;stroke:#c41a2e !important;stroke-width:2 !important;}
+#gyeonggiDetailSvg polygon[fill="#1e1e1e"].district.highlight{fill:#2a1015 !important;stroke:#c41a2e !important;stroke-width:2 !important;filter:drop-shadow(0 0 8px rgba(196,26,46,0.8)) drop-shadow(0 0 16px rgba(196,26,46,0.5));}
 #gyeonggiDetailSvg path{fill:none !important;stroke:none !important;}
 #gyeonggiDetailSvg polyline{stroke:#444 !important;stroke-width:0.3 !important;}
 #gyeonggiDetailSvg rect, #gyeonggiDetailSvg #XMLID_350_, #gyeonggiDetailSvg #XMLID_352_, #gyeonggiDetailSvg #XMLID_356_{display:none !important;}
@@ -163,16 +164,16 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .detail-info{width:240px;padding:20px;border-left:1px solid #222;overflow-y:auto;}
 .detail-info .di-region{font-size:20px;font-weight:800;color:#fff;margin-bottom:4px;}
 .detail-info .di-count{font-size:36px;font-weight:800;color:#c41a2e;}
-.detail-info .di-label{font-size:8px;color:#555;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;}
+.detail-info .di-label{font-size:12px;color:#555;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;}
 .detail-info .di-section{margin-top:16px;}
-.detail-info .di-section-title{font-size:9px;font-weight:700;letter-spacing:2px;color:#444;text-transform:uppercase;margin-bottom:8px;}
+.detail-info .di-section-title{font-size:13px;font-weight:700;letter-spacing:2px;color:#444;text-transform:uppercase;margin-bottom:8px;}
 .di-list-item{display:flex;align-items:center;padding:5px 0;gap:6px;cursor:pointer;transition:background .15s;border-radius:3px;}
 .di-list-item:hover{background:rgba(255,255,255,0.03);}
 .di-list-item.active{color:#fff;}
 .di-list-item .di-dot{width:5px;height:5px;background:#c41a2e;border-radius:50%;}
-.di-list-item .di-name{flex:1;font-size:11px;color:#bbb;}
+.di-list-item .di-name{flex:1;font-size:15px;color:#bbb;}
 .di-list-item.active .di-name{color:#fff;}
-.di-list-item .di-cnt{font-size:10px;color:#666;font-weight:600;}
+.di-list-item .di-cnt{font-size:14px;color:#666;font-weight:600;}
 </style>
 </head>
 <body>
@@ -2782,9 +2783,9 @@ const BOX_LAYOUT = {
   "대구":  {side:"right", rank:1, offsetY:-100},
   "부산":  {side:"right", rank:2, offsetY:0}
 };
-const BOX_HEIGHT = 90;
-const BOX_WIDTH = 120;
-const BOX_GAP = 36;
+const BOX_HEIGHT = 120;
+const BOX_WIDTH = 150;
+const BOX_GAP = 20;
 const BOX_MARGIN_TOP = 10;
 
 // ── Detail map configs ──
@@ -3164,53 +3165,71 @@ function renderDetailMap(key){
   const cfg = DETAIL_MAPS[key];
   if(!cfg) return;
 
+  // Helper: get SVG IDs as array (supports single string or array)
+  function getIds(val){ return Array.isArray(val) ? val : [val]; }
+
   // Highlight selected district
   document.querySelectorAll(".district").forEach(el=>el.classList.remove("highlight"));
   if(detailSelectedCity && cfg.districtMap[detailSelectedCity]){
-    let el = document.getElementById(cfg.districtMap[detailSelectedCity]);
-    if(el){
-      // If el is a <g>, find the .district polygon/path inside
-      const inner = el.querySelector(".district");
-      const target = inner || el;
-      target.classList.add("highlight");
-      // Bring highlighted element to top so stroke isn't hidden by neighbors
-      const parent = (inner ? el : target).parentNode;
-      if(parent) parent.appendChild(inner ? el : target);
-    }
+    getIds(cfg.districtMap[detailSelectedCity]).forEach(svgId=>{
+      let el = document.getElementById(svgId);
+      if(el){
+        const inner = el.querySelector(".district");
+        const target = inner || el;
+        target.classList.add("highlight");
+        const parent = (inner ? el : target).parentNode;
+        if(parent) parent.appendChild(inner ? el : target);
+      }
+    });
   }
 
   // District click handlers
-  Object.entries(cfg.districtMap).forEach(([city, svgId])=>{
-    const el = document.getElementById(svgId);
-    if(el){
-      el.onclick = ()=>{
-        detailSelectedCity = city;
-        selectedRegion = city;
-        renderDetailMap(key);
-        render();
-      };
-    }
+  Object.entries(cfg.districtMap).forEach(([city, val])=>{
+    getIds(val).forEach(svgId=>{
+      const el = document.getElementById(svgId);
+      if(el){
+        el.onclick = ()=>{
+          detailSelectedCity = city;
+          selectedRegion = city;
+          renderDetailMap(key);
+          render();
+        };
+      }
+    });
   });
 
-  // Render markers using getBBox
+  // Render markers
   const overlay = document.getElementById("detailMarkerOverlay");
   overlay.innerHTML = "";
   const svg = document.getElementById(cfg.svgId);
   const svgRect = svg.getBoundingClientRect();
   const mapDiv = svg.closest(".detail-map");
   const mapRect = mapDiv.getBoundingClientRect();
-  // SVG viewBox
   const vb = svg.viewBox.baseVal;
 
   cfg.cities.forEach(city=>{
-    const svgElId = cfg.districtMap[city];
-    if(!svgElId) return;
-    const el = document.getElementById(svgElId);
-    if(!el) return;
-    const bbox = el.getBBox();
-    // Center of district in SVG coords
-    const cx = bbox.x + bbox.width/2;
-    const cy = bbox.y + bbox.height/2;
+    const ids = getIds(cfg.districtMap[city]);
+    if(!ids.length) return;
+    // Combine bboxes of all elements for this city
+    let minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
+    let found = false;
+    ids.forEach(svgId=>{
+      const el = document.getElementById(svgId);
+      if(!el) return;
+      const poly = el.querySelector(".district") || el.querySelector("polygon,path") || el;
+      const bbox = poly.getBBox();
+      minX = Math.min(minX, bbox.x);
+      minY = Math.min(minY, bbox.y);
+      maxX = Math.max(maxX, bbox.x + bbox.width);
+      maxY = Math.max(maxY, bbox.y + bbox.height);
+      found = true;
+    });
+    if(!found) return;
+    let cx = (minX + maxX) / 2;
+    let cy = (minY + maxY) / 2;
+    // Manual position adjustments for small districts
+    const ADJ = {"\uC11C\uCD08":{dx:-60, dy:-35}, "\uAC15\uB0A8":{dy:40}};
+    if(ADJ[city]){ cx += (ADJ[city].dx||0); cy += (ADJ[city].dy||0); }
     // Convert to screen coords
     const scaleX = svgRect.width / vb.width;
     const scaleY = svgRect.height / vb.height;
@@ -3222,6 +3241,7 @@ function renderDetailMap(key){
     group.className = "marker-group" + (city===detailSelectedCity?" active":"");
     group.style.left = screenX + "px";
     group.style.top = screenY + "px";
+    group.style.transform = "translate(-50%, -50%)";
     group.style.pointerEvents = "auto";
     group.onclick = ()=>{
       detailSelectedCity = city;
@@ -3229,7 +3249,7 @@ function renderDetailMap(key){
       renderDetailMap(key);
       render();
     };
-    group.innerHTML = '<div class="dot"></div><div class="count">' + count + '</div><div class="label">' + city + '</div>';
+    group.innerHTML = '<div class="count">' + count + '</div><div class="label">' + city + '</div>';
     overlay.appendChild(group);
   });
 
