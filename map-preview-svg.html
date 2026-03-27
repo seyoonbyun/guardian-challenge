@@ -127,8 +127,22 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .quota-pct{font-size:14px;color:#888;margin-top:6px;text-align:right;font-weight:600;}
 .chapters-section{padding:22px 28px 0;}
 .chapters-title{font-size:12px;font-weight:700;letter-spacing:2px;color:#444;text-transform:uppercase;margin-bottom:14px;}
-.chapter-item{display:flex;align-items:center;margin-bottom:12px;gap:12px;}
+.chapter-item{display:flex;align-items:center;margin-bottom:12px;gap:12px;cursor:pointer;padding:4px 0;border-radius:4px;transition:all .15s;}
+.chapter-item:hover{background:rgba(255,255,255,0.02);}
 .chapter-name{width:70px;font-size:14px;color:#999;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.chapter-item:hover .chapter-name{color:#c41a2e;}
+/* Chapter detail panel */
+.chapter-detail{padding:0 28px 16px;}
+.chapter-detail-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.chapter-detail-title{font-size:13px;font-weight:700;color:#c41a2e;letter-spacing:1px;}
+.chapter-detail-close{font-size:11px;color:#555;cursor:pointer;padding:4px 8px;border-radius:3px;transition:all .2s;}
+.chapter-detail-close:hover{color:#fff;background:rgba(255,255,255,0.05);}
+.member-row{display:flex;align-items:center;padding:8px 0;border-bottom:1px solid #1a1a1a;gap:10px;}
+.member-row:last-child{border-bottom:none;}
+.member-rank{width:22px;font-size:11px;font-weight:700;color:#555;text-align:center;}
+.member-name{flex:1;font-size:13px;color:#ccc;}
+.member-recruits{font-size:11px;color:#888;}
+.member-score{font-size:13px;font-weight:700;color:#c41a2e;min-width:30px;text-align:right;}
 .chapter-bar-bg{flex:1;height:10px;background:#1a1a1a;border-radius:3px;overflow:hidden;}
 .chapter-bar-fill{height:100%;background:#c41a2e;border-radius:3px;transition:width .5s;}
 .chapter-count{font-size:13px;color:#666;font-weight:600;width:32px;text-align:right;flex-shrink:0;}
@@ -184,10 +198,10 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 <div class="topbar">
   <div class="brand"><div class="icon">G</div><span>GUARDIAN</span></div>
   <nav>
-    <a href="#">REGIONAL</a>
-    <a href="#">DIAGNOSTICS</a>
-    <a href="#" class="active">MAP</a>
-    <a href="#">SETTINGS</a>
+        <a href="home.html">HOME</a>
+    <a href="invite.html">INVITE</a>
+    <a href="map-preview-svg.html" class="active">DASHBOARD</a>
+    <a href="challenge.html">AWARDS</a>
   </nav>
   <div class="clock" id="clock"></div>
 </div>
@@ -261,9 +275,8 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
       <div class="chapters-title">TOP 5 CHAPTERS</div>
       <div id="chaptersList"></div>
     </div>
-    <div class="spotlight-section">
-      <div><div class="spotlight-label">SECTOR MVP SPOTLIGHT</div><div class="spotlight-name" id="spotlightName">-</div></div>
-      <div class="spotlight-avatar" id="spotlightAvatar">-</div>
+    <div class="spotlight-section" style="justify-content:flex-end;">
+      <div class="spotlight-label">Created by Joy Byun</div>
     </div>
   </div>
 </div>
@@ -2850,6 +2863,7 @@ const EN_NAMES = {
 
 let regionData = {};
 let chaptersByRegion = {};
+let rawRows = [];
 let selectedRegion = "송파";
 let zoomLevel = 1;
 let panX = 0, panY = 0;
@@ -2916,15 +2930,22 @@ async function loadData(){
     const data = await res.json();
     const rows = data.data || data;
     if(!rows || !rows.length) throw new Error("No data");
+    rawRows = rows;
     regionData = {};
     chaptersByRegion = {};
     rows.forEach(r => {
-      const region = (r.myRegion || "").trim();
-      const chapter = (r.myChapter || "").trim();
+      const region = (r.myRegion || r.referrerRegion || "").trim();
+      const chapter = (r.myChapter || r.referrerChapter || "").trim();
       if(!region) return;
-      regionData[region] = (regionData[region]||0) + 1;
+
+      // 90G2F check: memberType or is90G2FQualified
+      const type90 = ["90년생 사업가","글로벌 비즈니스 사업가","비즈니스 2세 경영자","프랜차이즈 경영자"];
+      const is90G2F = r.is90G2FQualified === true || r.is90G2FQualified === "true" || type90.includes(r.memberType);
+      const score = is90G2F ? 2 : 1;
+
+      regionData[region] = (regionData[region]||0) + score;
       if(!chaptersByRegion[region]) chaptersByRegion[region] = {};
-      if(chapter) chaptersByRegion[region][chapter] = (chaptersByRegion[region][chapter]||0) + 1;
+      if(chapter) chaptersByRegion[region][chapter] = (chaptersByRegion[region][chapter]||0) + score;
     });
     if(Object.keys(regionData).length === 0) throw new Error("Empty");
   } catch(e) {
@@ -3092,12 +3113,60 @@ function renderRightPanel(){
   const top5 = Object.entries(chapters).sort((a,b)=>b[1]-a[1]).slice(0,5);
   const maxVal = top5.length ? top5[0][1] : 1;
   document.getElementById("chaptersList").innerHTML = top5.map(([name,cnt])=>
-    '<div class="chapter-item"><div class="chapter-name">'+name+'</div><div class="chapter-bar-bg"><div class="chapter-bar-fill" style="width:'+(cnt/maxVal)*100+'%"></div></div><div class="chapter-count">'+cnt+'</div></div>'
+    '<div class="chapter-item" data-chapter="'+name+'"><div class="chapter-name">'+name+'</div><div class="chapter-bar-bg"><div class="chapter-bar-fill" style="width:'+(cnt/maxVal)*100+'%"></div></div><div class="chapter-count">'+cnt+'</div></div>'
   ).join("");
-  const names = ["SEO MIN-JI","KIM JI-YEON","PARK SUNG-HO","LEE HAE-WON","CHOI YUNA"];
-  const nameIdx = Math.abs(selectedRegion.charCodeAt(0)) % names.length;
-  document.getElementById("spotlightName").textContent = names[nameIdx];
-  document.getElementById("spotlightAvatar").textContent = names[nameIdx].charAt(0);
+  document.querySelectorAll(".chapter-item").forEach(el=>{
+    el.onclick = ()=> showChapterDetail(el.dataset.chapter);
+  });
+  // Remove old chapter detail if region changed
+  const oldDetail = document.getElementById("chapterDetail");
+  if(oldDetail) oldDetail.remove();
+}
+
+function showChapterDetail(chapterName){
+  const oldDetail = document.getElementById("chapterDetail");
+  if(oldDetail){
+    const wasOpen = oldDetail.dataset.chapter === chapterName;
+    oldDetail.remove();
+    if(wasOpen) return;
+  }
+
+  // Find all members in this chapter from rawRows
+  const type90 = ["90년생 사업가","글로벌 비즈니스 사업가","비즈니스 2세 경영자","프랜차이즈 경영자"];
+  const memberMap = {};
+  rawRows.forEach(r=>{
+    const ch = (r.referrerChapter || r.myChapter || "").trim();
+    const region = (r.referrerRegion || r.myRegion || "").trim();
+    if(ch !== chapterName) return;
+    if(region !== selectedRegion) return;
+    const name = (r.referrerName || r.myName || "").trim();
+    if(!name) return;
+    const is90G2F = r.is90G2FQualified === true || r.is90G2FQualified === "true" || type90.includes(r.memberType);
+    const score = is90G2F ? 2 : 1;
+    if(!memberMap[name]) memberMap[name] = {name:name, recruits:0, score:0};
+    memberMap[name].recruits++;
+    memberMap[name].score += score;
+  });
+
+  const members = Object.values(memberMap).sort((a,b)=> b.score - a.score || b.recruits - a.recruits);
+
+  const div = document.createElement("div");
+  div.id = "chapterDetail";
+  div.dataset.chapter = chapterName;
+  div.className = "chapter-detail";
+  let html = '<div class="chapter-detail-header"><div class="chapter-detail-title">'+chapterName+' 챕터 멤버별 현황</div><div class="chapter-detail-close" onclick="this.parentElement.parentElement.remove()">닫기 &times;</div></div>';
+  if(members.length){
+    members.forEach((m,i)=>{
+      html += '<div class="member-row"><div class="member-rank">'+(i+1)+'</div><div class="member-name">'+m.name+'</div><div class="member-recruits">'+m.recruits+'명</div><div class="member-score">'+m.score+'점</div></div>';
+    });
+  } else {
+    html += '<div style="font-size:12px;color:#555;padding:8px 0;">데이터 없음</div>';
+  }
+  div.innerHTML = html;
+
+  // Insert after chaptersList
+  const chaptersSection = document.querySelector(".chapters-section");
+  chaptersSection.parentNode.insertBefore(div, chaptersSection.nextSibling);
 }
 
 function updateTotals(){

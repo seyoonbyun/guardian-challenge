@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GUARDIAN - Challenge Awards</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hidden;height:100vh;width:100vw;}
+
+.topbar{height:46px;background:#111;border-bottom:1px solid #222;display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:100;position:relative;}
+.topbar .brand{display:flex;align-items:center;gap:10px;}
+.topbar .brand .icon{width:26px;height:26px;background:#c41a2e;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;}
+.topbar .brand span{font-weight:700;font-size:14px;letter-spacing:4px;color:#c41a2e;}
+.topbar nav{display:flex;gap:4px;position:absolute;left:50%;transform:translateX(-50%);}
+.topbar nav a{color:#555;text-decoration:none;font-size:10px;font-weight:600;letter-spacing:1.5px;padding:5px 12px;border-radius:3px;text-transform:uppercase;transition:all .2s;}
+.topbar nav a:hover{color:#999;}
+.topbar nav a.active{color:#ccc;background:rgba(255,255,255,0.05);}
+.topbar .clock{color:#555;font-size:11px;font-weight:500;letter-spacing:0.5px;}
+
+.main{display:flex;height:calc(100vh - 46px);}
+
+/* LEFT PANEL */
+.left-panel{width:380px;background:#111;border-right:1px solid #1a1a1a;display:flex;flex-direction:column;padding:32px 28px;overflow-y:auto;}
+.left-panel::-webkit-scrollbar{width:3px;}
+.left-panel::-webkit-scrollbar-track{background:transparent;}
+.left-panel::-webkit-scrollbar-thumb{background:#333;border-radius:2px;}
+.page-label{font-size:10px;font-weight:700;letter-spacing:3px;color:#c41a2e;text-transform:uppercase;margin-bottom:14px;}
+.page-title{font-size:32px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:16px;}
+.page-desc{font-size:13px;color:#555;line-height:1.8;margin-bottom:24px;}
+
+.event-period{padding:14px 16px;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:6px;margin-bottom:20px;}
+.event-period .ep-label{font-size:9px;font-weight:700;letter-spacing:2px;color:#444;text-transform:uppercase;margin-bottom:6px;}
+.event-period .ep-date{font-size:14px;color:#ccc;font-weight:600;}
+
+.scoring-box{padding:16px;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:6px;margin-bottom:20px;}
+.scoring-title{font-size:10px;font-weight:700;letter-spacing:2px;color:#444;text-transform:uppercase;margin-bottom:10px;}
+.scoring-item{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.scoring-item:last-child{margin-bottom:0;}
+.scoring-pts{font-size:20px;font-weight:800;color:#c41a2e;min-width:36px;text-align:center;}
+.scoring-desc{font-size:12px;color:#888;}
+
+.total-stats{display:flex;gap:12px;margin-bottom:20px;}
+.total-stat{flex:1;padding:14px;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:6px;text-align:center;}
+.total-stat .ts-num{font-size:28px;font-weight:800;color:#c41a2e;line-height:1;}
+.total-stat .ts-label{font-size:8px;font-weight:700;letter-spacing:1.5px;color:#555;text-transform:uppercase;margin-top:4px;}
+
+.visual-panel{flex:1;background:linear-gradient(135deg,#1a0a0a,#0a0a0a);border:1px solid #1a1a1a;border-radius:8px;overflow:hidden;position:relative;min-height:60px;}
+.visual-panel::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 3px,rgba(196,26,46,0.03) 3px,rgba(196,26,46,0.03) 4px);pointer-events:none;}
+.visual-panel::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 30%,rgba(0,0,0,0.6) 100%);pointer-events:none;}
+
+/* CONTENT */
+.content-area{flex:1;padding:32px 36px;overflow-y:auto;}
+.content-area::-webkit-scrollbar{width:3px;}
+.content-area::-webkit-scrollbar-track{background:transparent;}
+.content-area::-webkit-scrollbar-thumb{background:#333;border-radius:2px;}
+
+/* Award cards */
+.award-card{background:#111;border:1px solid #1a1a1a;border-radius:10px;padding:28px;margin-bottom:24px;transition:all .3s;}
+.award-card:hover{border-color:#222;transform:translateY(-2px);}
+.award-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.award-badge{display:flex;align-items:center;gap:10px;}
+.award-icon{width:44px;height:44px;background:rgba(196,26,46,0.1);border:1px solid rgba(196,26,46,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+.award-info{display:flex;flex-direction:column;}
+.award-category{font-size:9px;font-weight:700;letter-spacing:2px;color:#c41a2e;text-transform:uppercase;}
+.award-name{font-size:18px;font-weight:800;color:#fff;margin-top:2px;}
+.award-metric{text-align:right;}
+.award-metric .am-num{font-size:32px;font-weight:800;color:#c41a2e;line-height:1;}
+.award-metric .am-label{font-size:9px;color:#555;letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+
+/* Winner display */
+.winner-row{display:flex;align-items:center;gap:14px;padding:14px 16px;background:#0a0a0a;border-radius:6px;margin-bottom:8px;border-left:3px solid transparent;transition:all .2s;}
+.winner-row.gold{border-left-color:#ffd700;background:rgba(255,215,0,0.03);}
+.winner-row.silver{border-left-color:#c0c0c0;background:rgba(192,192,192,0.02);}
+.winner-row.bronze{border-left-color:#cd7f32;background:rgba(205,127,50,0.02);}
+.winner-rank{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;}
+.winner-row.gold .winner-rank{background:rgba(255,215,0,0.15);color:#ffd700;}
+.winner-row.silver .winner-rank{background:rgba(192,192,192,0.15);color:#c0c0c0;}
+.winner-row.bronze .winner-rank{background:rgba(205,127,50,0.15);color:#cd7f32;}
+.winner-info{flex:1;}
+.winner-name{font-size:14px;font-weight:700;color:#ddd;}
+.winner-detail{font-size:11px;color:#666;margin-top:2px;}
+.winner-score{text-align:right;}
+.winner-score .ws-num{font-size:18px;font-weight:800;color:#fff;}
+.winner-score .ws-label{font-size:8px;color:#555;letter-spacing:1px;text-transform:uppercase;}
+
+/* Loading */
+.loading{text-align:center;padding:40px;color:#555;font-size:13px;}
+.loading::after{content:"";display:inline-block;width:16px;height:16px;border:2px solid #333;border-top-color:#c41a2e;border-radius:50%;animation:spin .8s linear infinite;margin-left:8px;vertical-align:middle;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Empty state */
+.empty-state{text-align:center;padding:30px;color:#444;font-size:13px;}
+
+@media(max-width:900px){
+  body{overflow:auto;height:auto;}
+  .main{flex-direction:column;height:auto;}
+  .left-panel{width:100%;padding:24px 20px;}
+  .visual-panel{display:none;}
+  .content-area{padding:24px 20px;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><div class="icon">G</div><span>GUARDIAN</span></div>
+  <nav>
+        <a href="home.html">HOME</a>
+    <a href="invite.html">INVITE</a>
+    <a href="map-preview-svg.html">DASHBOARD</a>
+    <a href="challenge.html" class="active">AWARDS</a>
+  </nav>
+  <div class="clock" id="clock"></div>
+</div>
+
+<div class="main">
+  <div class="left-panel">
+    <div class="page-label">CHALLENGE AWARDS</div>
+    <div class="page-title">+1 Guardian<br>Leaderboard</div>
+    <div class="page-desc">실시간 챌린지 현황과 시상 내역을 확인하세요. 데이터는 자동으로 집계됩니다.</div>
+
+    <div class="event-period">
+      <div class="ep-label">EVENT PERIOD</div>
+      <div class="ep-date">2026.03.02 ~ 2026.12.31</div>
+    </div>
+
+    <div class="scoring-box">
+      <div class="scoring-title">SCORING</div>
+      <div class="scoring-item"><div class="scoring-pts">1</div><div class="scoring-desc">비지터를 멤버로 가입시킨 경우</div></div>
+      <div class="scoring-item"><div class="scoring-pts">2</div><div class="scoring-desc">90G2F 해당자를 멤버로 가입시킨 경우</div></div>
+    </div>
+
+    <div class="total-stats">
+      <div class="total-stat"><div class="ts-num" id="totalRecruits">0</div><div class="ts-label">TOTAL RECRUITS</div></div>
+      <div class="total-stat"><div class="ts-num" id="totalScore">0</div><div class="ts-label">TOTAL SCORE</div></div>
+      <div class="total-stat"><div class="ts-num" id="totalGuardians">0</div><div class="ts-label">GUARDIANS</div></div>
+    </div>
+
+  </div>
+
+  <div class="content-area">
+    <div style="text-align:center;margin-bottom:28px;">
+      <div style="font-size:15px;color:#c41a2e;font-weight:700;letter-spacing:2px;margin-bottom:8px;">현시점 +1 Guardian의 주인공 !!</div>
+      <div style="font-size:24px;font-weight:800;color:#fff;">최종 우승자는 누가될까요 ?? :)</div>
+    </div>
+    <div id="awardsContent"><div class="loading">데이터 로딩 중</div></div>
+    <div style="text-align:right;padding:16px 0 8px;font-size:9px;font-weight:700;letter-spacing:1.5px;color:#444;text-transform:uppercase;">Created by Joy Byun</div>
+  </div>
+</div>
+
+<script>
+function updateClock(){
+  const now = new Date();
+  const d = now.toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"});
+  const t = now.toLocaleTimeString("en-US",{hour12:false,hour:"2-digit",minute:"2-digit",second:"2-digit"});
+  document.getElementById("clock").textContent = d + " " + t;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+const API_URL = "https://script.google.com/macros/s/AKfycbyXXPPtJ-5T98hc63xxfLXtKqfvTK3YaUkxTyNjEbNofiWyAGf7N2GT6i4k1X2xDKUXEw/exec?action=getData";
+
+async function loadData(){
+  try {
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    const rows = data.data || data;
+    if(!rows || !rows.length) throw new Error("No data");
+    processData(rows);
+  } catch(e){
+    console.warn("API failed, using test data:", e);
+    processData(generateTestData());
+  }
+}
+
+function generateTestData(){
+  const names = ["김민수","이지현","박성호","최유나","정해원","한서진","오태호","윤지아","강민준","신예린","조승우","임하늘","배진우","류서현","황도윤"];
+  const chapters = ["시너지","미라클","미다스","피닉스","타이탄","알파","에이스","챔피언","레전드","프라임"];
+  const regions = ["강남","서초","마포","송파","성동","중구","영등포","대구","부산","수원","성남","고양","용인","화성","인천","천안","대전"];
+  const rows = [];
+  for(let i=0;i<60;i++){
+    const is90G2F = Math.random() > 0.6;
+    rows.push({
+      createdAt: new Date(2026, 2+Math.floor(Math.random()*9), 2+Math.floor(Math.random()*28)).toISOString(),
+      referrerName: names[Math.floor(Math.random()*names.length)],
+      referrerChapter: chapters[Math.floor(Math.random()*chapters.length)],
+      myRegion: regions[Math.floor(Math.random()*regions.length)],
+      referrerRegion: regions[Math.floor(Math.random()*regions.length)],
+      myChapter: chapters[Math.floor(Math.random()*chapters.length)],
+      newMemberName: "신규멤버" + (i+1),
+      joinedMember: "true",
+      is90G2FQualified: is90G2F ? "true" : "false",
+      score: is90G2F ? 2 : 1
+    });
+  }
+  return rows;
+}
+
+function processData(rows){
+  const EVENT_START = new Date("2026-03-02");
+  const EVENT_END = new Date("2026-12-31T23:59:59");
+
+  // Per-member stats
+  const memberStats = {};
+  // Per-chapter stats
+  const chapterStats = {};
+  let totalRecruits = 0;
+  let totalScoreSum = 0;
+
+  rows.forEach(r => {
+    // 90G2F check: new field or legacy memberType
+    const type90 = ["90년생 사업가","글로벌 비즈니스 사업가","비즈니스 2세 경영자","프랜차이즈 경영자"];
+    const is90G2F = r.is90G2FQualified === true || r.is90G2FQualified === "true" || type90.includes(r.memberType);
+    const score = r.score ? Number(r.score) : (is90G2F ? 2 : 1);
+    const referrer = (r.referrerName || r.myName || "").trim();
+    const chapter = (r.referrerChapter || r.myChapter || "").trim();
+    const region = (r.referrerRegion || r.myRegion || "").trim();
+    const createdAt = r.createdAt || r.timestamp || "";
+
+    if(!referrer) return;
+
+    totalRecruits++;
+    totalScoreSum += score;
+
+    // Member stats
+    if(!memberStats[referrer]){
+      memberStats[referrer] = {name:referrer, chapter:chapter, region:region, totalRecruits:0, totalScore:0, firstAt:createdAt};
+    }
+    memberStats[referrer].totalRecruits++;
+    memberStats[referrer].totalScore += score;
+    if(createdAt && createdAt < memberStats[referrer].firstAt) memberStats[referrer].firstAt = createdAt;
+
+    // Chapter stats
+    if(!chapterStats[chapter]){
+      chapterStats[chapter] = {name:chapter, region:region, guardians:new Set(), totalRecruits:0, totalScore:0};
+    }
+    chapterStats[chapter].guardians.add(referrer);
+    chapterStats[chapter].totalRecruits++;
+    chapterStats[chapter].totalScore += score;
+  });
+
+  const totalGuardians = Object.keys(memberStats).length;
+  document.getElementById("totalRecruits").textContent = totalRecruits;
+  document.getElementById("totalScore").textContent = totalScoreSum;
+  document.getElementById("totalGuardians").textContent = totalGuardians;
+
+  // 1. 최대 영입 멤버: totalScore desc > totalRecruits desc > firstAt asc
+  const memberRank = Object.values(memberStats).sort((a,b) => {
+    if(b.totalScore !== a.totalScore) return b.totalScore - a.totalScore;
+    if(b.totalRecruits !== a.totalRecruits) return b.totalRecruits - a.totalRecruits;
+    return (a.firstAt||"").localeCompare(b.firstAt||"");
+  });
+
+  // 2. 최대 영입율 챕터: guardians count desc
+  const chapterByGuardians = Object.values(chapterStats).sort((a,b) => b.guardians.size - a.guardians.size);
+
+  // 3. 최대 달성율 챕터: recruits / estimated members (use guardians*3 as proxy)
+  // Since we don't have total member count, use achievement = totalRecruits / guardians as rate
+  const chapterByRate = Object.values(chapterStats).sort((a,b) => {
+    const rateA = a.guardians.size > 0 ? a.totalRecruits / a.guardians.size : 0;
+    const rateB = b.guardians.size > 0 ? b.totalRecruits / b.guardians.size : 0;
+    return rateB - rateA;
+  });
+
+  renderAwards(memberRank, chapterByGuardians, chapterByRate);
+}
+
+function renderAwards(memberRank, chapterByGuardians, chapterByRate){
+  const container = document.getElementById("awardsContent");
+
+  // Helper: get tied winners (all entries matching rank 1's score)
+  function getTied(list, keyFn){
+    if(!list.length) return [];
+    const topVal = keyFn(list[0]);
+    return list.filter(item => keyFn(item) === topVal);
+  }
+
+  let html = "";
+
+  // Award 1: 최대 영입 멤버
+  const topMembers = getTied(memberRank, m => m.totalScore);
+  html += '<div class="award-card">';
+  html += '<div class="award-header"><div class="award-badge"><div class="award-icon">&#9733;</div><div class="award-info"><div class="award-category">TOP RECRUITER</div><div class="award-name">최대 영입 멤버</div></div></div>';
+  if(topMembers.length) html += '<div class="award-metric"><div class="am-num">'+topMembers[0].totalScore+'</div><div class="am-label">TOP SCORE</div></div>';
+  html += '</div>';
+  if(topMembers.length){
+    topMembers.forEach((m,i) => {
+      html += '<div class="winner-row gold"><div class="winner-rank">'+(i+1)+'</div><div class="winner-info"><div class="winner-name">'+m.name+'</div><div class="winner-detail">'+m.chapter+' &middot; '+m.totalRecruits+'명 영입</div></div><div class="winner-score"><div class="ws-num">'+m.totalScore+'</div><div class="ws-label">SCORE</div></div></div>';
+    });
+  } else { html += '<div class="empty-state">아직 데이터가 없습니다</div>'; }
+  html += '</div>';
+
+  // Award 2: 최대 영입율 챕터
+  const topGuardianChapters = getTied(chapterByGuardians, c => c.guardians.size);
+  html += '<div class="award-card">';
+  html += '<div class="award-header"><div class="award-badge"><div class="award-icon">&#9814;</div><div class="award-info"><div class="award-category">MOST GUARDIANS</div><div class="award-name">최대 영입율 챕터</div></div></div>';
+  if(topGuardianChapters.length) html += '<div class="award-metric"><div class="am-num">'+topGuardianChapters[0].guardians.size+'</div><div class="am-label">GUARDIANS</div></div>';
+  html += '</div>';
+  if(topGuardianChapters.length){
+    topGuardianChapters.forEach((c,i) => {
+      html += '<div class="winner-row gold"><div class="winner-rank">'+(i+1)+'</div><div class="winner-info"><div class="winner-name">'+c.name+'</div><div class="winner-detail">'+c.totalRecruits+'명 영입 &middot; '+c.totalScore+'점</div></div><div class="winner-score"><div class="ws-num">'+c.guardians.size+'</div><div class="ws-label">GUARDIANS</div></div></div>';
+    });
+  } else { html += '<div class="empty-state">아직 데이터가 없습니다</div>'; }
+  html += '</div>';
+
+  // Award 3: 최대 달성율 챕터
+  const getRateFn = c => c.guardians.size > 0 ? +(c.totalRecruits / c.guardians.size).toFixed(1) : 0;
+  const topRateChapters = getTied(chapterByRate, getRateFn);
+  html += '<div class="award-card">';
+  html += '<div class="award-header"><div class="award-badge"><div class="award-icon">&#9813;</div><div class="award-info"><div class="award-category">HIGHEST RATE</div><div class="award-name">최대 달성율 챕터</div></div></div>';
+  if(topRateChapters.length) html += '<div class="award-metric"><div class="am-num">'+getRateFn(topRateChapters[0])+'</div><div class="am-label">AVG RATE</div></div>';
+  html += '</div>';
+  if(topRateChapters.length){
+    topRateChapters.forEach((c,i) => {
+      html += '<div class="winner-row gold"><div class="winner-rank">'+(i+1)+'</div><div class="winner-info"><div class="winner-name">'+c.name+'</div><div class="winner-detail">'+c.guardians.size+'명 참여 &middot; '+c.totalRecruits+'명 영입</div></div><div class="winner-score"><div class="ws-num">'+getRateFn(c)+'</div><div class="ws-label">PER PERSON</div></div></div>';
+    });
+  } else { html += '<div class="empty-state">아직 데이터가 없습니다</div>'; }
+  html += '</div>';
+
+  container.innerHTML = html;
+}
+
+loadData();
+</script>
+</body>
+</html>
