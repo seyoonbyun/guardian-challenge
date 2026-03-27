@@ -255,6 +255,33 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
   .right-region-name{font-size:20px;}
   .right-big-number .num{font-size:28px;}
 }
+
+/* ── Detail Modal Mobile ── */
+@media(max-width:1024px){
+  .detail-content{width:100vw;height:100vh;max-width:none;border-radius:0;border:none;}
+  .detail-body{flex-direction:column;}
+  .detail-map{flex:1;min-height:0;}
+  .detail-map svg{height:auto !important;width:92% !important;max-height:100%;}
+  .detail-map::after{display:none;}
+  .detail-info{width:100%;border-left:none;border-top:1px solid #222;padding:12px 16px;overflow-y:auto;max-height:35vh;flex-shrink:0;}
+  .detail-info .di-region{font-size:16px;}
+  .detail-info .di-count{font-size:28px;}
+  .detail-info .di-label{font-size:10px;}
+  .detail-info .di-section-title{font-size:11px;}
+  .di-list-item .di-name{font-size:13px;}
+  .detail-header{padding:10px 16px;}
+  .detail-title{font-size:15px;}
+  .marker-group .label{font-size:11px;}
+  .marker-group .count{font-size:16px;}
+}
+@media(max-width:480px){
+  .detail-map svg{width:96% !important;}
+  .detail-info{max-height:30vh;padding:10px 14px;}
+  .detail-info .di-count{font-size:24px;}
+  .marker-group .label{font-size:10px;}
+  .marker-group .count{font-size:14px;}
+  .marker-group .dot{width:7px;height:7px;}
+}
 </style>
 </head>
 <body>
