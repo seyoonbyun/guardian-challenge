@@ -77,15 +77,25 @@ select.form-input option{background:#111;color:#fff;}
 .toast.error{border-color:#c41a2e;}
 
 /* Mobile */
-@media(max-width:900px){
+.hamburger{display:none;background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:4px;}
+@media(max-width:1024px){
   body{overflow:auto;height:auto;}
+  .topbar{padding:0 14px;}
+  .topbar .brand span{font-size:11px;letter-spacing:2px;}
+  .topbar nav{position:absolute;top:46px;left:0;right:0;transform:none;background:#111;border-bottom:1px solid #222;flex-direction:row;align-items:center;justify-content:center;gap:0;z-index:999;display:none;padding:8px 12px;}
+  .topbar nav.open{display:flex;}
+  .topbar nav a{font-size:10px;padding:10px 0;flex:1;text-align:center;border-radius:0;}
+  .topbar .clock{display:none;}
+  .hamburger{display:block;}
   .main{flex-direction:column;height:auto;}
   .left-panel{width:100%;padding:24px 20px;}
-  .visual-panel{display:none;}
   .page-title{font-size:26px;}
   .form-area{flex-direction:column;}
   .form-col{padding:24px 20px;}
   .form-col:first-child{border-right:none;border-bottom:1px solid #1a1a1a;}
+}
+@media(max-width:480px){
+  .topbar nav a{font-size:9px;padding:8px 8px;}
 }
 </style>
 </head>
@@ -93,6 +103,7 @@ select.form-input option{background:#111;color:#fff;}
 
 <div class="topbar">
   <div class="brand"><div class="icon">G</div><span>GUARDIAN</span></div>
+  <button class="hamburger" onclick="document.querySelector('.topbar nav').classList.toggle('open')">&#9776;</button>
   <nav>
         <a href="home.html">HOME</a>
     <a href="invite.html" class="active">INVITE</a>

@@ -191,12 +191,77 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .di-list-item .di-name{flex:1;font-size:15px;color:#bbb;}
 .di-list-item.active .di-name{color:#fff;}
 .di-list-item .di-cnt{font-size:14px;color:#666;font-weight:600;}
+
+/* Mobile hamburger */
+.hamburger{display:none;background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:4px;}
+
+/* MOBILE */
+@media(max-width:1024px){
+  body{overflow:auto;height:auto;}
+  .topbar{padding:0 14px;}
+  .topbar .brand span{font-size:11px;letter-spacing:2px;}
+  .topbar nav{position:absolute;top:46px;left:0;right:0;transform:none;background:#111;border-bottom:1px solid #222;flex-direction:row;align-items:center;justify-content:center;gap:0;z-index:999;display:none;padding:8px 12px;}
+  .topbar nav.open{display:flex;}
+  .topbar nav a{font-size:10px;padding:10px 0;flex:1;text-align:center;border-radius:0;}
+  .topbar .clock{display:none;}
+  .hamburger{display:block;}
+
+  .main{flex-direction:column;height:auto;}
+  .sidebar-left{width:100%;border-right:none;border-bottom:1px solid #1a1a1a;padding:12px;max-height:none;}
+  .profile-card{padding:10px 12px;}
+  .profile-name{font-size:13px;}
+  .profile-sub{font-size:9px;}
+  .tab-btn{padding:10px 0;font-size:11px;}
+  .section-header{padding:10px 12px 6px;font-size:10px;}
+  .region-list{padding:0 8px 0;overflow:hidden;max-height:none;}
+  .region-list.expanded{overflow-y:auto;max-height:300px;}
+  .region-toggle{display:block;text-align:center;padding:6px;font-size:10px;color:#555;cursor:pointer;border-top:1px solid #1a1a1a;letter-spacing:1px;}
+  .region-item{padding:8px 10px;}
+  .region-name{font-size:13px;}
+  .deploy-btn{display:none;}
+
+  .map-center{height:80vh;flex:none;}
+  .map-area{height:calc(80vh - 70px);}
+  .map-svg-wrap svg{height:95%;width:auto;transform:none !important;}
+  .bottom-stats{height:auto;padding:12px 0;gap:30px;flex-wrap:wrap;}
+  .stat-big .val{font-size:24px;}
+  .stat-big .label{font-size:8px;}
+
+  /* Hide info boxes on mobile, show simple markers */
+  .info-box{display:none !important;}
+  .connector-line{display:none !important;}
+  .map-pin{display:none !important;}
+  .map-area::after{display:none;}
+
+  .sidebar-right{width:100%;border-left:none;border-top:1px solid #1a1a1a;overflow-y:visible;}
+  .right-header{padding:14px 16px 4px;font-size:10px;}
+  .right-region-name{padding:0 16px;font-size:24px;}
+  .right-big-number{padding:10px 16px 0;}
+  .right-big-number .num{font-size:36px;}
+  .quota-section{padding:14px 16px 0;}
+  .chapters-section{padding:14px 16px 0;}
+  .chapter-name{font-size:12px;width:60px;}
+  .chapter-count{font-size:11px;}
+  .spotlight-section{padding:12px 16px;}
+
+  .zoom-controls{display:none;}
+}
+
+@media(max-width:480px){
+  .topbar nav a{font-size:9px;padding:8px 8px;}
+  .region-list{max-height:150px;}
+  .map-center{height:75vh;}
+  .map-area{height:calc(75vh - 70px);}
+  .right-region-name{font-size:20px;}
+  .right-big-number .num{font-size:28px;}
+}
 </style>
 </head>
 <body>
 
 <div class="topbar">
   <div class="brand"><div class="icon">G</div><span>GUARDIAN</span></div>
+  <button class="hamburger" onclick="document.querySelector('.topbar nav').classList.toggle('open')">&#9776;</button>
   <nav>
         <a href="home.html">HOME</a>
     <a href="invite.html">INVITE</a>
@@ -2998,10 +3063,43 @@ function renderRegionList(){
     return !REGIONAL_CITIES.includes(name);
   });
   const sorted = filtered.sort((a,b)=>b[1]-a[1]);
-  list.innerHTML = sorted.map(([name, count])=>{
+  const isMobile = window.innerWidth <= 1024;
+  const displayItems = isMobile ? sorted.slice(0,3) : sorted;
+  list.innerHTML = displayItems.map(([name, count])=>{
     const ac = name===selectedRegion?" active":"";
     return '<div class="region-item'+ac+'" data-rg="'+name+'"><div class="region-dot"></div><div class="region-name">'+name+'</div><div class="region-count">'+count+'</div></div>';
   }).join("");
+  // Mobile: add toggle to show all
+  if(isMobile && sorted.length > 3){
+    const toggle = document.createElement("div");
+    toggle.className = "region-toggle";
+    toggle.textContent = "더보기 ▼ (" + sorted.length + ")";
+    toggle.onclick = function(){
+      if(list.dataset.expanded === "true"){
+        list.dataset.expanded = "false";
+        list.innerHTML = "";
+        sorted.slice(0,3).forEach(([name,count])=>{
+          const ac = name===selectedRegion?" active":"";
+          list.innerHTML += '<div class="region-item'+ac+'" data-rg="'+name+'"><div class="region-dot"></div><div class="region-name">'+name+'</div><div class="region-count">'+count+'</div></div>';
+        });
+        list.appendChild(toggle);
+        toggle.textContent = "더보기 ▼ (" + sorted.length + ")";
+      } else {
+        list.dataset.expanded = "true";
+        list.innerHTML = "";
+        sorted.forEach(([name,count])=>{
+          const ac = name===selectedRegion?" active":"";
+          list.innerHTML += '<div class="region-item'+ac+'" data-rg="'+name+'"><div class="region-dot"></div><div class="region-name">'+name+'</div><div class="region-count">'+count+'</div></div>';
+        });
+        list.appendChild(toggle);
+        toggle.textContent = "접기 ▲";
+      }
+      list.querySelectorAll(".region-item").forEach(el=>{
+        el.onclick = ()=> selectRegion(el.dataset.rg);
+      });
+    };
+    list.appendChild(toggle);
+  }
   list.querySelectorAll(".region-item").forEach(el=>{
     el.onclick = ()=> selectRegion(el.dataset.rg);
   });
