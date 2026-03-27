@@ -330,9 +330,10 @@ function submitForm(){
   document.body.appendChild(iframe);
 
   const scoreMsg = score === 2 ? "2점 (90G2F 해당)" : score === 1 ? "1점" : "0점";
-  showToast("정보가 성공적으로 기록되었습니다! 점수: " + scoreMsg, "success");
+  showToast("정보가 성공적으로 기록되었습니다! 점수: " + scoreMsg + " | 대시보드로 이동합니다.", "success");
   form.reset();
   setTimeout(()=>{ if(document.body.contains(iframe)) document.body.removeChild(iframe); }, 1000);
+  setTimeout(()=>{ window.location.href = "/dashboard"; }, 2000);
   btn.disabled = false;
   btn.innerHTML = '정보 저장 <span class="arrow">&rarr;</span>';
 }
