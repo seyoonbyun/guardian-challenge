@@ -51,15 +51,16 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .map-center{flex:1;display:flex;flex-direction:column;position:relative;background:#0a0a0a;}
 .map-area{flex:1;position:relative;overflow:hidden;}
 .dot-grid{position:absolute;inset:0;background-image:radial-gradient(circle,#1a1a1a 1px,transparent 1px);background-size:24px 24px;opacity:0.5;}
+.map-area::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,0.6) 100%);pointer-events:none;z-index:1;}
 .scan-line{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(196,26,46,0.15),transparent);animation:scanMove 6s linear infinite;z-index:5;pointer-events:none;}
 @keyframes scanMove{0%{top:0;}100%{top:100%;}}
 .map-svg-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
-.map-svg-wrap svg{height:88%;width:auto;transition:transform .2s;}
-.province{fill:#1e1e1e;stroke:#333;stroke-width:1.5;transition:fill .2s, stroke .2s;cursor:pointer;}
-.province:hover{fill:#2a2a2a;}
-.province.highlight{fill:#2a1015;stroke:#c41a2e;stroke-width:3;filter:drop-shadow(0 0 8px rgba(196,26,46,0.8)) drop-shadow(0 0 16px rgba(196,26,46,0.5));}
+.map-svg-wrap svg{height:88%;width:auto;transition:transform .2s;filter:drop-shadow(4px 8px 16px rgba(0,0,0,0.8)) drop-shadow(0 0 40px rgba(196,26,46,0.08));}
+.province{fill:#1e1e1e;stroke:#555;stroke-width:1.5;transition:all .25s;cursor:pointer;filter:drop-shadow(2px 3px 3px rgba(0,0,0,0.5));}
+.province:hover{fill:#2d2d2d;stroke:#666;filter:drop-shadow(3px 5px 8px rgba(0,0,0,0.7)) drop-shadow(0 0 6px rgba(255,255,255,0.05));transform:translateY(-1px);}
+.province.highlight{fill:#2a1015;stroke:#c41a2e;stroke-width:3;filter:drop-shadow(0 0 12px rgba(196,26,46,0.9)) drop-shadow(0 0 24px rgba(196,26,46,0.5)) drop-shadow(0 0 40px rgba(196,26,46,0.3));}
 .province.has-detail{cursor:pointer;}
-.province.has-detail:hover{fill:#1a2a1a;stroke:#4a4;}
+.province.has-detail:hover{fill:#1a2a1a;stroke:#5b5;filter:drop-shadow(3px 5px 8px rgba(0,0,0,0.7)) drop-shadow(0 0 8px rgba(74,170,74,0.3));}
 
 .marker-overlay{position:absolute;inset:0;pointer-events:none;}
 /* Map dot (on-map pin) */
@@ -146,8 +147,10 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .detail-close:hover{background:#333;color:#fff;}
 .detail-body{flex:1;display:flex;position:relative;overflow:hidden;}
 .detail-map{flex:1;position:relative;display:flex;align-items:center;justify-content:center;}
-.detail-map svg{height:85%;width:auto;}
-.district{fill:#1e1e1e;stroke:#333;stroke-width:1.5;transition:fill .15s, stroke .15s;cursor:pointer;}
+.detail-map::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,0.6) 100%);pointer-events:none;z-index:1;}
+.detail-map svg{height:85%;width:auto;filter:drop-shadow(4px 8px 16px rgba(0,0,0,0.8)) drop-shadow(0 0 40px rgba(196,26,46,0.08));}
+.district{fill:#1e1e1e;stroke:#555;stroke-width:1.5;transition:all .25s;cursor:pointer;filter:drop-shadow(2px 3px 3px rgba(0,0,0,0.5));}
+.district:hover{fill:#2d2d2d;stroke:#666;filter:drop-shadow(3px 5px 8px rgba(0,0,0,0.7)) drop-shadow(0 0 6px rgba(255,255,255,0.05));}
 .district:hover{fill:#2a2a2a;}
 .district.highlight{fill:#2a1015 !important;stroke:#c41a2e !important;stroke-width:2 !important;filter:drop-shadow(0 0 8px rgba(196,26,46,0.8)) drop-shadow(0 0 16px rgba(196,26,46,0.5));}
 #detailSvg .district.highlight{stroke-width:6 !important;filter:drop-shadow(0 0 8px rgba(196,26,46,0.8)) drop-shadow(0 0 16px rgba(196,26,46,0.5)) !important;}
@@ -2849,6 +2852,8 @@ let regionData = {};
 let chaptersByRegion = {};
 let selectedRegion = "송파";
 let zoomLevel = 1;
+let panX = 0, panY = 0;
+let isPanning = false, panStartX = 0, panStartY = 0;
 let detailSelectedCity = null;
 let activeTab = "regional";
 const REGIONAL_CITIES = ["마포","서초","영등포","대구","수원","성남"];
@@ -3109,14 +3114,57 @@ function selectRegion(name){
 
 function zoomIn(){
   zoomLevel = Math.min(zoomLevel * 1.2, 3);
-  document.querySelector(".map-svg-wrap svg").style.transform = "scale("+zoomLevel+")";
-  setTimeout(renderMarkers, 50);
+  applyZoom();
 }
 function zoomOut(){
   zoomLevel = Math.max(zoomLevel / 1.2, 0.5);
-  document.querySelector(".map-svg-wrap svg").style.transform = "scale("+zoomLevel+")";
-  setTimeout(renderMarkers, 50);
+  applyZoom();
 }
+function applyZoom(){
+  const svgEl = document.querySelector(".map-svg-wrap svg");
+  if(zoomLevel <= 1){ panX = 0; panY = 0; }
+  svgEl.style.transform = "scale("+zoomLevel+") translate("+panX+"px,"+panY+"px)";
+  svgEl.addEventListener("transitionend", function handler(){
+    svgEl.removeEventListener("transitionend", handler);
+    renderMarkers();
+  });
+  setTimeout(renderMarkers, 250);
+}
+
+// Scroll zoom
+document.querySelector(".map-area").addEventListener("wheel", function(e){
+  e.preventDefault();
+  if(e.deltaY < 0) zoomLevel = Math.min(zoomLevel * 1.1, 3);
+  else zoomLevel = Math.max(zoomLevel / 1.1, 0.5);
+  applyZoom();
+}, {passive:false});
+
+// Drag to pan
+const mapArea = document.querySelector(".map-area");
+mapArea.addEventListener("mousedown", function(e){
+  if(zoomLevel <= 1) return;
+  isPanning = true;
+  panStartX = e.clientX - panX * zoomLevel;
+  panStartY = e.clientY - panY * zoomLevel;
+  mapArea.style.cursor = "grabbing";
+  e.preventDefault();
+});
+window.addEventListener("mousemove", function(e){
+  if(!isPanning) return;
+  panX = (e.clientX - panStartX) / zoomLevel;
+  panY = (e.clientY - panStartY) / zoomLevel;
+  const svgEl = document.querySelector(".map-svg-wrap svg");
+  svgEl.style.transition = "none";
+  svgEl.style.transform = "scale("+zoomLevel+") translate("+panX+"px,"+panY+"px)";
+  renderMarkers();
+});
+window.addEventListener("mouseup", function(){
+  if(!isPanning) return;
+  isPanning = false;
+  mapArea.style.cursor = "";
+  const svgEl = document.querySelector(".map-svg-wrap svg");
+  svgEl.style.transition = "transform .2s";
+});
 
 document.getElementById("tabNational").onclick = function(){
   activeTab = "national";
