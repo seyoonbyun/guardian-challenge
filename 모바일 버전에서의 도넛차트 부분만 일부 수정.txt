@@ -1,0 +1,28 @@
+모바일 버전에서의 도넛차트 부분만 일부 수정했어, 아래와 같이, 
+아래 수정된 코드를 기존 코드에서 찾아서 대체해서 전체 수정된 코드를 제공해줘
+
+<!-- 모바일 도넛차트 수정된 CSS -->
+<style>
+/* 도넛차트 컨테이너 수정 */
+.chart-container.donut-container {
+    height: auto;
+    min-height: 320px;
+    overflow: visible;
+}
+
+/* 모바일에서 */
+@media (max-width: 768px) {
+    .chart-container.donut-container {
+        min-height: 340px;
+        padding-bottom: 10px;
+    }
+}
+
+/* 작은 모바일에서 */
+@media (max-width: 480px) {
+    .chart-container.donut-container {
+        min-height: 380px;
+        padding-bottom: 15px;
+    }
+}
+</style>

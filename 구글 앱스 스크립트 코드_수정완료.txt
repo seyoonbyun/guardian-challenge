@@ -1,0 +1,188 @@
+// 구글 앱스 스크립트 코드 (구글 시트 구조에 맞게 수정)
+// 이 코드를 구글 앱스 스크립트에 복사하여 사용하세요
+
+function doGet(e) {
+  try {
+    // 스프레드시트 연결
+    const sheet = SpreadsheetApp.getActiveSheet();
+    
+    // 현재 시간
+    const timestamp = new Date();
+    
+    // 파라미터에서 데이터 추출
+    const data = {
+      timestamp: timestamp,
+      myRegion: e.parameter.myRegion || '',
+      myChapter: e.parameter.myChapter || '',
+      myName: e.parameter.myName || '',
+      myContact: e.parameter.myContact || '',
+      newMemberName: e.parameter.newMemberName || '',
+      newMemberChapter: e.parameter.newMemberChapter || '',
+      memberType: e.parameter.memberType || '',
+      // 상금 관련 데이터
+      regionType: e.parameter.regionType || '',
+      rewardAmount: e.parameter.rewardAmount || 0,
+      rewardRate: e.parameter.rewardRate || '0%',
+      membershipFee: e.parameter.membershipFee || 1760000
+    };
+    
+    // 구글 시트의 실제 컬럼 구조에 맞게 데이터 배열 생성
+    // A: 타임스탬프, B: 내 지역명, C: 내 챕터명, D: 내 멤버명, E: 내 연락처, F: 신규 멤버 성함, G: 입회 챕터, H: 90G2F, I: 상금
+    const rowData = [
+      data.timestamp,           // A열: 타임스탬프
+      data.myRegion,            // B열: 내 지역명
+      data.myChapter,           // C열: 내 챕터명
+      data.myName,              // D열: 내 멤버명
+      data.myContact,           // E열: 내 연락처
+      data.newMemberName,       // F열: 신규 멤버 성함
+      data.newMemberChapter,    // G열: 입회 챕터
+      data.memberType,          // H열: 90G2F
+      data.rewardAmount         // I열: 상금 (계산된 금액)
+    ];
+    
+    // 시트에 데이터 추가
+    sheet.appendRow(rowData);
+    
+    // 성공 응답
+    return ContentService
+      .createTextOutput(JSON.stringify({
+        success: true, 
+        message: '데이터가 성공적으로 저장되었습니다.',
+        rewardAmount: data.rewardAmount,
+        regionType: data.regionType
+      }))
+      .setMimeType(ContentService.MimeType.JSON);
+      
+  } catch (error) {
+    // 오류 응답
+    return ContentService
+      .createTextOutput(JSON.stringify({success: false, message: '오류가 발생했습니다: ' + error.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+// 데이터 조회 함수 (대시보드용)
+function getData() {
+  try {
+    const sheet = SpreadsheetApp.getActiveSheet();
+    const data = sheet.getDataRange().getValues();
+    
+    // 헤더 제거하고 데이터만 반환
+    const headers = data[0];
+    const rows = data.slice(1);
+    
+    // 데이터를 객체 배열로 변환
+    const result = rows.map(row => {
+      const obj = {};
+      headers.forEach((header, index) => {
+        obj[header] = row[index];
+      });
+      return obj;
+    });
+    
+    return ContentService
+      .createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+      
+  } catch (error) {
+    return ContentService
+      .createTextOutput(JSON.stringify({error: error.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+// 총 상금 계산 함수 (I열 기준)
+function calculateTotalReward() {
+  try {
+    const sheet = SpreadsheetApp.getActiveSheet();
+    const data = sheet.getDataRange().getValues();
+    
+    let totalReward = 0;
+    let directMembers = 0;
+    let regionalMembers = 0;
+    
+    // 헤더 제외하고 데이터 처리 (I열 = 인덱스 8)
+    for (let i = 1; i < data.length; i++) {
+      const rewardAmount = parseFloat(data[i][8]) || 0; // I열: 상금
+      const region = data[i][1]; // B열: 내 지역명
+      
+      totalReward += rewardAmount;
+      
+      // 직영 지역 판별
+      const directRegions = ['대전', '강남', '인천', '송파', '부산', '고양', '용인', '성동', '중구'];
+      if (directRegions.includes(region)) {
+        directMembers++;
+      } else {
+        regionalMembers++;
+      }
+    }
+    
+    return {
+      totalReward: totalReward,
+      directMembers: directMembers,
+      regionalMembers: regionalMembers,
+      directReward: directMembers * 176000, // 17.6만원
+      regionalReward: regionalMembers * 140800 // 14.08만원
+    };
+    
+  } catch (error) {
+    return {error: error.toString()};
+  }
+}
+
+// 상금 통계 조회 함수
+function getRewardStats() {
+  try {
+    const stats = calculateTotalReward();
+    return ContentService
+      .createTextOutput(JSON.stringify(stats))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    return ContentService
+      .createTextOutput(JSON.stringify({error: error.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+// 기존 데이터에 상금 정보 추가하는 함수 (한 번만 실행)
+function updateExistingDataWithRewards() {
+  try {
+    const sheet = SpreadsheetApp.getActiveSheet();
+    const data = sheet.getDataRange().getValues();
+    
+    // 직영 지역 목록
+    const directRegions = ['대전', '강남', '인천', '송파', '부산', '고양', '용인', '성동', '중구'];
+    const membershipFee = 1760000;
+    const directRewardRate = 0.1; // 10%
+    const regionalRewardRate = 0.8 * 0.1; // 8%
+    
+    // 헤더 제외하고 데이터 처리
+    for (let i = 1; i < data.length; i++) {
+      const region = data[i][1]; // B열: 내 지역명
+      const currentReward = data[i][8]; // I열: 상금
+      
+      // 상금이 비어있거나 0인 경우에만 계산
+      if (!currentReward || currentReward === 0 || currentReward === '') {
+        let rewardAmount = 0;
+        
+        if (directRegions.includes(region)) {
+          rewardAmount = membershipFee * directRewardRate; // 176,000원
+        } else {
+          rewardAmount = membershipFee * regionalRewardRate; // 140,800원
+        }
+        
+        // I열에 상금 정보 업데이트
+        sheet.getRange(i + 1, 9).setValue(rewardAmount);
+      }
+    }
+    
+    return ContentService
+      .createTextOutput(JSON.stringify({success: true, message: '기존 데이터에 상금 정보가 추가되었습니다.'}))
+      .setMimeType(ContentService.MimeType.JSON);
+      
+  } catch (error) {
+    return ContentService
+      .createTextOutput(JSON.stringify({success: false, message: '오류가 발생했습니다: ' + error.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}

@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>리더 포럼 스탬프 카드</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f3e7fc 0%, #e7e7fc 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 헤더 */
+        .header {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            border-radius: 10px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #7c3aed;
+            border-radius: 50%;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-details {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 18px;
+        }
+
+        .user-meta {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        /* 스탬프 카드 */
+        .stamp-card {
+            background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+            border-radius: 20px;
+            padding: 30px;
+            color: white;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(124, 58, 237, 0.3);
+        }
+
+        .stamp-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .stamp-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stamp-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+
+        .participant-id {
+            text-align: right;
+        }
+
+        .participant-id-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .participant-id-value {
+            font-size: 20px;
+            font-weight: bold;
+            font-family: monospace;
+        }
+
+        .stamps-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stamp-slot {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all 0.3s;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+        }
+
+        .stamp-slot.stamped {
+            background: white;
+            border: none;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stamp-slot.stamped::after {
+            content: '✓';
+            color: #7c3aed;
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .stamp-slot:not(.stamped) span {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+        }
+
+        .progress-section {
+            background: rgba(124, 58, 237, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .progress-label {
+            font-size: 14px;
+        }
+
+        .progress-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(124, 58, 237, 0.3);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: white;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-message {
+            margin-top: 10px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* 액션 버튼 */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .action-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 16px;
+        }
+
+        .btn-scan {
+            background: #7c3aed;
+            color: white;
+        }
+
+        .btn-scan:hover {
+            background: #6d28d9;
+            transform: translateY(-2px);
+        }
+
+        .btn-history {
+            background: white;
+            color: #374151;
+            border: 2px solid #e5e7eb;
+        }
+
+        .btn-history:hover {
+            background: #f9fafb;
+        }
+
+        /* 세션 알림 */
+        .session-alert {
+            background: #dbeafe;
+            border: 1px solid #93c5fd;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .session-alert-title {
+            color: #1e40af;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .session-info {
+            color: #1976d2;
+            font-size: 14px;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .stamps-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .stamp-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .participant-id {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 헤더 -->
+        <div class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="dots">
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
+                    <span style="font-weight: bold; color: #7c3aed;">Leader Forum</span>
+                </div>
+                <div class="user-info">
+                    <div class="user-details">
+                        <div class="user-name" id="userName">김민수</div>
+                        <div class="user-meta" id="userMeta">서울 • 강남 • 내셔널 트레이너 포럼</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 세션 알림 -->
+        <div class="session-alert">
+            <div class="session-alert-title">
+                ⚠️ 다음 세션 안내
+            </div>
+            <div class="session-info">
+                <strong>Session 7 - 비지터 호스트 마스터</strong><br>
+                2025-09-14 09:00 - 10:30<br>
+                📍 Hall B
+            </div>
+        </div>
+
+        <!-- 스탬프 카드 -->
+        <div class="stamp-card">
+            <div class="stamp-header">
+                <div>
+                    <div class="stamp-title">나의 스탬프 카드</div>
+                    <div class="stamp-subtitle">리더 포럼 2025 (6개월 텀)</div>
+                </div>
+                <div class="participant-id">
+                    <div class="participant-id-label">참가 번호</div>
+                    <div class="participant-id-value" id="participantId">U001</div>
+                </div>
+            </div>
+
+            <div class="stamps-grid" id="stampsGrid">
+                <!-- 스탬프 슬롯들이 동적으로 생성됨 -->
+            </div>
+
+            <div class="progress-section">
+                <div class="progress-info">
+                    <span class="progress-label">진행률</span>
+                    <span class="progress-value" id="progressValue">6/12</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 50%"></div>
+                </div>
+                <div class="progress-message" id="progressMessage">
+                    6개 더 모으면 수료증을 받을 수 있습니다!
+                </div>
+            </div>
+        </div>
+
+        <!-- 액션 버튼 -->
+        <div class="action-buttons">
+            <button class="action-btn btn-scan" onclick="openQRScanner()">
+                📷 QR 코드 스캔
+            </button>
+            <button class="action-btn btn-history" onclick="showHistory()">
+                📋 출석 내역
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 스탬프 데이터
+        let currentUser = {
+            id: 'U001',
+            name: '김민수',
+            region: '서울',
+            chapter: '강남',
+            className: '내셔널 트레이너 포럼',
+            stamps: [true, true, true, true, true, true, false, false, false, false, false, false]
+        };
+
+        // 스탬프 표시 업데이트
+        function updateStampDisplay() {
+            const stampsGrid = document.getElementById('stampsGrid');
+            stampsGrid.innerHTML = '';
+            
+            let stampCount = 0;
+            currentUser.stamps.forEach((stamped, index) => {
+                const slot = document.createElement('div');
+                slot.className = `stamp-slot ${stamped ? 'stamped' : ''}`;
+                if (!stamped) {
+                    slot.innerHTML = `<span>${index + 1}</span>`;
+                }
+                stampsGrid.appendChild(slot);
+                if (stamped) stampCount++;
+            });
+            
+            // 진행률 업데이트
+            const progress = (stampCount / 12) * 100;
+            document.getElementById('progressValue').textContent = `${stampCount}/12`;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+            
+            const remaining = 12 - stampCount;
+            document.getElementById('progressMessage').textContent = 
+                remaining > 0 
+                    ? `${remaining}개 더 모으면 수료증을 받을 수 있습니다!`
+                    : '축하합니다! 모든 세션을 완료했습니다!';
+        }
+
+        // QR 스캐너 시뮬레이션
+        function openQRScanner() {
+            alert('QR 코드 스캔 기능이 활성화되었습니다!\n\n스캔을 시뮬레이션합니다...');
+            
+            setTimeout(() => {
+                const stampCount = currentUser.stamps.filter(s => s).length;
+                if (stampCount < 12) {
+                    const nextEmpty = currentUser.stamps.findIndex(s => !s);
+                    if (nextEmpty !== -1) {
+                        currentUser.stamps[nextEmpty] = true;
+                        updateStampDisplay();
+                        alert('✅ 출석 체크 완료!');
+                    }
+                } else {
+                    alert('🎉 모든 스탬프를 완료했습니다!');
+                }
+            }, 2000);
+        }
+
+        // 출석 내역 표시
+        function showHistory() {
+            const stampCount = currentUser.stamps.filter(s => s).length;
+            const completedSessions = [];
+            const remainingSessions = [];
+            
+            currentUser.stamps.forEach((stamped, index) => {
+                if (stamped) {
+                    completedSessions.push(`Session ${index + 1}`);
+                } else {
+                    remainingSessions.push(`Session ${index + 1}`);
+                }
+            });
+            
+            let message = `📊 ${currentUser.name}님의 출석 현황\n\n`;
+            message += `✅ 완료된 세션 (${completedSessions.length}개):\n`;
+            message += completedSessions.join(', ') + '\n\n';
+            message += `⏳ 남은 세션 (${remainingSessions.length}개):\n`;
+            message += remainingSessions.join(', ');
+            
+            alert(message);
+        }
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStampDisplay();
+        });
+    </script>
+</body>
+</html>
