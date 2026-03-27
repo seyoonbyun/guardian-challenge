@@ -1,7 +1,7 @@
 import os
 
-b64_path = os.path.join(os.path.dirname(__file__), 'korea3_b64_clean.txt')
-out_path = os.path.join(os.path.dirname(__file__), 'map-preview.html')
+b64_path = os.path.join(os.path.dirname(__file__), 'seoul3_b64_clean.txt')
+out_path = os.path.join(os.path.dirname(__file__), 'seoul-map-preview.html')
 
 with open(b64_path, 'r') as f:
     b64 = f.read().strip().replace('\r','').replace('\n','')
@@ -11,7 +11,7 @@ part1 = r'''<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GUARDIAN - Regional Performance Map</title>
+<title>GUARDIAN - Seoul Detailed Map</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Segoe UI',sans-serif;background:#0a0a0a;color:#fff;overflow:hidden;height:100vh;width:100vw;}
@@ -59,7 +59,9 @@ body{font-family:'Segoe UI',sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .region-count{font-size:10px;color:#666;font-weight:600;background:#1a1a1a;padding:1px 7px;border-radius:8px;min-width:24px;text-align:center;}
 .region-item.active .region-count{background:rgba(196,26,46,0.2);color:#e88;}
 
-.deploy-btn{margin:10px 12px;padding:10px;background:#c41a2e;color:#fff;border:none;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:2px;cursor:pointer;text-transform:uppercase;transition:all .2s;}
+.back-btn{margin:10px 12px;padding:10px;background:#333;color:#ccc;border:none;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:2px;cursor:pointer;text-transform:uppercase;transition:all .2s;text-align:center;}
+.back-btn:hover{background:#444;}
+.deploy-btn{margin:0 12px 10px;padding:10px;background:#c41a2e;color:#fff;border:none;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:2px;cursor:pointer;text-transform:uppercase;transition:all .2s;}
 .deploy-btn:hover{background:#d42a3e;}
 
 /* CENTER MAP */
@@ -69,7 +71,7 @@ body{font-family:'Segoe UI',sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .map-container{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#0a0a0a;}
 .map-container canvas{user-select:none;pointer-events:none;}
 
-/* Marker overlay - positioned relative to canvas */
+/* Marker overlay */
 #markerOverlay{position:absolute;pointer-events:none;}
 @keyframes pulse{0%,100%{box-shadow:0 0 6px rgba(196,26,46,0.5);}50%{box-shadow:0 0 16px rgba(196,26,46,0.9);}}
 
@@ -118,7 +120,7 @@ body{font-family:'Segoe UI',sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .spotlight-name{font-size:12px;color:#ccc;font-weight:600;margin-top:2px;}
 .spotlight-avatar{width:32px;height:32px;background:#c41a2e;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
 
-/* Scan line animation */
+/* Scan line */
 .scan-line{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(196,26,46,0.15),transparent);animation:scanMove 6s linear infinite;z-index:5;pointer-events:none;}
 @keyframes scanMove{0%{top:0;}100%{top:100%;}}
 
@@ -143,7 +145,7 @@ body{font-family:'Segoe UI',sans-serif;background:#0a0a0a;color:#fff;overflow:hi
   <nav>
     <a href="#">REGIONAL</a>
     <a href="#">DIAGNOSTICS</a>
-    <a href="#" class="active">MAP</a>
+    <a href="#" class="active">SEOUL MAP</a>
     <a href="#">SETTINGS</a>
   </nav>
   <div class="clock" id="clock"></div>
@@ -158,15 +160,16 @@ body{font-family:'Segoe UI',sans-serif;background:#0a0a0a;color:#fff;overflow:hi
       <div class="profile-avatar">P</div>
       <div class="profile-info">
         <div class="profile-name">Protocol Alpha</div>
-        <div class="profile-sub">Command Center v2.0</div>
+        <div class="profile-sub">Seoul Command v2.0</div>
       </div>
     </div>
     <div class="tabs">
-      <button class="tab-btn" id="tabNational">NATIONAL</button>
-      <button class="tab-btn active" id="tabRegional">REGIONAL</button>
+      <button class="tab-btn active" id="tabDistrict">DISTRICT</button>
+      <button class="tab-btn" id="tabAll">ALL</button>
     </div>
-    <div class="section-header">REGIONAL ASSETS</div>
+    <div class="section-header">SEOUL DISTRICTS</div>
     <div class="region-list" id="regionList"></div>
+    <a class="back-btn" href="map-preview.html">&larr; NATIONAL MAP</a>
     <button class="deploy-btn">DEPLOY MONITOR</button>
   </div>
 
@@ -181,9 +184,7 @@ body{font-family:'Segoe UI',sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 part2 = r'''" id="mapImg" style="display:none" />
         <canvas id="mapCanvas"></canvas>
       </div>
-      <!-- Marker overlay aligned to canvas -->
       <div id="markerOverlay"></div>
-      <!-- Zoom controls -->
       <div class="zoom-controls">
         <div class="zoom-btn" onclick="zoomIn()">+</div>
         <div class="zoom-btn" onclick="zoomOut()">&minus;</div>
@@ -191,11 +192,11 @@ part2 = r'''" id="mapImg" style="display:none" />
     </div>
     <div class="bottom-stats">
       <div class="stat-big">
-        <div class="val" id="totalCount">168</div>
-        <div class="label">TOTAL GUARDIANS</div>
+        <div class="val" id="totalCount">0</div>
+        <div class="label">SEOUL GUARDIANS</div>
       </div>
       <div class="stat-big">
-        <div class="val" id="activeRate">95.6%</div>
+        <div class="val" id="activeRate">0%</div>
         <div class="label">ACTIVE RATE</div>
       </div>
     </div>
@@ -203,18 +204,18 @@ part2 = r'''" id="mapImg" style="display:none" />
 
   <!-- RIGHT PANEL -->
   <div class="sidebar-right">
-    <div class="right-header">SELECTED REGION</div>
-    <div class="right-region-name" id="rightRegionName">SONGPA</div>
+    <div class="right-header">SELECTED DISTRICT</div>
+    <div class="right-region-name" id="rightRegionName">GANGNAM</div>
     <div class="right-big-number">
-      <div class="num" id="rightCount">14</div>
-      <div class="badge" id="rightBadge">+51.4%</div>
+      <div class="num" id="rightCount">0</div>
+      <div class="badge" id="rightBadge">+0%</div>
     </div>
-    <div class="right-label">GUARDIANS IN REGION</div>
+    <div class="right-label">GUARDIANS IN DISTRICT</div>
 
     <div class="quota-section">
       <div class="quota-title">QUOTA FULFILLMENT</div>
-      <div class="quota-bar-bg"><div class="quota-bar-fill" id="quotaBar" style="width:14%"></div></div>
-      <div class="quota-pct" id="quotaPct">14%</div>
+      <div class="quota-bar-bg"><div class="quota-bar-fill" id="quotaBar" style="width:0%"></div></div>
+      <div class="quota-pct" id="quotaPct">0%</div>
     </div>
 
     <div class="chapters-section">
@@ -224,10 +225,10 @@ part2 = r'''" id="mapImg" style="display:none" />
 
     <div class="spotlight-section">
       <div>
-        <div class="spotlight-label">SECTOR MAP SPOTLIGHT</div>
-        <div class="spotlight-name" id="spotlightName">SEO MIN-JI</div>
+        <div class="spotlight-label">DISTRICT MVP SPOTLIGHT</div>
+        <div class="spotlight-name" id="spotlightName">-</div>
       </div>
-      <div class="spotlight-avatar" id="spotlightAvatar">S</div>
+      <div class="spotlight-avatar" id="spotlightAvatar">-</div>
     </div>
   </div>
 
@@ -236,24 +237,26 @@ part2 = r'''" id="mapImg" style="display:none" />
 <script>
 const API_URL = 'https://script.google.com/macros/s/AKfycbyXXPPtJ-5T98hc63xxfLXtKqfvTK3YaUkxTyNjEbNofiWyAGf7N2GT6i4k1X2xDKUXEw/exec?action=getData';
 
-const CITY_POSITIONS = {
-  '\uc778\ucc9c': {x:34,y:17}, '\uace0\uc591': {x:34,y:13}, '\ub9c8\ud3ec': {x:33,y:16}, '\uc911\uad6c': {x:36,y:16},
-  '\uc131\ub3d9': {x:38,y:16}, '\uac15\ub0a8': {x:37,y:18}, '\uc11c\ucd08': {x:35,y:19}, '\uc1a1\ud30c': {x:39,y:18},
-  '\uc601\ub4f1\ud3ec': {x:33,y:18}, '\uc131\ub0a8': {x:39,y:21}, '\uc218\uc6d0': {x:34,y:24}, '\uc6a9\uc778': {x:39,y:25},
-  '\ud654\uc131': {x:31,y:24}, '\ucc9c\uc548': {x:33,y:34}, '\ub300\uc804': {x:41,y:42}, '\ub300\uad6c': {x:58,y:54},
-  '\ubd80\uc0b0': {x:64,y:66}
+// Seoul district positions (% on seoul3.jpg)
+const DISTRICT_POSITIONS = {
+  '\uac15\ub0a8': {x:60,y:72},
+  '\uc11c\ucd08': {x:48,y:78},
+  '\uc131\ub3d9': {x:58,y:50},
+  '\ub9c8\ud3ec': {x:32,y:48},
+  '\uc1a1\ud30c': {x:78,y:68},
+  '\uc911\uad6c': {x:48,y:50},
+  '\uc601\ub4f1\ud3ec': {x:30,y:64}
 };
 
 const EN_NAMES = {
-  '\uac15\ub0a8':'GANGNAM','\ub300\uad6c':'DAEGU','\ub300\uc804':'DAEJEON','\uc11c\ucd08':'SEOCHO','\uc131\ub3d9':'SEONGDONG',
-  '\ub9c8\ud3ec':'MAPO','\ubd80\uc0b0':'BUSAN','\uc1a1\ud30c':'SONGPA','\uc218\uc6d0':'SUWON','\uc6a9\uc778':'YONGIN',
-  '\uc601\ub4f1\ud3ec':'YEONGDEUNGPO','\uc778\ucc9c':'INCHEON','\uace0\uc591':'GOYANG','\ud654\uc131':'HWASEONG',
-  '\uc911\uad6c':'JUNGGU','\ucc9c\uc548':'CHEONAN','\uc131\ub0a8':'SEONGNAM'
+  '\uac15\ub0a8':'GANGNAM','\uc11c\ucd08':'SEOCHO','\uc131\ub3d9':'SEONGDONG',
+  '\ub9c8\ud3ec':'MAPO','\uc1a1\ud30c':'SONGPA','\uc911\uad6c':'JUNGGU',
+  '\uc601\ub4f1\ud3ec':'YEONGDEUNGPO'
 };
 
 let regionData = {};
 let chaptersByRegion = {};
-let selectedRegion = '\uc1a1\ud30c';
+let selectedRegion = '\uac15\ub0a8';
 let zoomLevel = 1;
 
 // Clock
@@ -289,30 +292,34 @@ function processMap() {
   const px = imageData.data;
   const len = w * h;
 
-  // Step 1: Classify each pixel as map (dark) or background (light)
+  // Step 1: Classify pixels - map(dark), river(blue), background(light)
   const isMap = new Uint8Array(len);
+  const isRiver = new Uint8Array(len);
   for(let i = 0; i < len; i++) {
-    const avg = (px[i*4] + px[i*4+1] + px[i*4+2]) / 3;
-    isMap[i] = avg < 100 ? 1 : 0;
+    const r = px[i*4], g = px[i*4+1], b = px[i*4+2];
+    const avg = (r + g + b) / 3;
+    // Detect blue river pixels (blue channel dominant)
+    if(b > 100 && b > r * 1.5 && b > g * 1.2) {
+      isRiver[i] = 1;
+    } else if(avg < 100) {
+      isMap[i] = 1;
+    }
   }
 
-  // Step 2: Remove interior light pixels (text/labels inside map regions)
-  // Flood-fill from edges to find true background; anything light but not reachable = interior text
+  // Step 2: Remove interior text via flood-fill from edges
   const isExterior = new Uint8Array(len);
   const queue = [];
-  // Seed all edge pixels that are light
   for(let x = 0; x < w; x++) {
-    if(!isMap[x]) { isExterior[x] = 1; queue.push(x); }
+    if(!isMap[x] && !isRiver[x]) { isExterior[x] = 1; queue.push(x); }
     const b = (h-1)*w+x;
-    if(!isMap[b]) { isExterior[b] = 1; queue.push(b); }
+    if(!isMap[b] && !isRiver[b]) { isExterior[b] = 1; queue.push(b); }
   }
   for(let y = 1; y < h-1; y++) {
     const l = y*w;
-    if(!isMap[l]) { isExterior[l] = 1; queue.push(l); }
+    if(!isMap[l] && !isRiver[l]) { isExterior[l] = 1; queue.push(l); }
     const r = y*w+w-1;
-    if(!isMap[r]) { isExterior[r] = 1; queue.push(r); }
+    if(!isMap[r] && !isRiver[r]) { isExterior[r] = 1; queue.push(r); }
   }
-  // BFS spread to connected light pixels
   let qi = 0;
   while(qi < queue.length) {
     const idx = queue[qi++];
@@ -323,23 +330,23 @@ function processMap() {
     if(y > 0) neighbors.push(idx-w);
     if(y < h-1) neighbors.push(idx+w);
     for(const ni of neighbors) {
-      if(!isMap[ni] && !isExterior[ni]) {
+      if(!isMap[ni] && !isRiver[ni] && !isExterior[ni]) {
         isExterior[ni] = 1;
         queue.push(ni);
       }
     }
   }
-  // Interior light pixels (text) → treat as map
+  // Interior light pixels (text) -> treat as map
   for(let i = 0; i < len; i++) {
-    if(!isMap[i] && !isExterior[i]) isMap[i] = 1;
+    if(!isMap[i] && !isRiver[i] && !isExterior[i]) isMap[i] = 1;
   }
 
-  // Step 3: Find border pixels (exterior light pixels adjacent to map)
+  // Step 3: Find border pixels
   const isBorder = new Uint8Array(len);
   for(let y = 1; y < h-1; y++) {
     for(let x = 1; x < w-1; x++) {
       const idx = y * w + x;
-      if(isMap[idx]) continue;
+      if(isMap[idx] || isRiver[idx]) continue;
       if(isMap[idx-1] || isMap[idx+1] || isMap[idx-w] || isMap[idx+w] ||
          isMap[idx-w-1] || isMap[idx-w+1] || isMap[idx+w-1] || isMap[idx+w+1]) {
         isBorder[idx] = 1;
@@ -347,7 +354,7 @@ function processMap() {
     }
   }
 
-  // Step 4: Dilate borders by 1px to make them thicker/smoother
+  // Step 4: Dilate borders
   const isBorder2 = new Uint8Array(len);
   for(let y = 1; y < h-1; y++) {
     for(let x = 1; x < w-1; x++) {
@@ -358,14 +365,17 @@ function processMap() {
     }
   }
 
-  // Step 5: Render processed pixels
-  const bgColor = 10;      // #0a0a0a - matches page background
-  const fillColor = 34;    // #222222 - dark map fill (visible contrast)
-  const borderColor = 65;  // #414141 - visible border lines
+  // Step 5: Render
+  const bgColor = 10;
+  const fillColor = 34;
+  const borderColor = 65;
 
   for(let i = 0; i < len; i++) {
     const pi = i * 4;
-    if(isMap[i]) {
+    if(isRiver[i]) {
+      // Dark subtle river
+      px[pi] = 15; px[pi+1] = 25; px[pi+2] = 50; px[pi+3] = 255;
+    } else if(isMap[i]) {
       px[pi] = fillColor; px[pi+1] = fillColor; px[pi+2] = fillColor; px[pi+3] = 255;
     } else if(isBorder2[i]) {
       px[pi] = borderColor; px[pi+1] = borderColor; px[pi+2] = borderColor; px[pi+3] = 255;
@@ -377,14 +387,15 @@ function processMap() {
   ctx.putImageData(imageData, 0, 0);
 }
 
-// Test data
+// Seoul-only districts from data
+const SEOUL_DISTRICTS = ['\uac15\ub0a8','\uc11c\ucd08','\uc131\ub3d9','\ub9c8\ud3ec','\uc1a1\ud30c','\uc911\uad6c','\uc601\ub4f1\ud3ec'];
+
 function generateTestData(){
-  const cities = ['\uac15\ub0a8','\ub300\uad6c','\ub300\uc804','\uc11c\ucd08','\uc131\ub3d9','\ub9c8\ud3ec','\ubd80\uc0b0','\uc1a1\ud30c','\uc218\uc6d0','\uc6a9\uc778','\uc601\ub4f1\ud3ec','\uc778\ucc9c','\uace0\uc591','\ud654\uc131','\uc911\uad6c','\ucc9c\uc548'];
+  const counts = [22,15,14,14,14,5,9];
   const chapters = ['\uc2dc\ub108\uc9c0','\ubbf8\ub77c\ud074','\ubbf8\ub2e4\uc2a4','\ud53c\ub2c9\uc2a4','\ud0c0\uc774\ud0c4','\ub4dc\ub798\uace4','\uc774\uae00','\uc624\uba54\uac00','\uc54c\ud30c','\ube0c\ub808\uc774\ube0c'];
-  const counts = [22,18,16,15,14,14,12,14,11,10,9,8,7,6,5,4];
   regionData = {};
   chaptersByRegion = {};
-  cities.forEach((c,i)=>{
+  SEOUL_DISTRICTS.forEach((c,i)=>{
     regionData[c] = counts[i] || Math.floor(Math.random()*10)+3;
     const chs = {};
     const shuffled = [...chapters].sort(()=>Math.random()-0.5).slice(0,5);
@@ -411,7 +422,7 @@ async function loadData(){
     rows.forEach(r => {
       const region = (r.myRegion || '').trim();
       const chapter = (r.myChapter || '').trim();
-      if(!region) return;
+      if(!region || !SEOUL_DISTRICTS.includes(region)) return;
       regionData[region] = (regionData[region]||0) + 1;
       if(!chaptersByRegion[region]) chaptersByRegion[region] = {};
       if(chapter) chaptersByRegion[region][chapter] = (chaptersByRegion[region][chapter]||0) + 1;
@@ -457,7 +468,7 @@ function renderMarkers(){
   overlay.style.height = canvasRect.height + 'px';
 
   Object.entries(regionData).forEach(([name, count])=>{
-    const pos = CITY_POSITIONS[name];
+    const pos = DISTRICT_POSITIONS[name];
     if(!pos) return;
     const group = document.createElement('div');
     group.className = 'marker-group' + (name===selectedRegion?' active':'');
@@ -468,7 +479,6 @@ function renderMarkers(){
     overlay.appendChild(group);
   });
 }
-// Re-render markers on resize to keep alignment
 window.addEventListener('resize', ()=>{ renderMarkers(); });
 
 function renderRightPanel(){
@@ -476,7 +486,7 @@ function renderRightPanel(){
   const count = regionData[selectedRegion] || 0;
   const total = Object.values(regionData).reduce((a,b)=>a+b,0);
   const pct = total > 0 ? ((count/total)*100).toFixed(1) : 0;
-  const quota = 100;
+  const quota = 50;
   const fulfillment = Math.round((count/quota)*100);
 
   document.getElementById('rightRegionName').textContent = en;
@@ -485,7 +495,6 @@ function renderRightPanel(){
   document.getElementById('quotaBar').style.width = fulfillment + '%';
   document.getElementById('quotaPct').textContent = fulfillment + '%';
 
-  // Top 5 chapters
   const chapters = chaptersByRegion[selectedRegion] || {};
   const top5 = Object.entries(chapters).sort((a,b)=>b[1]-a[1]).slice(0,5);
   const maxVal = top5.length ? top5[0][1] : 1;
@@ -498,7 +507,6 @@ function renderRightPanel(){
     </div>
   `).join('');
 
-  // Spotlight - pick a random Korean name
   const names = ['SEO MIN-JI','KIM JI-YEON','PARK SUNG-HO','LEE HAE-WON','CHOI YUNA'];
   const nameIdx = Math.abs(selectedRegion.charCodeAt(0)) % names.length;
   document.getElementById('spotlightName').textContent = names[nameIdx];
@@ -529,13 +537,13 @@ function zoomOut(){
 }
 
 // Tab switching
-document.getElementById('tabNational').onclick = function(){
+document.getElementById('tabDistrict').onclick = function(){
   this.classList.add('active');
-  document.getElementById('tabRegional').classList.remove('active');
+  document.getElementById('tabAll').classList.remove('active');
 };
-document.getElementById('tabRegional').onclick = function(){
+document.getElementById('tabAll').onclick = function(){
   this.classList.add('active');
-  document.getElementById('tabNational').classList.remove('active');
+  document.getElementById('tabDistrict').classList.remove('active');
 };
 
 // Init

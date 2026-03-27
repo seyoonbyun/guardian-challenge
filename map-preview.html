@@ -63,9 +63,6 @@ body{font-family:'Segoe UI',sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 
 /* Marker overlay - positioned relative to canvas */
 #markerOverlay{position:absolute;pointer-events:none;}
-.marker{position:absolute;width:10px;height:10px;background:#c41a2e;border-radius:50%;transform:translate(-50%,-50%);cursor:pointer;transition:all .2s;z-index:10;box-shadow:0 0 6px rgba(196,26,46,0.5);pointer-events:auto;}
-.marker:hover{transform:translate(-50%,-50%) scale(1.5);box-shadow:0 0 12px rgba(196,26,46,0.8);}
-.marker.active{animation:pulse 1.5s ease-in-out infinite;}
 @keyframes pulse{0%,100%{box-shadow:0 0 6px rgba(196,26,46,0.5);}50%{box-shadow:0 0 16px rgba(196,26,46,0.9);}}
 
 /* Zoom controls */
@@ -114,8 +111,17 @@ body{font-family:'Segoe UI',sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .spotlight-avatar{width:32px;height:32px;background:#c41a2e;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
 
 /* Scan line animation */
-.scan-line{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(196,26,46,0.3),transparent);animation:scanMove 4s linear infinite;z-index:5;pointer-events:none;}
+.scan-line{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(196,26,46,0.15),transparent);animation:scanMove 6s linear infinite;z-index:5;pointer-events:none;}
 @keyframes scanMove{0%{top:0;}100%{top:100%;}}
+
+/* Marker labels */
+.marker-group{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:10;pointer-events:auto;display:flex;flex-direction:column;align-items:center;}
+.marker-group .dot{width:8px;height:8px;background:#c41a2e;border-radius:50%;box-shadow:0 0 6px rgba(196,26,46,0.5);transition:all .2s;}
+.marker-group:hover .dot{transform:scale(1.4);box-shadow:0 0 12px rgba(196,26,46,0.8);}
+.marker-group.active .dot{animation:pulse 1.5s ease-in-out infinite;}
+.marker-group .label{margin-top:3px;font-size:9px;font-weight:700;color:#999;letter-spacing:0.5px;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,0.8);}
+.marker-group.active .label{color:#fff;}
+.marker-group .count{font-size:10px;font-weight:800;color:#c41a2e;text-shadow:0 1px 3px rgba(0,0,0,0.8);}
 </style>
 </head>
 <body>
@@ -221,11 +227,11 @@ body{font-family:'Segoe UI',sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 const API_URL = 'https://script.google.com/macros/s/AKfycbyXXPPtJ-5T98hc63xxfLXtKqfvTK3YaUkxTyNjEbNofiWyAGf7N2GT6i4k1X2xDKUXEw/exec?action=getData';
 
 const CITY_POSITIONS = {
-  '\uc778\ucc9c': {x:24,y:19}, '\uace0\uc591': {x:34,y:15}, '\ub9c8\ud3ec': {x:33,y:19}, '\uc911\uad6c': {x:37,y:19},
-  '\uc131\ub3d9': {x:40,y:18}, '\uac15\ub0a8': {x:38,y:21}, '\uc11c\ucd08': {x:35,y:22}, '\uc1a1\ud30c': {x:42,y:20},
-  '\uc601\ub4f1\ud3ec': {x:32,y:21}, '\uc131\ub0a8': {x:40,y:24}, '\uc218\uc6d0': {x:34,y:28}, '\uc6a9\uc778': {x:40,y:29},
-  '\ud654\uc131': {x:28,y:28}, '\ucc9c\uc548': {x:33,y:36}, '\ub300\uc804': {x:42,y:44}, '\ub300\uad6c': {x:62,y:55},
-  '\ubd80\uc0b0': {x:65,y:70}
+  '\uc778\ucc9c': {x:34,y:17}, '\uace0\uc591': {x:34,y:13}, '\ub9c8\ud3ec': {x:33,y:16}, '\uc911\uad6c': {x:36,y:16},
+  '\uc131\ub3d9': {x:38,y:16}, '\uac15\ub0a8': {x:37,y:18}, '\uc11c\ucd08': {x:35,y:19}, '\uc1a1\ud30c': {x:39,y:18},
+  '\uc601\ub4f1\ud3ec': {x:33,y:18}, '\uc131\ub0a8': {x:39,y:21}, '\uc218\uc6d0': {x:34,y:24}, '\uc6a9\uc778': {x:39,y:25},
+  '\ud654\uc131': {x:31,y:24}, '\ucc9c\uc548': {x:33,y:34}, '\ub300\uc804': {x:41,y:42}, '\ub300\uad6c': {x:58,y:54},
+  '\ubd80\uc0b0': {x:64,y:66}
 };
 
 const EN_NAMES = {
@@ -280,7 +286,45 @@ function processMap() {
     isMap[i] = avg < 100 ? 1 : 0;
   }
 
-  // Step 2: Find border pixels (light pixels adjacent to map pixels)
+  // Step 2: Remove interior light pixels (text/labels inside map regions)
+  // Flood-fill from edges to find true background; anything light but not reachable = interior text
+  const isExterior = new Uint8Array(len);
+  const queue = [];
+  // Seed all edge pixels that are light
+  for(let x = 0; x < w; x++) {
+    if(!isMap[x]) { isExterior[x] = 1; queue.push(x); }
+    const b = (h-1)*w+x;
+    if(!isMap[b]) { isExterior[b] = 1; queue.push(b); }
+  }
+  for(let y = 1; y < h-1; y++) {
+    const l = y*w;
+    if(!isMap[l]) { isExterior[l] = 1; queue.push(l); }
+    const r = y*w+w-1;
+    if(!isMap[r]) { isExterior[r] = 1; queue.push(r); }
+  }
+  // BFS spread to connected light pixels
+  let qi = 0;
+  while(qi < queue.length) {
+    const idx = queue[qi++];
+    const x = idx % w, y = (idx - x) / w;
+    const neighbors = [];
+    if(x > 0) neighbors.push(idx-1);
+    if(x < w-1) neighbors.push(idx+1);
+    if(y > 0) neighbors.push(idx-w);
+    if(y < h-1) neighbors.push(idx+w);
+    for(const ni of neighbors) {
+      if(!isMap[ni] && !isExterior[ni]) {
+        isExterior[ni] = 1;
+        queue.push(ni);
+      }
+    }
+  }
+  // Interior light pixels (text) → treat as map
+  for(let i = 0; i < len; i++) {
+    if(!isMap[i] && !isExterior[i]) isMap[i] = 1;
+  }
+
+  // Step 3: Find border pixels (exterior light pixels adjacent to map)
   const isBorder = new Uint8Array(len);
   for(let y = 1; y < h-1; y++) {
     for(let x = 1; x < w-1; x++) {
@@ -293,7 +337,7 @@ function processMap() {
     }
   }
 
-  // Step 3: Dilate borders by 1px to make them thicker/smoother
+  // Step 4: Dilate borders by 1px to make them thicker/smoother
   const isBorder2 = new Uint8Array(len);
   for(let y = 1; y < h-1; y++) {
     for(let x = 1; x < w-1; x++) {
@@ -304,10 +348,10 @@ function processMap() {
     }
   }
 
-  // Step 4: Render processed pixels
+  // Step 5: Render processed pixels
   const bgColor = 10;      // #0a0a0a - matches page background
-  const fillColor = 30;    // #1e1e1e - dark map fill
-  const borderColor = 60;  // #3c3c3c - subtle visible border lines
+  const fillColor = 34;    // #222222 - dark map fill (visible contrast)
+  const borderColor = 65;  // #414141 - visible border lines
 
   for(let i = 0; i < len; i++) {
     const pi = i * 4;
@@ -316,7 +360,7 @@ function processMap() {
     } else if(isBorder2[i]) {
       px[pi] = borderColor; px[pi+1] = borderColor; px[pi+2] = borderColor; px[pi+3] = 255;
     } else {
-      px[pi] = bgColor; px[pi+1] = bgColor; px[pi+2] = bgColor; px[pi+3] = 0;
+      px[pi] = bgColor; px[pi+1] = bgColor; px[pi+2] = bgColor; px[pi+3] = 255;
     }
   }
 
@@ -405,13 +449,13 @@ function renderMarkers(){
   Object.entries(regionData).forEach(([name, count])=>{
     const pos = CITY_POSITIONS[name];
     if(!pos) return;
-    const marker = document.createElement('div');
-    marker.className = 'marker' + (name===selectedRegion?' active':'');
-    marker.style.left = pos.x + '%';
-    marker.style.top = pos.y + '%';
-    marker.title = name + ': ' + count;
-    marker.onclick = () => selectRegion(name);
-    overlay.appendChild(marker);
+    const group = document.createElement('div');
+    group.className = 'marker-group' + (name===selectedRegion?' active':'');
+    group.style.left = pos.x + '%';
+    group.style.top = pos.y + '%';
+    group.onclick = () => selectRegion(name);
+    group.innerHTML = '<div class="dot"></div><div class="count">' + count + '</div><div class="label">' + name + '</div>';
+    overlay.appendChild(group);
   });
 }
 // Re-render markers on resize to keep alignment
@@ -487,9 +531,15 @@ document.getElementById('tabRegional').onclick = function(){
 // Init
 const mapImg = document.getElementById('mapImg');
 function initMap(){
+  if(!mapImg.naturalWidth || !mapImg.naturalHeight){
+    console.warn('Map image not loaded, retrying...');
+    setTimeout(initMap, 200);
+    return;
+  }
   processMap();
   loadData();
 }
+mapImg.onerror = function(){ console.error('Map image failed to load'); loadData(); };
 if(mapImg.complete && mapImg.naturalWidth > 0){ initMap(); }
 else { mapImg.onload = initMap; }
 
