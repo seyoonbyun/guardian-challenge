@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>+1 Challenge 통계</title>
+    <link rel="preconnect" href="https://script.google.com">
+    <script>
+    var __prefetch = fetch('https://script.google.com/macros/s/AKfycbyD8gqW7madpUrKEZr_RKCBPaGXdiB8p5o3qxnXM7Ah73gbY2VQIPbGC_P3cC6JHp5ETA/exec?action=getData').then(function(r){return r.text();});
+    </script>
     
     <style>
 	  /* 모바일 도넛차트 긴급 수정 */
@@ -2770,15 +2774,16 @@
                 updateTimestamp();
                 showLoading();
 
-                // Google Apps Script는 GET 요청만 허용하고 간단한 fetch 사용
-                const response = await fetch(API_URL);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                // Use prefetched data if available, otherwise fetch fresh
+                var text;
+                if (window.__prefetch) {
+                    text = await window.__prefetch;
+                    window.__prefetch = null;
+                } else {
+                    const response = await fetch(API_URL);
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+                    text = await response.text();
                 }
-                
-                // Google Apps Script는 JSON이 아닌 텍스트로 응답할 수 있음
-                const text = await response.text();
                 
                 let jsonData;
                 try {
@@ -2800,12 +2805,6 @@
                     throw new Error('데이터가 배열 형식이 아닙니다');
                 }
                 
-                // 원본 데이터의 컬럼명 확인
-                if (jsonData.length > 0) {
-                    console.log('원본 데이터 컬럼명:', Object.keys(jsonData[0]));
-                    console.log('첫 번째 행 데이터:', jsonData[0]);
-                }
-                
                 // 데이터 매핑
                 allData = jsonData.map(row => ({
                     timestamp: row.timestamp || '',
@@ -2817,22 +2816,6 @@
                     newMemberChapter: row.newMemberChapter || '',
                     memberType: row.memberType || row['90G2F'] || ''
                 }));
-                
-                console.log('=== 데이터 로딩 디버깅 ===');
-                console.log('원본 JSON 데이터 샘플:', jsonData.slice(0, 3));
-                console.log('매핑된 데이터 샘플:', allData.slice(0, 3));
-                console.log('지역 목록:', [...new Set(allData.map(row => row.myRegion).filter(Boolean))]);
-                console.log('멤버 타입 목록:', [...new Set(allData.map(row => row.memberType).filter(Boolean))]);
-                
-                // 멤버 타입별 상세 분석
-                const memberTypeAnalysis = {};
-                allData.forEach(row => {
-                    const type = row.memberType;
-                    if (type && type.trim()) {
-                        memberTypeAnalysis[type] = (memberTypeAnalysis[type] || 0) + 1;
-                    }
-                });
-                console.log('멤버 타입별 분석:', memberTypeAnalysis);
                 
                 // 이전 데이터 저장 (변화율 계산용)
                 previousData = [...allData];
