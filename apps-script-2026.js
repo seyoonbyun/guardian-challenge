@@ -10,7 +10,7 @@ function getOrCreateSheet() {
   var sheet = ss.getSheetByName("2026");
   if (!sheet) {
     sheet = ss.insertSheet("2026");
-    var headers = ["createdAt","referrerName","referrerRegion","referrerChapter","referrerContact","newMemberName","newMemberContact","newMemberChapter","joinedMember","is90Born","isGlobal","isSecondGenOwner","isFranchise","is90G2FQualified","score","uniqueKey"];
+    var headers = ["\ub4f1\ub85d\uc77c\uc2dc","\uc601\uc785\uba64\ubc84\uba85","\uc9c0\uc5ed\uba85","\ucc55\ud130\uba85","\uc5f0\ub77d\ucc98","\uc2e0\uaddc\uba64\ubc84\uc131\ud568","\uc2e0\uaddc\uba64\ubc84\uc5f0\ub77d\ucc98","\uc785\ud68c\ucc55\ud130","\uac00\uc785\uc5ec\ubd80","90\ub144\uc0dd\uc0ac\uc5c5\uac00","\uae00\ub85c\ubc8c\ube44\uc988\ub2c8\uc2a4","2\uc138\uacbd\uc601\uc790","\ud504\ub79c\ucc28\uc774\uc988","90G2F\ud574\ub2f9","\uc810\uc218","\uc911\ubcf5\uccb4\ud06c\ud0a4"];
     sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
     sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold").setBackground("#4285f4").setFontColor("#ffffff");
     sheet.setFrozenRows(1);
