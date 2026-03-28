@@ -83,15 +83,6 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .info-box .ib-chapters{margin-top:5px;border-top:1px solid rgba(255,255,255,0.06);padding-top:5px;}
 .info-box .ib-ch{font-size:11px;color:#777;display:flex;justify-content:space-between;gap:10px;line-height:1.6;}
 .info-box .ib-ch span{color:#999;font-weight:600;}
-/* Detail map markers (old style for Seoul/Gyeonggi detail modals) */
-.marker-group{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:10;pointer-events:auto;display:flex;flex-direction:column;align-items:center;}
-.marker-group .dot{width:10px;height:10px;background:#c41a2e;border-radius:50%;box-shadow:0 0 6px rgba(196,26,46,0.5);transition:all .2s;}
-.marker-group:hover .dot{transform:scale(1.4);box-shadow:0 0 12px rgba(196,26,46,0.8);}
-.marker-group.active .dot{animation:pulse 1.5s ease-in-out infinite;}
-.marker-group .label{margin-top:4px;font-size:15px;font-weight:700;color:#999;letter-spacing:0.5px;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,0.8);}
-.marker-group.active .label{color:#fff;}
-.marker-group .count{font-size:24px;font-weight:800;color:#c41a2e;text-shadow:0 1px 3px rgba(0,0,0,0.8);}
-.marker-group.active .count{color:#fff;}
 /* Province label (for clickable provinces like Seoul/Gyeonggi) */
 .province-label{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;cursor:pointer;z-index:10;background:rgba(10,10,14,0.85);border:1px solid rgba(100,200,100,0.3);border-radius:5px;padding:8px 14px;backdrop-filter:blur(6px);display:flex;flex-direction:column;align-items:center;transition:all .25s;}
 .province-label:hover{border-color:rgba(100,200,100,0.6);background:rgba(15,20,15,0.92);}
@@ -184,7 +175,6 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 #gyeonggiDetailSvg polyline{stroke:#444 !important;stroke-width:0.3 !important;}
 #gyeonggiDetailSvg rect, #gyeonggiDetailSvg #XMLID_350_, #gyeonggiDetailSvg #XMLID_352_, #gyeonggiDetailSvg #XMLID_356_{display:none !important;}
 #gyeonggiDetailSvg [stroke="#949584"]{display:none !important;}
-.detail-marker-overlay{position:absolute;pointer-events:none;z-index:5;}
 .detail-info{width:240px;padding:20px;border-left:1px solid #222;overflow-y:auto;}
 .detail-info .di-region{font-size:20px;font-weight:800;color:#fff;margin-bottom:4px;}
 .detail-info .di-count{font-size:36px;font-weight:800;color:#c41a2e;}
@@ -218,9 +208,9 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
   .profile-card{padding:10px 12px;}
   .profile-name{font-size:13px;}
   .profile-sub{font-size:9px;}
-  .tab-btn{padding:10px 0;font-size:11px;}
-  .section-header{padding:10px 12px 6px;font-size:10px;}
-  .region-list{padding:0 8px 0;overflow-y:auto;max-height:108px;}
+  .tabs{display:none;}
+  .section-header{display:none;}
+  .region-list{display:none;}
   .region-toggle{display:none;}
   .region-item{padding:8px 10px;}
   .region-name{font-size:13px;}
@@ -287,16 +277,11 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
   .di-list-item .di-name{font-size:13px;}
   .detail-header{padding:10px 16px;}
   .detail-title{font-size:15px;}
-  .marker-group .label{font-size:11px;}
-  .marker-group .count{font-size:16px;}
 }
 @media(max-width:480px){
   .detail-map svg{width:96% !important;}
   .detail-info{max-height:30vh;padding:10px 14px;}
   .detail-info .di-count{font-size:24px;}
-  .marker-group .label{font-size:10px;}
-  .marker-group .count{font-size:14px;}
-  .marker-group .dot{width:7px;height:7px;}
 }
 </style>
 </head>
@@ -2871,7 +2856,6 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 	l0.546,1.17l0.857,1.482l1.404,1.092L222.969,311.118"/>
 <path fill="#040000" d="M206.494,340.224"/>
 </svg>
-        <div class="detail-marker-overlay" id="detailMarkerOverlay"></div>
       </div>
       <div class="detail-info">
         <div class="di-region" id="diRegion">SEOUL</div>
@@ -3452,25 +3436,20 @@ function renderDetailMap(key){
     });
   });
 
-  // Render markers — position overlay to match SVG exactly, use % coords
-  const overlay = document.getElementById("detailMarkerOverlay");
-  overlay.innerHTML = "";
+  // Render markers as SVG <text> elements inside the SVG itself (scroll-proof)
   const svg = document.getElementById(cfg.svgId);
-  const svgRect = svg.getBoundingClientRect();
-  const mapDiv = svg.closest(".detail-map");
-  const mapRect = mapDiv.getBoundingClientRect();
   const vb = svg.viewBox.baseVal;
+  // Remove previous markers
+  svg.querySelectorAll(".svg-marker-group").forEach(el=>el.remove());
 
-  // Position overlay to exactly match SVG position within .detail-map
-  overlay.style.left = (svgRect.left - mapRect.left) + "px";
-  overlay.style.top = (svgRect.top - mapRect.top) + "px";
-  overlay.style.width = svgRect.width + "px";
-  overlay.style.height = svgRect.height + "px";
+  // Determine font sizes based on SVG viewBox scale
+  const isSeoul = cfg.svgId === "detailSvg";
+  const countSize = isSeoul ? 48 : 22;
+  const labelSize = isSeoul ? 32 : 14;
 
   cfg.cities.forEach(city=>{
     const ids = getIds(cfg.districtMap[city]);
     if(!ids.length) return;
-    // Combine bboxes of all elements for this city
     let minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
     let found = false;
     ids.forEach(svgId=>{
@@ -3487,28 +3466,46 @@ function renderDetailMap(key){
     if(!found) return;
     let cx = (minX + maxX) / 2;
     let cy = (minY + maxY) / 2;
-    // Manual position adjustments for small districts
     const ADJ = {"\uC11C\uCD08":{dx:-60, dy:-35}, "\uAC15\uB0A8":{dy:40}};
     if(ADJ[city]){ cx += (ADJ[city].dx||0); cy += (ADJ[city].dy||0); }
-    // Convert to percentage within SVG viewBox
-    const pctX = (cx / vb.width) * 100;
-    const pctY = (cy / vb.height) * 100;
     const count = regionData[city] || 0;
+    const isActive = city === detailSelectedCity;
+    const countColor = isActive ? "#fff" : "#c41a2e";
+    const labelColor = isActive ? "#fff" : "#999";
 
-    const group = document.createElement("div");
-    group.className = "marker-group" + (city===detailSelectedCity?" active":"");
-    group.style.left = pctX + "%";
-    group.style.top = pctY + "%";
-    group.style.transform = "translate(-50%, -50%)";
-    group.style.pointerEvents = "auto";
-    group.onclick = ()=>{
+    const g = document.createElementNS("http://www.w3.org/2000/svg","g");
+    g.setAttribute("class","svg-marker-group");
+    g.style.cursor = "pointer";
+    g.onclick = ()=>{
       detailSelectedCity = city;
       selectedRegion = city;
       renderDetailMap(key);
       render();
     };
-    group.innerHTML = '<div class="count">' + count + '</div><div class="label">' + city + '</div>';
-    overlay.appendChild(group);
+    const countText = document.createElementNS("http://www.w3.org/2000/svg","text");
+    countText.setAttribute("x", cx);
+    countText.setAttribute("y", cy);
+    countText.setAttribute("text-anchor","middle");
+    countText.setAttribute("fill", countColor);
+    countText.setAttribute("font-size", countSize);
+    countText.setAttribute("font-weight","800");
+    countText.style.textShadow = "0 1px 3px rgba(0,0,0,0.8)";
+    countText.style.filter = "drop-shadow(0 1px 3px rgba(0,0,0,0.8))";
+    countText.textContent = count;
+    g.appendChild(countText);
+
+    const labelText = document.createElementNS("http://www.w3.org/2000/svg","text");
+    labelText.setAttribute("x", cx);
+    labelText.setAttribute("y", cy + countSize * 0.85);
+    labelText.setAttribute("text-anchor","middle");
+    labelText.setAttribute("fill", labelColor);
+    labelText.setAttribute("font-size", labelSize);
+    labelText.setAttribute("font-weight","700");
+    labelText.style.filter = "drop-shadow(0 1px 3px rgba(0,0,0,0.8))";
+    labelText.textContent = city;
+    g.appendChild(labelText);
+
+    svg.appendChild(g);
   });
 
   // Render detail info panel
