@@ -98,6 +98,13 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .province-label .name{font-size:14px;font-weight:800;color:#6c6;letter-spacing:1px;}
 .province-label .sub{font-size:9px;color:#585;letter-spacing:0.5px;margin-top:2px;}
 
+/* Loading overlay */
+.loading-overlay{position:fixed;inset:0;z-index:9999;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;transition:opacity .4s;}
+.loading-overlay.hidden{opacity:0;pointer-events:none;}
+.loading-overlay .loading-spinner{width:24px;height:24px;border:2px solid #333;border-top-color:#c41a2e;border-radius:50%;animation:spin .8s linear infinite;}
+.loading-overlay .loading-text{color:#555;font-size:13px;letter-spacing:1px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
 .zoom-controls{position:absolute;left:14px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:2px;z-index:20;}
 .zoom-btn{width:28px;height:28px;background:#1a1a1a;border:1px solid #333;color:#888;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:all .2s;}
 .zoom-btn:first-child{border-radius:4px 4px 0 0;}
@@ -177,7 +184,7 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 #gyeonggiDetailSvg polyline{stroke:#444 !important;stroke-width:0.3 !important;}
 #gyeonggiDetailSvg rect, #gyeonggiDetailSvg #XMLID_350_, #gyeonggiDetailSvg #XMLID_352_, #gyeonggiDetailSvg #XMLID_356_{display:none !important;}
 #gyeonggiDetailSvg [stroke="#949584"]{display:none !important;}
-.detail-marker-overlay{position:absolute;inset:0;pointer-events:none;}
+.detail-marker-overlay{position:absolute;pointer-events:none;z-index:5;}
 .detail-info{width:240px;padding:20px;border-left:1px solid #222;overflow-y:auto;}
 .detail-info .di-region{font-size:20px;font-weight:800;color:#fff;margin-bottom:4px;}
 .detail-info .di-count{font-size:36px;font-weight:800;color:#c41a2e;}
@@ -213,9 +220,8 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
   .profile-sub{font-size:9px;}
   .tab-btn{padding:10px 0;font-size:11px;}
   .section-header{padding:10px 12px 6px;font-size:10px;}
-  .region-list{padding:0 8px 0;overflow:hidden;max-height:none;}
-  .region-list.expanded{overflow-y:auto;max-height:300px;}
-  .region-toggle{display:block;text-align:center;padding:6px;font-size:10px;color:#555;cursor:pointer;border-top:1px solid #1a1a1a;letter-spacing:1px;}
+  .region-list{padding:0 8px 0;overflow-y:auto;max-height:108px;}
+  .region-toggle{display:none;}
   .region-item{padding:8px 10px;}
   .region-name{font-size:13px;}
   .deploy-btn{display:none;}
@@ -259,7 +265,7 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 
 @media(max-width:480px){
   .topbar nav a{font-size:9px;padding:8px 8px;}
-  .region-list{max-height:150px;}
+  .region-list{max-height:102px;}
   .map-center{height:75vh;}
   .map-area{height:calc(75vh - 70px);}
   .right-region-name{font-size:20px;}
@@ -296,6 +302,11 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 </head>
 <body>
 
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">데이터 로딩 중</div>
+</div>
+
 <div class="topbar">
   <div class="brand"><div class="icon">G</div><span>GUARDIAN</span></div>
   <button class="hamburger" onclick="document.querySelector('.topbar nav').classList.toggle('open')">&#9776;</button>
@@ -318,10 +329,10 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
       </div>
     </div>
     <div class="tabs">
-      <button class="tab-btn" id="tabNational">NATIONAL</button>
-      <button class="tab-btn active" id="tabRegional">REGIONAL</button>
+      <button class="tab-btn active" id="tabNational">NATIONAL</button>
+      <button class="tab-btn" id="tabRegional">REGIONAL</button>
     </div>
-    <div class="section-header">REGIONAL ASSETS</div>
+    <div class="section-header">NATIONAL ASSETS</div>
     <div class="region-list" id="regionList"></div>
     <button class="deploy-btn">DEPLOY MONITOR</button>
   </div>
@@ -2971,7 +2982,7 @@ let zoomLevel = 1;
 let panX = 0, panY = 0;
 let isPanning = false, panStartX = 0, panStartY = 0;
 let detailSelectedCity = null;
-let activeTab = "regional";
+let activeTab = "national";
 const REGIONAL_CITIES = ["마포","서초","영등포","대구","수원","성남"];
 
 // ── Clock ──
@@ -3055,6 +3066,8 @@ async function loadData(){
     generateTestData();
   }
   render();
+  const lo = document.getElementById("loadingOverlay");
+  if(lo){ lo.classList.add("hidden"); setTimeout(()=>lo.remove(), 400); }
 }
 
 // ── Render national map ──
@@ -3100,43 +3113,10 @@ function renderRegionList(){
     return !REGIONAL_CITIES.includes(name);
   });
   const sorted = filtered.sort((a,b)=>b[1]-a[1]);
-  const isMobile = window.innerWidth <= 1024;
-  const displayItems = isMobile ? sorted.slice(0,3) : sorted;
-  list.innerHTML = displayItems.map(([name, count])=>{
+  list.innerHTML = sorted.map(([name, count])=>{
     const ac = name===selectedRegion?" active":"";
     return '<div class="region-item'+ac+'" data-rg="'+name+'"><div class="region-dot"></div><div class="region-name">'+name+'</div><div class="region-count">'+count+'</div></div>';
   }).join("");
-  // Mobile: add toggle to show all
-  if(isMobile && sorted.length > 3){
-    const toggle = document.createElement("div");
-    toggle.className = "region-toggle";
-    toggle.textContent = "더보기 ▼ (" + sorted.length + ")";
-    toggle.onclick = function(){
-      if(list.dataset.expanded === "true"){
-        list.dataset.expanded = "false";
-        list.innerHTML = "";
-        sorted.slice(0,3).forEach(([name,count])=>{
-          const ac = name===selectedRegion?" active":"";
-          list.innerHTML += '<div class="region-item'+ac+'" data-rg="'+name+'"><div class="region-dot"></div><div class="region-name">'+name+'</div><div class="region-count">'+count+'</div></div>';
-        });
-        list.appendChild(toggle);
-        toggle.textContent = "더보기 ▼ (" + sorted.length + ")";
-      } else {
-        list.dataset.expanded = "true";
-        list.innerHTML = "";
-        sorted.forEach(([name,count])=>{
-          const ac = name===selectedRegion?" active":"";
-          list.innerHTML += '<div class="region-item'+ac+'" data-rg="'+name+'"><div class="region-dot"></div><div class="region-name">'+name+'</div><div class="region-count">'+count+'</div></div>';
-        });
-        list.appendChild(toggle);
-        toggle.textContent = "접기 ▲";
-      }
-      list.querySelectorAll(".region-item").forEach(el=>{
-        el.onclick = ()=> selectRegion(el.dataset.rg);
-      });
-    };
-    list.appendChild(toggle);
-  }
   list.querySelectorAll(".region-item").forEach(el=>{
     el.onclick = ()=> selectRegion(el.dataset.rg);
   });
@@ -3472,7 +3452,7 @@ function renderDetailMap(key){
     });
   });
 
-  // Render markers
+  // Render markers — position overlay to match SVG exactly, use % coords
   const overlay = document.getElementById("detailMarkerOverlay");
   overlay.innerHTML = "";
   const svg = document.getElementById(cfg.svgId);
@@ -3480,6 +3460,12 @@ function renderDetailMap(key){
   const mapDiv = svg.closest(".detail-map");
   const mapRect = mapDiv.getBoundingClientRect();
   const vb = svg.viewBox.baseVal;
+
+  // Position overlay to exactly match SVG position within .detail-map
+  overlay.style.left = (svgRect.left - mapRect.left) + "px";
+  overlay.style.top = (svgRect.top - mapRect.top) + "px";
+  overlay.style.width = svgRect.width + "px";
+  overlay.style.height = svgRect.height + "px";
 
   cfg.cities.forEach(city=>{
     const ids = getIds(cfg.districtMap[city]);
@@ -3504,17 +3490,15 @@ function renderDetailMap(key){
     // Manual position adjustments for small districts
     const ADJ = {"\uC11C\uCD08":{dx:-60, dy:-35}, "\uAC15\uB0A8":{dy:40}};
     if(ADJ[city]){ cx += (ADJ[city].dx||0); cy += (ADJ[city].dy||0); }
-    // Convert to screen coords
-    const scaleX = svgRect.width / vb.width;
-    const scaleY = svgRect.height / vb.height;
-    const screenX = svgRect.left - mapRect.left + cx * scaleX;
-    const screenY = svgRect.top - mapRect.top + cy * scaleY;
+    // Convert to percentage within SVG viewBox
+    const pctX = (cx / vb.width) * 100;
+    const pctY = (cy / vb.height) * 100;
     const count = regionData[city] || 0;
 
     const group = document.createElement("div");
     group.className = "marker-group" + (city===detailSelectedCity?" active":"");
-    group.style.left = screenX + "px";
-    group.style.top = screenY + "px";
+    group.style.left = pctX + "%";
+    group.style.top = pctY + "%";
     group.style.transform = "translate(-50%, -50%)";
     group.style.pointerEvents = "auto";
     group.onclick = ()=>{

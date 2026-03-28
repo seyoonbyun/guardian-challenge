@@ -71,7 +71,7 @@ select.form-input option{background:#111;color:#fff;}
 .submit-btn:hover .arrow{transform:translateX(4px);}
 
 /* Toast */
-.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:#111;border:1px solid #333;border-radius:6px;padding:14px 24px;font-size:13px;color:#ccc;z-index:9999;transition:transform .3s ease;display:flex;align-items:center;gap:10px;max-width:90vw;}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:#111;border:1px solid #333;border-radius:6px;padding:14px 24px;font-size:13px;color:#ccc;z-index:9999;transition:transform .3s ease;display:flex;align-items:center;gap:10px;max-width:90vw;width:max-content;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 .toast.success{border-color:#4caf50;}
 .toast.error{border-color:#c41a2e;}
@@ -96,6 +96,8 @@ select.form-input option{background:#111;color:#fff;}
 }
 @media(max-width:480px){
   .topbar nav a{font-size:9px;padding:8px 8px;}
+  .toast{left:5vw;right:5vw;transform:translateX(0) translateY(100px);max-width:none;width:auto;padding:14px 16px;font-size:12px;}
+  .toast.show{transform:translateX(0) translateY(0);}
 }
 </style>
 </head>
@@ -333,7 +335,7 @@ function submitForm(){
   showToast("정보가 성공적으로 기록되었습니다! 점수: " + scoreMsg + " | 대시보드로 이동합니다.", "success");
   form.reset();
   setTimeout(()=>{ if(document.body.contains(iframe)) document.body.removeChild(iframe); }, 1000);
-  setTimeout(()=>{ window.location.href = "/dashboard"; }, 2000);
+  setTimeout(()=>{ window.location.href = "map-preview-svg.html"; }, 2000);
   btn.disabled = false;
   btn.innerHTML = '정보 저장 <span class="arrow">&rarr;</span>';
 }
