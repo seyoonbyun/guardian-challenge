@@ -227,11 +227,21 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
   .stat-big .val{font-size:24px;}
   .stat-big .label{font-size:8px;}
 
-  /* Hide info boxes on mobile, show simple markers */
+  /* Hide PC info boxes on mobile, use map markers instead */
   .info-box{display:none !important;}
   .connector-line{display:none !important;}
   .map-pin{display:none !important;}
   .map-area::after{display:none;}
+  /* Mobile map markers (same style as detail maps) */
+  .mobile-marker{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:10;pointer-events:auto;display:flex;flex-direction:column;align-items:center;transition:all .2s;}
+  .mobile-marker .mm-count{font-size:16px;font-weight:800;color:#c41a2e;text-shadow:0 1px 4px rgba(0,0,0,0.9);}
+  .mobile-marker .mm-name{font-size:11px;font-weight:700;color:#999;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,0.8);}
+  .mobile-marker .mm-dot{width:8px;height:8px;background:#c41a2e;border-radius:50%;margin-bottom:2px;box-shadow:0 0 6px rgba(196,26,46,0.5);}
+  .mobile-marker.active .mm-name{color:#fff;}
+  .mobile-marker.active .mm-count{color:#fff;}
+  .mobile-marker.active .mm-dot{animation:pulse 1.5s ease-in-out infinite;}
+  .mobile-marker.detail .mm-click{font-size:10px;font-weight:400;color:#5b5;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:1px;}
+  .mobile-marker.detail.active .mm-click{color:#fff;}
 
   .sidebar-right{width:100%;border-left:none;border-top:1px solid #1a1a1a;overflow-y:visible;}
   .right-header{padding:14px 16px 4px;font-size:10px;}
@@ -3160,6 +3170,28 @@ function renderMarkers(){
     items.push({name: "경기", count: ggTotal, pinX: svgRect.left - areaRect.left + GYEONGGI_LABEL_POS.x * scaleX, pinY: svgRect.top - areaRect.top + GYEONGGI_LABEL_POS.y * scaleY, isActive: ggCfg.cities.includes(selectedRegion), onClick: ()=>openDetailMap("gyeonggi"), chapters: null, isDetail: true});
   }
 
+  const isMobile = window.innerWidth <= 1024;
+
+  if(isMobile){
+    // Mobile: render simple markers on map (same style as detail maps)
+    items.forEach(item => {
+      const mk = document.createElement("div");
+      const isDetail = item.isDetail || false;
+      mk.className = "mobile-marker" + (item.isActive?" active":"") + (isDetail?" detail":"");
+      mk.style.left = item.pinX + "px";
+      mk.style.top = item.pinY + "px";
+      mk.onclick = item.onClick;
+      if(isDetail){
+        mk.innerHTML = '<div class="mm-dot"></div><div class="mm-click">CLICK</div><div class="mm-name">' + item.name + '</div>';
+      } else {
+        mk.innerHTML = '<div class="mm-dot"></div><div class="mm-count">' + item.count + '</div><div class="mm-name">' + item.name + '</div>';
+      }
+      overlay.appendChild(mk);
+    });
+    return;
+  }
+
+  // Desktop: render info boxes with connector lines
   const mapLeft = svgRect.left - areaRect.left;
   const mapRight = mapLeft + svgRect.width;
   const leftItems = items.filter(it => BOX_LAYOUT[it.name] && BOX_LAYOUT[it.name].side === "left").sort((a,b) => a.pinY - b.pinY);
