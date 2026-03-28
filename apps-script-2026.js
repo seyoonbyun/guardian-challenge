@@ -10,7 +10,7 @@ function getOrCreateSheet() {
   var sheet = ss.getSheetByName("2026");
   if (!sheet) {
     sheet = ss.insertSheet("2026");
-    var headers = ["\ub4f1\ub85d\uc77c\uc2dc","\uc601\uc785\uba64\ubc84\uba85","\uc9c0\uc5ed\uba85","\ucc55\ud130\uba85","\uc5f0\ub77d\ucc98","\uc2e0\uaddc\uba64\ubc84\uc131\ud568","\uc2e0\uaddc\uba64\ubc84\uc5f0\ub77d\ucc98","\uc785\ud68c\ucc55\ud130","\uac00\uc785\uc5ec\ubd80","90\ub144\uc0dd\uc0ac\uc5c5\uac00","\uae00\ub85c\ubc8c\ube44\uc988\ub2c8\uc2a4","2\uc138\uacbd\uc601\uc790","\ud504\ub79c\ucc28\uc774\uc988","90G2F\ud574\ub2f9","\uc810\uc218","\uc911\ubcf5\uccb4\ud06c\ud0a4"];
+    var headers = ["등록일시","영입멤버명","지역명","챕터명","연락처","신규멤버성함","신규멤버연락처","입회챕터","가입여부","90G2F유형","점수","중복체크키"];
     sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
     sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold").setBackground("#4285f4").setFontColor("#ffffff");
     sheet.setFrozenRows(1);
@@ -81,7 +81,7 @@ function addData(e) {
     if (uniqueKey) {
       var existingData = sheet.getDataRange().getValues();
       for (var i = 1; i < existingData.length; i++) {
-        if ((existingData[i][15] || "").toString().trim() === uniqueKey) {
+        if ((existingData[i][11] || "").toString().trim() === uniqueKey) {
           return jsonResponse({
             success: false,
             error: "DUPLICATE_DATA",
@@ -91,12 +91,8 @@ function addData(e) {
       }
     }
 
-    // Parse checkbox values
-    var is90Born = (p.is90Born === "true");
-    var isGlobal = (p.isGlobal === "true");
-    var isSecondGenOwner = (p.isSecondGenOwner === "true");
-    var isFranchise = (p.isFranchise === "true");
-    var is90G2FQualified = (p.is90G2FQualified === "true");
+    // Parse values
+    var g2fType = (p.g2fType || "").trim();
     var joinedMember = (p.joinedMember === "true");
     var score = parseInt(p.score) || 0;
 
@@ -106,7 +102,7 @@ function addData(e) {
       createdAt = Utilities.formatDate(new Date(), "Asia/Seoul", "yyyy. MM. dd. HH:mm:ss");
     }
 
-    // Append row (columns A~P)
+    // Append row (columns A~L)
     sheet.appendRow([
       createdAt,
       referrerName,
@@ -117,11 +113,7 @@ function addData(e) {
       newMemberContact,
       newMemberChapter,
       joinedMember,
-      is90Born,
-      isGlobal,
-      isSecondGenOwner,
-      isFranchise,
-      is90G2FQualified,
+      g2fType,
       score,
       uniqueKey
     ]);
@@ -162,34 +154,28 @@ function getData() {
       var name = (row[1] || "").toString().trim();
       if (!name) continue;
 
-      result.push({
-        // Dashboard fields (challenge-dashboard.html)
-        timestamp: row[0] || "",
-        myRegion: row[2] || "",
-        myChapter: row[3] || "",
-        myName: row[1] || "",
-        myContact: row[4] || "",
-        newMemberName: row[5] || "",
-        newMemberChapter: row[7] || "",
-        memberType: getMemberType(row),
+      var g2fType = (row[9] || "").toString().trim();
 
-        // Awards fields (challenge.html)
+      result.push({
+        timestamp: row[0] || "",
         createdAt: row[0] || "",
         referrerName: row[1] || "",
+        myName: row[1] || "",
         referrerRegion: row[2] || "",
+        myRegion: row[2] || "",
         referrerChapter: row[3] || "",
+        myChapter: row[3] || "",
         referrerContact: row[4] || "",
+        myContact: row[4] || "",
+        newMemberName: row[5] || "",
         newMemberContact: row[6] || "",
-
-        // New fields
+        newMemberChapter: row[7] || "",
         joinedMember: row[8] || false,
-        is90Born: row[9] || false,
-        isGlobal: row[10] || false,
-        isSecondGenOwner: row[11] || false,
-        isFranchise: row[12] || false,
-        is90G2FQualified: row[13] || false,
-        score: row[14] || 0,
-        uniqueKey: row[15] || ""
+        g2fType: g2fType,
+        memberType: g2fType,
+        is90G2FQualified: g2fType !== "",
+        score: row[10] || 0,
+        uniqueKey: row[11] || ""
       });
     }
 
@@ -201,15 +187,6 @@ function getData() {
   }
 }
 
-// Member type string for legacy dashboard compatibility
-function getMemberType(row) {
-  var types = [];
-  if (row[9] === true || row[9] === "true") types.push("90born");
-  if (row[10] === true || row[10] === "true") types.push("global");
-  if (row[11] === true || row[11] === "true") types.push("2ndGen");
-  if (row[12] === true || row[12] === "true") types.push("franchise");
-  return types.join(", ") || "";
-}
 
 // ===== Debug Sheet =====
 function debugSheet() {

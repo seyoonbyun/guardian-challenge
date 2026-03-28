@@ -12,7 +12,7 @@
 <meta property="og:site_name" content="guardian-bnikorea.com">
 <link rel="preconnect" href="https://script.google.com">
 <script>
-var __prefetch = fetch('https://script.google.com/macros/s/AKfycbyD8gqW7madpUrKEZr_RKCBPaGXdiB8p5o3qxnXM7Ah73gbY2VQIPbGC_P3cC6JHp5ETA/exec?action=getData').then(function(r){return r.json();});
+var __prefetch = fetch('https://script.google.com/macros/s/AKfycbysr8Ur6HiwmM3suSHrhiyUl9-zYryB_luyhQOXpDyULv83PEbWL1umV1LzTOTYC-3JrQ/exec?action=getData').then(function(r){return r.json();});
 </script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -180,7 +180,7 @@ function updateClock(){
 setInterval(updateClock, 1000);
 updateClock();
 
-const API_URL = "https://script.google.com/macros/s/AKfycbyD8gqW7madpUrKEZr_RKCBPaGXdiB8p5o3qxnXM7Ah73gbY2VQIPbGC_P3cC6JHp5ETA/exec?action=getData";
+const API_URL = "https://script.google.com/macros/s/AKfycbysr8Ur6HiwmM3suSHrhiyUl9-zYryB_luyhQOXpDyULv83PEbWL1umV1LzTOTYC-3JrQ/exec?action=getData";
 
 async function loadData(){
   try {
@@ -191,32 +191,9 @@ async function loadData(){
     if(!rows || !rows.length) throw new Error("No data");
     processData(rows);
   } catch(e){
-    console.warn("API failed, using test data:", e);
-    processData(generateTestData());
+    console.warn("API failed:", e);
+    processData([]);
   }
-}
-
-function generateTestData(){
-  const names = ["김민수","이지현","박성호","최유나","정해원","한서진","오태호","윤지아","강민준","신예린","조승우","임하늘","배진우","류서현","황도윤"];
-  const chapters = ["시너지","미라클","미다스","피닉스","타이탄","알파","에이스","챔피언","레전드","프라임"];
-  const regions = ["강남","서초","마포","송파","성동","중구","영등포","대구","부산","수원","성남","고양","용인","화성","인천","천안","대전"];
-  const rows = [];
-  for(let i=0;i<60;i++){
-    const is90G2F = Math.random() > 0.6;
-    rows.push({
-      createdAt: new Date(2026, 2+Math.floor(Math.random()*9), 2+Math.floor(Math.random()*28)).toISOString(),
-      referrerName: names[Math.floor(Math.random()*names.length)],
-      referrerChapter: chapters[Math.floor(Math.random()*chapters.length)],
-      myRegion: regions[Math.floor(Math.random()*regions.length)],
-      referrerRegion: regions[Math.floor(Math.random()*regions.length)],
-      myChapter: chapters[Math.floor(Math.random()*chapters.length)],
-      newMemberName: "신규멤버" + (i+1),
-      joinedMember: "true",
-      is90G2FQualified: is90G2F ? "true" : "false",
-      score: is90G2F ? 2 : 1
-    });
-  }
-  return rows;
 }
 
 function processData(rows){

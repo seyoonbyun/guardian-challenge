@@ -270,6 +270,17 @@ function showToast(msg, type){
   setTimeout(()=> toast.classList.remove("show"), 3000);
 }
 
+// 90G2F 체크박스: 하나만 선택 가능
+document.querySelectorAll("#is90Born, #isGlobal, #isSecondGenOwner, #isFranchise").forEach(cb=>{
+  cb.addEventListener("change", function(){
+    if(this.checked){
+      document.querySelectorAll("#is90Born, #isGlobal, #isSecondGenOwner, #isFranchise").forEach(other=>{
+        if(other !== this) other.checked = false;
+      });
+    }
+  });
+});
+
 function submitForm(){
   const form = document.getElementById("memberForm");
   const fields = ["myRegion","myChapter","myName","myContact","newMemberName","newMemberContact","newMemberChapter"];
@@ -293,7 +304,8 @@ function submitForm(){
   const isGlobal = document.getElementById("isGlobal").checked;
   const isSecondGenOwner = document.getElementById("isSecondGenOwner").checked;
   const isFranchise = document.getElementById("isFranchise").checked;
-  const is90G2FQualified = is90Born || isGlobal || isSecondGenOwner || isFranchise;
+  const g2fType = is90Born ? "90년생 사업가" : isGlobal ? "글로벌 비즈니스 사업가" : isSecondGenOwner ? "비즈니스 2세 경영자" : isFranchise ? "프랜차이즈 경영자" : "";
+  const is90G2FQualified = g2fType !== "";
 
   // 입회 챕터가 선택되었으면 가입 완료로 간주
   const joinedMember = form.querySelector("[name=newMemberChapter]").value ? true : false;
@@ -316,11 +328,7 @@ function submitForm(){
     newMemberContact: newMemberContact,
     newMemberChapter: form.querySelector("[name=newMemberChapter]").value,
     joinedMember: joinedMember ? "true" : "false",
-    is90Born: is90Born,
-    isGlobal: isGlobal,
-    isSecondGenOwner: isSecondGenOwner,
-    isFranchise: isFranchise,
-    is90G2FQualified: is90G2FQualified,
+    g2fType: g2fType,
     score: score,
     uniqueKey: uniqueKey,
     eventYear: 2026
@@ -331,7 +339,7 @@ function submitForm(){
   btn.innerHTML = "SUBMITTING...";
 
   const params = new URLSearchParams(data);
-  const url = "https://script.google.com/macros/s/AKfycbyD8gqW7madpUrKEZr_RKCBPaGXdiB8p5o3qxnXM7Ah73gbY2VQIPbGC_P3cC6JHp5ETA/exec?" + params.toString();
+  const url = "https://script.google.com/macros/s/AKfycbysr8Ur6HiwmM3suSHrhiyUl9-zYryB_luyhQOXpDyULv83PEbWL1umV1LzTOTYC-3JrQ/exec?" + params.toString();
   const iframe = document.createElement("iframe");
   iframe.style.display = "none";
   iframe.src = url;

@@ -2955,7 +2955,7 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 <div class="map-hover-box" id="mapHoverBox"></div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbyXXPPtJ-5T98hc63xxfLXtKqfvTK3YaUkxTyNjEbNofiWyAGf7N2GT6i4k1X2xDKUXEw/exec?action=getData";
+const API_URL = "https://script.google.com/macros/s/AKfycbysr8Ur6HiwmM3suSHrhiyUl9-zYryB_luyhQOXpDyULv83PEbWL1umV1LzTOTYC-3JrQ/exec?action=getData";
 
 // ── National map: city positions (SVG coords 800x1200) ──
 // Non-Seoul cities shown directly on national map
@@ -3106,28 +3106,6 @@ Object.keys(PROVINCE_CITY_MAP).forEach(provId => {
 });
 
 // ── Data ──
-function generateTestData(){
-  const cities = ["강남","대구","대전","서초","성동","마포","부산","송파","수원","용인","영등포","인천","고양","화성","중구","천안"];
-  const chapters = ["시너지","미라클","미다스","피닉스","타이탄","드래곤","이글","오메가","알파","브레이브"];
-  const counts = [22,18,16,15,14,14,12,14,11,10,9,8,7,6,5,4];
-  regionData = {};
-  chaptersByRegion = {};
-  cities.forEach((c,i)=>{
-    regionData[c] = counts[i] || Math.floor(Math.random()*10)+3;
-    const chs = {};
-    const shuffled = [...chapters].sort(()=>Math.random()-0.5).slice(0,5);
-    const total = regionData[c];
-    let remaining = total;
-    shuffled.forEach((ch,j)=>{
-      const v = j < shuffled.length-1 ? Math.max(1,Math.floor(remaining/(shuffled.length-j)*(.5+Math.random()))) : remaining;
-      chs[ch] = Math.max(1, v);
-      remaining -= chs[ch];
-      if(remaining < 1) remaining = 1;
-    });
-    chaptersByRegion[c] = chs;
-  });
-}
-
 async function loadData(){
   try {
     const res = await fetch(API_URL);
@@ -3151,10 +3129,8 @@ async function loadData(){
       if(!chaptersByRegion[region]) chaptersByRegion[region] = {};
       if(chapter) chaptersByRegion[region][chapter] = (chaptersByRegion[region][chapter]||0) + score;
     });
-    if(Object.keys(regionData).length === 0) throw new Error("Empty");
   } catch(e) {
-    console.warn("API failed, using test data:", e);
-    generateTestData();
+    console.warn("API failed:", e);
   }
   render();
   const lo = document.getElementById("loadingOverlay");
