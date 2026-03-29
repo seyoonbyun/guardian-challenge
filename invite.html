@@ -92,9 +92,9 @@ select.form-input option{background:#111;color:#fff;}
 .hamburger{display:none;background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:4px;}
 @media(max-width:1024px){
   body{overflow:auto;height:auto;}
-  .topbar{padding:0 14px;}
+  .topbar{padding:0 14px;flex-wrap:wrap;height:auto;min-height:46px;}
   .topbar .brand span{font-size:11px;letter-spacing:2px;}
-  .topbar nav{position:absolute;top:46px;left:0;right:0;transform:none;background:#111;border-bottom:1px solid #222;flex-direction:row;align-items:center;justify-content:center;gap:0;z-index:999;display:none;padding:8px 12px;}
+  .topbar nav{position:static;transform:none;background:#111;border-bottom:1px solid #222;flex-direction:row;align-items:center;justify-content:center;gap:0;z-index:999;display:none;padding:8px 12px;width:100%;}
   .topbar nav.open{display:flex;}
   .topbar nav a{font-size:10px;padding:10px 0;flex:1;text-align:center;border-radius:0;}
   .topbar .clock{display:none;}
@@ -118,11 +118,11 @@ select.form-input option{background:#111;color:#fff;}
 <div class="topbar">
   <div class="brand"><img src="bni-logo-white.png" alt="BNI" style="height:22px;"></div>
   <button class="hamburger" onclick="document.querySelector('.topbar nav').classList.toggle('open')">&#9776;</button>
-  <nav>
-        <a href="home.html">HOME</a>
-    <a href="invite.html" class="active">INVITE</a>
-    <a href="map-preview-svg.html">DASHBOARD</a>
-    <a href="challenge.html">AWARDS</a>
+  <nav onclick="this.classList.remove('open')">
+        <a href="/home">HOME</a>
+    <a href="/invite" class="active">INVITE</a>
+    <a href="/dashboard">DASHBOARD</a>
+    <a href="/awards">AWARDS</a>
   </nav>
   <div class="clock" id="clock"></div>
 </div>
@@ -356,7 +356,7 @@ function submitForm(){
   showToast("정보가 성공적으로 기록되었습니다! 점수: " + scoreMsg + " | 대시보드로 이동합니다.", "success");
   form.reset();
   setTimeout(()=>{ if(document.body.contains(iframe)) document.body.removeChild(iframe); }, 1000);
-  setTimeout(()=>{ window.location.href = "map-preview-svg.html"; }, 2000);
+  setTimeout(()=>{ window.location.href = "/dashboard"; }, 2000);
   btn.disabled = false;
   btn.innerHTML = '+1 챌린지 참가 <span class="arrow">&rarr;</span>';
 }

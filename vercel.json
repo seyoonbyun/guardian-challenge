@@ -5,6 +5,7 @@
     { "source": "/invite", "destination": "/invite.html" },
     { "source": "/awards", "destination": "/challenge.html" },
     { "source": "/stamp", "destination": "/stamp-page.html" },
-    { "source": "/map", "destination": "/map-preview-svg.html" }
+    { "source": "/map", "destination": "/map-preview-svg.html" },
+    { "source": "/dashboard", "destination": "/map-preview-svg.html" }
   ]
 }

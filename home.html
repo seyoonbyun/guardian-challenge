@@ -24,8 +24,9 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;width:100vw
 .topbar nav a.active{color:#ccc;background:rgba(255,255,255,0.05);}
 .topbar .clock{color:rgba(255,255,255,0.5);font-size:11px;font-weight:500;letter-spacing:0.5px;}
 
-.hero-banner{width:100%;overflow:hidden;border-bottom:1px solid #1a1a1a;flex-shrink:0;}
-.hero-banner img{width:100%;display:block;transform:scaleY(0.9);}
+.hero-banner{width:100%;overflow:hidden;border-bottom:1px solid #1a1a1a;flex-shrink:0;max-height:625px;position:relative;}
+.hero-banner .banner-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Dancing Script','Brush Script MT','Segoe Script',cursive;font-size:72px;font-weight:700;color:#fff;text-shadow:0 2px 20px rgba(0,0,0,0.7),0 0 40px rgba(196,26,46,0.3);z-index:2;white-space:nowrap;letter-spacing:2px;text-align:center;}
+.hero-banner video{width:100%;display:block;object-fit:cover;height:625px;}
 .main{display:flex;flex:1;min-height:calc(100vh - 46px);}
 
 /* LEFT PANEL */
@@ -107,9 +108,9 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;width:100vw
 .hamburger{display:none;background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:4px;}
 @media(max-width:1024px){
   body{overflow:auto;height:auto;}
-  .topbar{padding:0 14px;}
+  .topbar{padding:0 14px;flex-wrap:wrap;height:auto;min-height:46px;}
   .topbar .brand span{font-size:11px;letter-spacing:2px;}
-  .topbar nav{position:absolute;top:46px;left:0;right:0;transform:none;background:#111;border-bottom:1px solid #222;flex-direction:row;align-items:center;justify-content:center;gap:0;z-index:999;display:none;padding:8px 12px;}
+  .topbar nav{position:static;transform:none;background:#111;border-bottom:1px solid #222;flex-direction:row;align-items:center;justify-content:center;gap:0;z-index:999;display:none;padding:8px 12px;width:100%;}
   .topbar nav.open{display:flex;}
   .topbar nav a{font-size:10px;padding:10px 0;flex:1;text-align:center;border-radius:0;}
   .topbar .clock{display:none;}
@@ -119,9 +120,17 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;width:100vw
   .content-area{padding:24px 20px;}
   .info-grid{grid-template-columns:1fr;}
   .step-grid{grid-template-columns:1fr 1fr;}
+  .hero-banner{max-height:250px;}
+  .hero-banner video{height:250px;}
+  .hero-banner .banner-text{font-size:36px;}
+  .hero-banner .banner-text span{font-size:12px !important;letter-spacing:3px !important;}
 }
 @media(max-width:480px){
   .topbar nav a{font-size:9px;padding:8px 8px;}
+  .hero-banner{max-height:180px;}
+  .hero-banner video{height:180px;}
+  .hero-banner .banner-text{font-size:28px;}
+  .hero-banner .banner-text span{font-size:10px !important;letter-spacing:2px !important;}
 }
 </style>
 </head>
@@ -130,17 +139,21 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;width:100vw
 <div class="topbar">
   <div class="brand"><img src="bni-logo-white.png" alt="BNI" style="height:22px;"></div>
   <button class="hamburger" onclick="document.querySelector('.topbar nav').classList.toggle('open')">&#9776;</button>
-  <nav>
-        <a href="home.html" class="active">HOME</a>
-    <a href="invite.html">INVITE</a>
-    <a href="map-preview-svg.html">DASHBOARD</a>
-    <a href="challenge.html">AWARDS</a>
+  <nav onclick="this.classList.remove('open')">
+        <a href="/home" class="active">HOME</a>
+    <a href="/invite">INVITE</a>
+    <a href="/dashboard">DASHBOARD</a>
+    <a href="/awards">AWARDS</a>
   </nav>
   <div class="clock" id="clock"></div>
 </div>
 
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
 <div class="hero-banner">
-  <img src="og-banner.png" alt="BNI 코리아 +1 가디언 챌린지">
+  <div class="banner-text">+1 Guardian Challenge<br><span style="font-family:'Segoe UI',sans-serif;font-size:20px;letter-spacing:4px;font-weight:800;color:#c41a2e;text-transform:uppercase;">ONE CONNECTION MATTERS</span></div>
+  <video autoplay muted loop playsinline>
+    <source src="win.mp4" type="video/mp4">
+  </video>
 </div>
 
 <div class="main">
@@ -228,7 +241,7 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;width:100vw
       </div>
     </div>
 
-    <a href="invite.html" class="cta-btn">지금 참여하기 &rarr;</a>
+    <a href="/invite" class="cta-btn">지금 참여하기 &rarr;</a>
 
     <div class="footer">BNI 코리아의 모든 멤버가 함께 만들어가는 성공의 여정! 지금 바로 비지터를 초대하세요!</div>
     <div style="position:fixed;bottom:12px;right:20px;font-size:9px;font-weight:700;letter-spacing:1.5px;color:#444;text-transform:uppercase;z-index:10;">Created by Joy Byun</div>
