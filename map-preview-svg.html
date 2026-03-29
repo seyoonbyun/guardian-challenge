@@ -3817,6 +3817,8 @@ function showDetailPanelChapter(chapterName, regionName){
 function openMobileRegionModal(regionName){
   selectedRegion = regionName;
   render();
+  const oldDetail = document.getElementById("mrChapterDetail");
+  if(oldDetail) oldDetail.remove();
 
   const en = EN_NAMES[regionName] || regionName;
   const count = regionData[regionName] || 0;
