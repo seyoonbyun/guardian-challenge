@@ -3499,7 +3499,10 @@ function openDetailMap(key){
   // Wait for layout then render detail markers
   requestAnimationFrame(()=>{
     renderDetailMap(key);
-    showRegionInDetailPanel(cfg.cities[0]);
+    // PC only: show region info in side panel (mobile uses detail map modal directly)
+    if(window.innerWidth > 1024){
+      showRegionInDetailPanel(cfg.cities[0]);
+    }
   });
 }
 
