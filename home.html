@@ -72,29 +72,29 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;width:100vw
 .info-card{background:linear-gradient(145deg,#1a1a1a,#141414);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:24px;transition:all .25s ease;box-shadow:0 4px 12px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.06);}
 .info-card:hover{border-color:rgba(196,26,46,0.4);transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,0.5),0 0 16px rgba(196,26,46,0.15),inset 0 1px 0 rgba(255,255,255,0.08);}
 .info-card.full{grid-column:1/-1;}
-.card-title{font-size:14px;font-weight:800;color:#fff;letter-spacing:1px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.card-title{font-size:15px;font-weight:800;color:#fff;letter-spacing:1px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
 .card-title::before{content:"";width:3px;height:14px;background:#c41a2e;border-radius:2px;}
 .card-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
-.card-list li{font-size:13px;color:#fff;line-height:1.6;padding-left:16px;position:relative;}
+.card-list li{font-size:14px;color:#fff;line-height:1.6;padding-left:16px;position:relative;}
 .card-list li::before{content:"";position:absolute;left:0;top:8px;width:6px;height:6px;background:#c41a2e;border-radius:50%;}
 .card-list li strong{color:#ccc;}
 
 .info-table{width:100%;border-collapse:collapse;}
 .info-table tr{border-bottom:1px solid #1a1a1a;}
 .info-table tr:last-child{border-bottom:none;}
-.info-table td{padding:10px 0;font-size:13px;color:#fff;vertical-align:top;}
+.info-table td{padding:10px 0;font-size:14px;color:#fff;vertical-align:top;}
 .info-table td:first-child{color:#fff;font-weight:700;width:80px;white-space:nowrap;padding-right:16px;}
 .info-table td strong{color:#c41a2e;}
 
 .step-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;}
 .step-card{background:linear-gradient(145deg,#1a1a1a,#141414);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:20px 16px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;transition:all .25s ease;box-shadow:0 4px 12px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.06);}
 .step-card:hover{border-color:rgba(196,26,46,0.4);transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,0.5),0 0 16px rgba(196,26,46,0.15),inset 0 1px 0 rgba(255,255,255,0.08);}
-.step-num{padding:6px 14px;background:rgba(196,26,46,0.1);border:1px solid rgba(196,26,46,0.3);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;letter-spacing:1px;}
-.step-text{font-size:12px;color:#fff;line-height:1.6;}
+.step-num{padding:6px 14px;background:rgba(196,26,46,0.1);border:1px solid rgba(196,26,46,0.3);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0;letter-spacing:1px;}
+.step-text{font-size:13px;color:#fff;line-height:1.6;}
 .step-text strong{color:#c41a2e;}
 
-.highlight-box{background:linear-gradient(145deg,#2a1520,#1a1015);border:1px solid rgba(196,26,46,0.35);border-radius:10px;padding:20px 24px;text-align:center;margin-bottom:24px;transition:all .25s ease;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.5),0 0 12px rgba(196,26,46,0.1),inset 0 1px 0 rgba(255,255,255,0.08);}
-.highlight-box:hover{transform:translateY(-3px);border-color:rgba(196,26,46,0.6);box-shadow:0 8px 28px rgba(0,0,0,0.6),0 0 24px rgba(196,26,46,0.25),inset 0 1px 0 rgba(255,255,255,0.1);}
+.highlight-box{background:linear-gradient(145deg,#2a1520,#1a1015);border:1px solid rgba(196,26,46,0.5);border-radius:10px;padding:20px 24px;text-align:center;margin-bottom:24px;transition:all .25s ease;cursor:pointer;box-shadow:0 0 12px rgba(196,26,46,0.4),0 0 24px rgba(196,26,46,0.2),0 0 40px rgba(196,26,46,0.1),inset 0 1px 0 rgba(255,255,255,0.08);}
+.highlight-box:hover{transform:translateY(-3px);border-color:rgba(196,26,46,0.8);box-shadow:0 0 16px rgba(196,26,46,0.6),0 0 32px rgba(196,26,46,0.4),0 0 56px rgba(196,26,46,0.2),inset 0 1px 0 rgba(255,255,255,0.1);}
 .highlight-box .big{font-size:18px;font-weight:800;color:#fff;margin-bottom:6px;}
 .highlight-box .big .red{color:#c41a2e;}
 .highlight-box .sub{font-size:12px;color:rgba(255,255,255,0.7);}
@@ -102,7 +102,7 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;width:100vw
 .cta-btn{display:block;width:100%;max-width:none;padding:14px;background:#c41a2e;color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer;text-transform:uppercase;text-align:center;text-decoration:none;transition:all .2s;}
 .cta-btn:hover{background:#d42a3e;box-shadow:0 4px 20px rgba(196,26,46,0.3);transform:translateY(-2px);}
 
-.footer{text-align:center;padding:20px;font-size:14px;color:#fff;border-top:1px solid #1a1a1a;margin-top:28px;}
+.footer{text-align:center;padding:20px;font-size:14px;color:#fff;border-top:1px solid #1a1a1a;margin-top:14px;}
 
 .hamburger{display:none;background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:4px;}
 @media(max-width:1024px){
@@ -174,7 +174,7 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;width:100vw
 
     <div class="highlight-box" style="margin-top:20px;">
       <div class="big">챌린지 달성 시 <span class="red">특별 인정 & 시상</span></div>
-      <div class="sub">우승자는 누적 점수 최고자 / 동점 시 영입 수<br>> 최초 달성 시각 순</div>
+      <div class="sub" style="text-align:left;display:inline-block;">1. 우승자는 누적 점수 최고자<br>2. 동점 시 영입 수<br>3. 최초 달성 시각 순</div>
     </div>
 
   </div>
