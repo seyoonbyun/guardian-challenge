@@ -66,7 +66,7 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 @keyframes scanMove{0%{top:0;}100%{top:100%;}}
 .map-svg-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
 .map-svg-wrap svg{height:88%;width:auto;transition:transform .2s;filter:drop-shadow(4px 8px 16px rgba(0,0,0,0.8)) drop-shadow(0 0 40px rgba(196,26,46,0.08));}
-.province{fill:#1e1e1e;stroke:#555;stroke-width:1.5;transition:all .3s ease;cursor:pointer;filter:drop-shadow(2px 3px 3px rgba(0,0,0,0.5));transform-box:fill-box;transform-origin:center;}
+.province{fill:#1e1e1e;stroke:#fff;stroke-width:1.5;transition:all .3s ease;cursor:pointer;filter:drop-shadow(2px 3px 3px rgba(0,0,0,0.5));transform-box:fill-box;transform-origin:center;}
 .province:hover{fill:#2d2d2d;stroke:#666;filter:drop-shadow(3px 5px 8px rgba(0,0,0,0.7)) drop-shadow(0 0 6px rgba(255,255,255,0.05));}
 .province.highlight{fill:#2a1015;stroke:#c41a2e;stroke-width:3;filter:drop-shadow(0 0 12px rgba(196,26,46,0.9)) drop-shadow(0 0 24px rgba(196,26,46,0.5)) drop-shadow(0 0 40px rgba(196,26,46,0.3));}
 /* Provinces with data (red glow + zoom) */
@@ -3127,44 +3127,69 @@ Object.keys(PROVINCE_CITY_MAP).forEach(provId => {
 });
 
 // ── Data ──
+const CACHE_KEY = "dashboard_cache";
+const CACHE_TTL = 5 * 60 * 1000; // 5분
+
+function processRows(rows){
+  rawRows = rows;
+  regionData = {};
+  regionMemberCount = {};
+  chaptersByRegion = {};
+  g2fCounts = {born90:0, global:0, secondGen:0, franchise:0};
+  rows.forEach(r => {
+    const region = (r.myRegion || r.referrerRegion || "").trim();
+    const chapter = (r.myChapter || r.referrerChapter || "").trim();
+    if(!region) return;
+
+    const type90 = ["90년생 사업가","글로벌 비즈니스 사업가","비즈니스 2세 경영자","프랜차이즈 경영자"];
+    const memberType = (r.memberType || r.g2fType || "").trim();
+    const is90G2F = r.is90G2FQualified === true || r.is90G2FQualified === "true" || type90.includes(memberType);
+    const score = is90G2F ? 2 : 1;
+
+    if(memberType === "90년생 사업가") g2fCounts.born90++;
+    else if(memberType === "글로벌 비즈니스 사업가") g2fCounts.global++;
+    else if(memberType === "비즈니스 2세 경영자") g2fCounts.secondGen++;
+    else if(memberType === "프랜차이즈 경영자") g2fCounts.franchise++;
+
+    regionData[region] = (regionData[region]||0) + score;
+    regionMemberCount[region] = (regionMemberCount[region]||0) + 1;
+    if(!chaptersByRegion[region]) chaptersByRegion[region] = {};
+    if(chapter) chaptersByRegion[region][chapter] = (chaptersByRegion[region][chapter]||0) + score;
+  });
+}
+
+function hideLoading(){
+  const lo = document.getElementById("loadingOverlay");
+  if(lo){ lo.classList.add("hidden"); setTimeout(()=>lo.remove(), 400); }
+}
+
 async function loadData(){
+  // 1) 캐시가 있으면 즉시 렌더링
+  let usedCache = false;
+  try {
+    const cached = JSON.parse(localStorage.getItem(CACHE_KEY));
+    if(cached && cached.rows && cached.rows.length && (Date.now() - cached.ts < CACHE_TTL)){
+      processRows(cached.rows);
+      render();
+      hideLoading();
+      usedCache = true;
+    }
+  } catch(e){}
+
+  // 2) API에서 최신 데이터 가져오기
   try {
     const res = await fetch(API_URL);
     const data = await res.json();
     const rows = data.data || data;
     if(!rows || !rows.length) throw new Error("No data");
-    rawRows = rows;
-    regionData = {};
-    regionMemberCount = {};
-    chaptersByRegion = {};
-    g2fCounts = {born90:0, global:0, secondGen:0, franchise:0};
-    rows.forEach(r => {
-      const region = (r.myRegion || r.referrerRegion || "").trim();
-      const chapter = (r.myChapter || r.referrerChapter || "").trim();
-      if(!region) return;
-
-      // 90G2F check: memberType or is90G2FQualified
-      const type90 = ["90년생 사업가","글로벌 비즈니스 사업가","비즈니스 2세 경영자","프랜차이즈 경영자"];
-      const memberType = (r.memberType || r.g2fType || "").trim();
-      const is90G2F = r.is90G2FQualified === true || r.is90G2FQualified === "true" || type90.includes(memberType);
-      const score = is90G2F ? 2 : 1;
-
-      if(memberType === "90년생 사업가") g2fCounts.born90++;
-      else if(memberType === "글로벌 비즈니스 사업가") g2fCounts.global++;
-      else if(memberType === "비즈니스 2세 경영자") g2fCounts.secondGen++;
-      else if(memberType === "프랜차이즈 경영자") g2fCounts.franchise++;
-
-      regionData[region] = (regionData[region]||0) + score;
-      regionMemberCount[region] = (regionMemberCount[region]||0) + 1;
-      if(!chaptersByRegion[region]) chaptersByRegion[region] = {};
-      if(chapter) chaptersByRegion[region][chapter] = (chaptersByRegion[region][chapter]||0) + score;
-    });
+    localStorage.setItem(CACHE_KEY, JSON.stringify({rows, ts: Date.now()}));
+    processRows(rows);
+    render();
   } catch(e) {
     console.warn("API failed:", e);
+    if(!usedCache) render();
   }
-  render();
-  const lo = document.getElementById("loadingOverlay");
-  if(lo){ lo.classList.add("hidden"); setTimeout(()=>lo.remove(), 400); }
+  hideLoading();
 }
 
 // ── Render national map ──

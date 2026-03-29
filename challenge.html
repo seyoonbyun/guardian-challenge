@@ -100,7 +100,7 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .winner-score .ws-label{font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:1px;text-transform:uppercase;}
 
 /* Loading */
-.loading{text-align:center;padding:40px;color:rgba(255,255,255,0.7);font-size:13px;}
+.loading{text-align:center;padding:40px;color:rgba(255,255,255,0.7);font-size:13px;width:100%;}
 .loading::after{content:"";display:inline-block;width:16px;height:16px;border:2px solid #333;border-top-color:#c41a2e;border-radius:50%;animation:spin .8s linear infinite;margin-left:8px;vertical-align:middle;}
 @keyframes spin{to{transform:rotate(360deg);}}
 
@@ -224,18 +224,32 @@ setInterval(updateClock, 1000);
 updateClock();
 
 const API_URL = "https://script.google.com/macros/s/AKfycbysr8Ur6HiwmM3suSHrhiyUl9-zYryB_luyhQOXpDyULv83PEbWL1umV1LzTOTYC-3JrQ/exec?action=getData";
+const CACHE_KEY = "dashboard_cache";
+const CACHE_TTL = 5 * 60 * 1000; // 5분
 
 async function loadData(){
+  // 1) 캐시가 있으면 즉시 렌더링
+  let usedCache = false;
+  try {
+    const cached = JSON.parse(localStorage.getItem(CACHE_KEY));
+    if(cached && cached.rows && cached.rows.length && (Date.now() - cached.ts < CACHE_TTL)){
+      processData(cached.rows);
+      usedCache = true;
+    }
+  } catch(e){}
+
+  // 2) API에서 최신 데이터 가져오기
   try {
     var data;
     if(window.__prefetch){ data = await window.__prefetch; window.__prefetch = null; }
     else { const res = await fetch(API_URL); data = await res.json(); }
     const rows = data.data || data;
     if(!rows || !rows.length) throw new Error("No data");
+    localStorage.setItem(CACHE_KEY, JSON.stringify({rows, ts: Date.now()}));
     processData(rows);
   } catch(e){
     console.warn("API failed:", e);
-    processData([]);
+    if(!usedCache) processData([]);
   }
 }
 
