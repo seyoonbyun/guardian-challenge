@@ -3131,8 +3131,27 @@ Object.keys(PROVINCE_CITY_MAP).forEach(provId => {
 });
 
 // ── Data ──
-const CACHE_KEY = "dashboard_cache";
-const CACHE_TTL = 5 * 60 * 1000; // 5분
+const SUPABASE_URL = "https://gyaonqcpbmuqlxdfleby.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5YW9ucWNwYm11cWx4ZGZsZWJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3ODk3OTQsImV4cCI6MjA5MDM2NTc5NH0.TOaj-OfRcsTNNPRRF6cobSbfCtp_k-e0TUYqK6k4hXc";
+const GAS_API_URL = API_URL;
+
+function mapSupabaseRow(r) {
+  return {
+    createdAt: r.created_at, timestamp: r.created_at,
+    referrerName: r.referrer_name, myName: r.referrer_name,
+    referrerRegion: r.referrer_region, myRegion: r.referrer_region,
+    referrerChapter: r.referrer_chapter, myChapter: r.referrer_chapter,
+    referrerContact: r.referrer_contact, myContact: r.referrer_contact,
+    newMemberName: r.new_member_name,
+    newMemberContact: r.new_member_contact,
+    newMemberChapter: r.new_member_chapter,
+    joinedMember: r.joined_member,
+    g2fType: r.g2f_type, memberType: r.g2f_type,
+    score: r.score,
+    uniqueKey: r.unique_key,
+    is90G2FQualified: r.g2f_type !== ""
+  };
+}
 
 function processRows(rows){
   rawRows = rows;
@@ -3168,30 +3187,34 @@ function hideLoading(){
 }
 
 async function loadData(){
-  // 1) 캐시가 있으면 즉시 렌더링
-  let usedCache = false;
+  // 1) Supabase (primary, fast)
   try {
-    const cached = JSON.parse(localStorage.getItem(CACHE_KEY));
-    if(cached && cached.rows && cached.rows.length && (Date.now() - cached.ts < CACHE_TTL)){
-      processRows(cached.rows);
-      render();
-      hideLoading();
-      usedCache = true;
-    }
-  } catch(e){}
+    const res = await fetch(SUPABASE_URL + "/rest/v1/guardians?select=*", {
+      headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY }
+    });
+    if(!res.ok) throw new Error("Supabase HTTP " + res.status);
+    const sbRows = await res.json();
+    if(!sbRows || !sbRows.length) throw new Error("No data from Supabase");
+    const rows = sbRows.map(mapSupabaseRow);
+    processRows(rows);
+    render();
+    hideLoading();
+    return;
+  } catch(e) {
+    console.warn("Supabase failed, falling back to GAS:", e);
+  }
 
-  // 2) API에서 최신 데이터 가져오기
+  // 2) GAS fallback
   try {
-    const res = await fetch(API_URL);
+    const res = await fetch(GAS_API_URL);
     const data = await res.json();
     const rows = data.data || data;
     if(!rows || !rows.length) throw new Error("No data");
-    localStorage.setItem(CACHE_KEY, JSON.stringify({rows, ts: Date.now()}));
     processRows(rows);
     render();
   } catch(e) {
-    console.warn("API failed:", e);
-    if(!usedCache) render();
+    console.warn("GAS API also failed:", e);
+    render();
   }
   hideLoading();
 }

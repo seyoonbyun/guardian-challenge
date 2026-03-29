@@ -288,7 +288,7 @@ document.querySelectorAll("#is90Born, #isGlobal, #isSecondGenOwner, #isFranchise
   });
 });
 
-function submitForm(){
+async function submitForm(){
   const form = document.getElementById("memberForm");
   const fields = ["myRegion","myChapter","myName","myContact","newMemberName","newMemberContact","newMemberChapter"];
   let valid = true, firstInvalid = null;
@@ -345,11 +345,47 @@ function submitForm(){
   btn.disabled = true;
   btn.innerHTML = "SUBMITTING...";
 
+  const SUPABASE_URL = "https://gyaonqcpbmuqlxdfleby.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5YW9ucWNwYm11cWx4ZGZsZWJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3ODk3OTQsImV4cCI6MjA5MDM2NTc5NH0.TOaj-OfRcsTNNPRRF6cobSbfCtp_k-e0TUYqK6k4hXc";
+
+  // Supabase insert (primary - await for fast user feedback)
+  const sbPayload = {
+    created_at: data.createdAt,
+    referrer_name: data.referrerName,
+    referrer_region: data.referrerRegion,
+    referrer_chapter: data.referrerChapter,
+    referrer_contact: data.referrerContact,
+    new_member_name: data.newMemberName,
+    new_member_contact: data.newMemberContact,
+    new_member_chapter: data.newMemberChapter,
+    joined_member: data.joinedMember,
+    g2f_type: data.g2fType,
+    score: data.score,
+    unique_key: data.uniqueKey
+  };
+
+  try {
+    const sbRes = await fetch(SUPABASE_URL + "/rest/v1/guardians", {
+      method: "POST",
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": "Bearer " + SUPABASE_KEY,
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify(sbPayload)
+    });
+    if(!sbRes.ok) throw new Error("Supabase insert failed: " + sbRes.status);
+  } catch(e) {
+    console.warn("Supabase insert error:", e);
+  }
+
+  // GAS write (fire-and-forget backup to keep Google Sheet updated)
   const params = new URLSearchParams(data);
-  const url = "https://script.google.com/macros/s/AKfycbysr8Ur6HiwmM3suSHrhiyUl9-zYryB_luyhQOXpDyULv83PEbWL1umV1LzTOTYC-3JrQ/exec?" + params.toString();
+  const gasUrl = "https://script.google.com/macros/s/AKfycbysr8Ur6HiwmM3suSHrhiyUl9-zYryB_luyhQOXpDyULv83PEbWL1umV1LzTOTYC-3JrQ/exec?" + params.toString();
   const iframe = document.createElement("iframe");
   iframe.style.display = "none";
-  iframe.src = url;
+  iframe.src = gasUrl;
   document.body.appendChild(iframe);
 
   const scoreMsg = score === 2 ? "2점 (90G2F 해당)" : score === 1 ? "1점" : "0점";
