@@ -91,6 +91,7 @@ select.form-input option{background:#111;color:#fff;}
 /* Mobile */
 .hamburger{display:none;background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:4px;}
 @media(max-width:1024px){
+  .pc-video{display:none !important;}
   body{overflow:auto;height:auto;}
   .topbar{padding:0 14px;flex-wrap:wrap;height:auto;min-height:46px;}
   .topbar .brand span{font-size:11px;letter-spacing:2px;}
@@ -184,6 +185,12 @@ select.form-input option{background:#111;color:#fff;}
       <div class="form-group">
         <label class="form-label">연락처 <span class="req">*</span></label>
         <input type="tel" class="form-input" id="myContact" name="myContact" placeholder="010-0000-0000" maxlength="13" required>
+      </div>
+
+      <div class="pc-video" style="margin-top:16px;border-radius:8px;overflow:hidden;">
+        <video autoplay muted loop playsinline style="width:100%;display:block;border-radius:8px;">
+          <source src="win1.mp4" type="video/mp4">
+        </video>
       </div>
     </div>
 
