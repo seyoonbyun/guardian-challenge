@@ -8,23 +8,25 @@
 <meta property="og:title" content="+1 Guardian Challenge">
 <meta property="og:description" content="BNI Korea 2026 +1 Guardian Challenge">
 <meta property="og:url" content="https://guardian-bnikorea.com">
-<meta property="og:image" content="https://guardian-bnikorea.com/bni-logo-white.png">
+<meta property="og:image" content="https://guardian-challenge.vercel.app/og-banner.png">
 <meta property="og:site_name" content="guardian-bnikorea.com">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hidden;height:100vh;width:100vw;}
+body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;width:100vw;display:flex;flex-direction:column;min-height:100vh;overflow-x:hidden;}
 
 .topbar{height:46px;background:#111;border-bottom:1px solid #222;display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:100;position:relative;}
 .topbar .brand{display:flex;align-items:center;gap:10px;}
 .topbar .brand .icon{width:26px;height:26px;background:#c41a2e;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;}
 .topbar .brand span{font-weight:700;font-size:14px;letter-spacing:4px;color:#c41a2e;}
 .topbar nav{display:flex;gap:4px;position:absolute;left:50%;transform:translateX(-50%);}
-.topbar nav a{color:#555;text-decoration:none;font-size:10px;font-weight:600;letter-spacing:1.5px;padding:5px 12px;border-radius:3px;text-transform:uppercase;transition:all .2s;}
-.topbar nav a:hover{color:#999;}
+.topbar nav a{color:#fff;text-decoration:none;font-size:10px;font-weight:600;letter-spacing:1.5px;padding:5px 12px;border-radius:3px;text-transform:uppercase;transition:all .2s;}
+.topbar nav a:hover{color:#fff;}
 .topbar nav a.active{color:#ccc;background:rgba(255,255,255,0.05);}
-.topbar .clock{color:#555;font-size:11px;font-weight:500;letter-spacing:0.5px;}
+.topbar .clock{color:rgba(255,255,255,0.5);font-size:11px;font-weight:500;letter-spacing:0.5px;}
 
-.main{display:flex;height:calc(100vh - 46px);}
+.hero-banner{width:100%;overflow:hidden;border-bottom:1px solid #1a1a1a;flex-shrink:0;}
+.hero-banner img{width:100%;display:block;transform:scaleY(0.9);}
+.main{display:flex;flex:1;min-height:calc(100vh - 46px);}
 
 /* LEFT PANEL */
 .left-panel{width:380px;background:#111;border-right:1px solid #1a1a1a;display:flex;flex-direction:column;padding:32px 28px;overflow-y:auto;}
@@ -33,21 +35,28 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .left-panel::-webkit-scrollbar-thumb{background:#333;border-radius:2px;}
 
 /* Countdown */
-.countdown-label{font-size:10px;font-weight:700;letter-spacing:3px;color:#c41a2e;text-transform:uppercase;margin-bottom:16px;text-align:center;}
-.countdown-display{display:flex;justify-content:center;gap:10px;margin-bottom:14px;}
-.countdown-item{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:14px 16px;flex:1;text-align:center;transition:all .3s;}
-.countdown-item:hover{border-color:#c41a2e;transform:translateY(-2px);}
-.countdown-number{display:block;font-size:28px;font-weight:800;color:#c41a2e;line-height:1;}
-.countdown-unit{display:block;font-size:8px;color:#555;letter-spacing:2px;text-transform:uppercase;margin-top:4px;font-weight:600;}
-.countdown-target{font-size:11px;color:#555;text-align:center;margin-bottom:28px;}
+.countdown-label{font-size:14px;font-weight:700;letter-spacing:2px;color:#fff;text-transform:uppercase;margin-bottom:4px;text-align:center;}
+.countdown-display{display:flex;justify-content:center;gap:16px;margin-bottom:28px;}
+.countdown-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:all .25s ease;}
+.countdown-circle{box-shadow:0 4px 12px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.06);}
+.countdown-item:hover{transform:translateY(-4px);}
+.countdown-circle{width:72px;height:72px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;background:#111;border:none;transition:all .25s ease;}
+.countdown-item:hover .countdown-circle{border-color:rgba(196,26,46,0.5);box-shadow:0 0 16px rgba(196,26,46,0.2);}
+.countdown-circle svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);}
+.countdown-circle svg circle{fill:none;stroke-width:3;stroke-linecap:round;}
+.countdown-circle .bg{stroke:#fff;}
+.countdown-circle .progress{stroke:#c41a2e;transition:stroke-dashoffset .5s ease;}
+.countdown-number{font-size:24px;font-weight:800;color:#c41a2e;line-height:1;z-index:1;}
+.countdown-unit{font-size:10px;color:rgba(255,255,255,0.7);letter-spacing:1.5px;text-transform:uppercase;font-weight:600;}
+.countdown-target{font-size:14px;color:rgba(255,255,255,0.7);text-align:center;margin-bottom:28px;}
 .countdown-target span{color:#ccc;font-weight:700;}
 
 /* Hero in left panel */
-.hero-badge{display:inline-block;font-size:9px;font-weight:700;letter-spacing:2px;color:#c41a2e;background:rgba(196,26,46,0.08);padding:5px 12px;border-radius:16px;text-transform:uppercase;margin-bottom:14px;}
-.hero-title{font-size:28px;font-weight:800;color:#fff;line-height:1.3;margin-bottom:10px;}
+.hero-badge{display:block;text-align:center;font-size:9px;font-weight:700;letter-spacing:2px;color:#c41a2e;background:rgba(196,26,46,0.08);padding:5px 12px;border-radius:16px;text-transform:uppercase;margin-bottom:14px;}
+.hero-title{font-size:42px;font-weight:800;color:#fff;line-height:1.3;margin-bottom:10px;text-align:center;width:100%;}
 .hero-title .red{color:#c41a2e;}
-.hero-sub{font-size:14px;color:#999;font-weight:500;margin-bottom:8px;line-height:1.5;}
-.hero-desc{font-size:12px;color:#555;line-height:1.7;margin-bottom:24px;}
+.hero-sub{font-size:14px;color:#fff;font-weight:500;margin-bottom:8px;line-height:1.5;}
+.hero-desc{font-size:12px;color:rgba(255,255,255,0.7);line-height:1.7;margin-bottom:24px;}
 
 .visual-panel{flex:1;background:linear-gradient(135deg,#1a0a0a,#0a0a0a);border:1px solid #1a1a1a;border-radius:8px;overflow:hidden;position:relative;min-height:80px;}
 .visual-panel::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 3px,rgba(196,26,46,0.03) 3px,rgba(196,26,46,0.03) 4px);pointer-events:none;}
@@ -60,32 +69,40 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .content-area::-webkit-scrollbar-thumb{background:#333;border-radius:2px;}
 
 .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;}
-.info-card{background:#111;border:1px solid #1a1a1a;border-radius:8px;padding:24px;transition:all .3s;}
-.info-card:hover{border-color:#222;transform:translateY(-2px);}
+.info-card{background:linear-gradient(145deg,#1a1a1a,#141414);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:24px;transition:all .25s ease;box-shadow:0 4px 12px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.06);}
+.info-card:hover{border-color:rgba(196,26,46,0.4);transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,0.5),0 0 16px rgba(196,26,46,0.15),inset 0 1px 0 rgba(255,255,255,0.08);}
 .info-card.full{grid-column:1/-1;}
 .card-title{font-size:14px;font-weight:800;color:#fff;letter-spacing:1px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
 .card-title::before{content:"";width:3px;height:14px;background:#c41a2e;border-radius:2px;}
 .card-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
-.card-list li{font-size:13px;color:#888;line-height:1.6;padding-left:16px;position:relative;}
+.card-list li{font-size:13px;color:#fff;line-height:1.6;padding-left:16px;position:relative;}
 .card-list li::before{content:"";position:absolute;left:0;top:8px;width:6px;height:6px;background:#c41a2e;border-radius:50%;}
 .card-list li strong{color:#ccc;}
 
 .info-table{width:100%;border-collapse:collapse;}
 .info-table tr{border-bottom:1px solid #1a1a1a;}
 .info-table tr:last-child{border-bottom:none;}
-.info-table td{padding:10px 0;font-size:13px;color:#888;vertical-align:top;}
-.info-table td:first-child{color:#999;font-weight:700;width:80px;white-space:nowrap;padding-right:16px;}
+.info-table td{padding:10px 0;font-size:13px;color:#fff;vertical-align:top;}
+.info-table td:first-child{color:#fff;font-weight:700;width:80px;white-space:nowrap;padding-right:16px;}
 .info-table td strong{color:#c41a2e;}
 
-.highlight-box{background:rgba(196,26,46,0.05);border:1px solid rgba(196,26,46,0.15);border-radius:8px;padding:20px 24px;text-align:center;margin-bottom:24px;}
+.step-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;}
+.step-card{background:linear-gradient(145deg,#1a1a1a,#141414);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:20px 16px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;transition:all .25s ease;box-shadow:0 4px 12px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.06);}
+.step-card:hover{border-color:rgba(196,26,46,0.4);transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,0.5),0 0 16px rgba(196,26,46,0.15),inset 0 1px 0 rgba(255,255,255,0.08);}
+.step-num{padding:6px 14px;background:rgba(196,26,46,0.1);border:1px solid rgba(196,26,46,0.3);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;letter-spacing:1px;}
+.step-text{font-size:12px;color:#fff;line-height:1.6;}
+.step-text strong{color:#c41a2e;}
+
+.highlight-box{background:linear-gradient(145deg,#2a1520,#1a1015);border:1px solid rgba(196,26,46,0.35);border-radius:10px;padding:20px 24px;text-align:center;margin-bottom:24px;transition:all .25s ease;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.5),0 0 12px rgba(196,26,46,0.1),inset 0 1px 0 rgba(255,255,255,0.08);}
+.highlight-box:hover{transform:translateY(-3px);border-color:rgba(196,26,46,0.6);box-shadow:0 8px 28px rgba(0,0,0,0.6),0 0 24px rgba(196,26,46,0.25),inset 0 1px 0 rgba(255,255,255,0.1);}
 .highlight-box .big{font-size:18px;font-weight:800;color:#fff;margin-bottom:6px;}
 .highlight-box .big .red{color:#c41a2e;}
-.highlight-box .sub{font-size:12px;color:#666;}
+.highlight-box .sub{font-size:12px;color:rgba(255,255,255,0.7);}
 
-.cta-btn{display:block;width:100%;max-width:360px;margin:0 auto;padding:14px;background:#c41a2e;color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer;text-transform:uppercase;text-align:center;text-decoration:none;transition:all .2s;}
+.cta-btn{display:block;width:100%;max-width:none;padding:14px;background:#c41a2e;color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer;text-transform:uppercase;text-align:center;text-decoration:none;transition:all .2s;}
 .cta-btn:hover{background:#d42a3e;box-shadow:0 4px 20px rgba(196,26,46,0.3);transform:translateY(-2px);}
 
-.footer{text-align:center;padding:20px;font-size:11px;color:#333;border-top:1px solid #1a1a1a;margin-top:28px;}
+.footer{text-align:center;padding:20px;font-size:14px;color:#fff;border-top:1px solid #1a1a1a;margin-top:28px;}
 
 .hamburger{display:none;background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:4px;}
 @media(max-width:1024px){
@@ -101,6 +118,7 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
   .left-panel{width:100%;padding:24px 20px;}
   .content-area{padding:24px 20px;}
   .info-grid{grid-template-columns:1fr;}
+  .step-grid{grid-template-columns:1fr 1fr;}
 }
 @media(max-width:480px){
   .topbar nav a{font-size:9px;padding:8px 8px;}
@@ -121,22 +139,43 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
   <div class="clock" id="clock"></div>
 </div>
 
+<div class="hero-banner">
+  <img src="og-banner.png" alt="BNI 코리아 +1 가디언 챌린지">
+</div>
+
 <div class="main">
   <!-- LEFT PANEL -->
   <div class="left-panel">
-    <div class="countdown-label">COUNTDOWN TO DEADLINE</div>
-    <div class="countdown-display">
-      <div class="countdown-item"><span class="countdown-number" id="days">0</span><span class="countdown-unit">Days</span></div>
-      <div class="countdown-item"><span class="countdown-number" id="hours">0</span><span class="countdown-unit">Hours</span></div>
-      <div class="countdown-item"><span class="countdown-number" id="minutes">0</span><span class="countdown-unit">Min</span></div>
-      <div class="countdown-item"><span class="countdown-number" id="seconds">0</span><span class="countdown-unit">Sec</span></div>
-    </div>
+    <div class="countdown-label">COUNTDOWN TO WIN</div>
     <div class="countdown-target"><span>2026년 12월 31일</span>까지</div>
+    <div class="countdown-display">
+      <div class="countdown-item">
+        <div class="countdown-circle" id="circDays"><svg viewBox="0 0 78 78"><circle class="bg" cx="39" cy="39" r="36"/><circle class="progress" cx="39" cy="39" r="36" stroke-dasharray="226" stroke-dashoffset="0"/></svg><span class="countdown-number" id="days">0</span></div>
+        <span class="countdown-unit">Days</span>
+      </div>
+      <div class="countdown-item">
+        <div class="countdown-circle" id="circHours"><svg viewBox="0 0 78 78"><circle class="bg" cx="39" cy="39" r="36"/><circle class="progress" cx="39" cy="39" r="36" stroke-dasharray="226" stroke-dashoffset="0"/></svg><span class="countdown-number" id="hours">0</span></div>
+        <span class="countdown-unit">Hours</span>
+      </div>
+      <div class="countdown-item">
+        <div class="countdown-circle" id="circMin"><svg viewBox="0 0 78 78"><circle class="bg" cx="39" cy="39" r="36"/><circle class="progress" cx="39" cy="39" r="36" stroke-dasharray="226" stroke-dashoffset="0"/></svg><span class="countdown-number" id="minutes">0</span></div>
+        <span class="countdown-unit">Minutes</span>
+      </div>
+      <div class="countdown-item">
+        <div class="countdown-circle" id="circSec"><svg viewBox="0 0 78 78"><circle class="bg" cx="39" cy="39" r="36"/><circle class="progress" cx="39" cy="39" r="36" stroke-dasharray="226" stroke-dashoffset="0"/></svg><span class="countdown-number" id="seconds">0</span></div>
+        <span class="countdown-unit">Seconds</span>
+      </div>
+    </div>
 
     <div class="hero-badge">BNI KOREA +1 CHALLENGE</div>
     <div class="hero-title">한 사람의 초대가<br><span class="red">변화</span>를 만듭니다!</div>
-    <div class="hero-sub">함께 성장하는 BNI 네트워크,<br>당신의 그 사업가로!</div>
+    <div class="hero-sub">함께 성장하는 BNI 네트워크, 당신이 그 시작입니다 !</div>
     <div class="hero-desc">챌린지 달성자를 위한 특별한 인정과 축하가 기다립니다!</div>
+
+    <div class="highlight-box" style="margin-top:20px;">
+      <div class="big">챌린지 달성 시 <span class="red">특별 인정 & 시상</span></div>
+      <div class="sub">우승자는 누적 점수 최고자 / 동점 시 영입 수<br>> 최초 달성 시각 순</div>
+    </div>
 
   </div>
 
@@ -159,44 +198,18 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
       </div>
     </div>
 
-    <div class="info-card full" style="margin-bottom:20px;">
-      <div class="card-title">참여에서 달성까지!</div>
-      <table class="info-table">
-        <tr><td>STEP 1</td><td>내 사업 네트워크에서 <strong>BNI에 적합한 사업가 1명</strong>을 선정합니다</td></tr>
-        <tr><td>STEP 2</td><td>해당 사업가를 <strong>BNI 챕터 미팅에 비지터로 초대</strong>합니다</td></tr>
-        <tr><td>STEP 3</td><td>비지터가 <strong>BNI 멤버로 입회</strong>하면 챌린지 달성!</td></tr>
-        <tr><td>STEP 4</td><td><strong>INVITE 페이지</strong>에서 정보를 등록하여 기록합니다</td></tr>
-      </table>
+    <div class="card-title" style="margin-bottom:16px;">참여에서 달성까지!</div>
+    <div class="step-grid">
+      <div class="step-card"><div class="step-num">STEP 1</div><div class="step-text">내 사업 네트워크에서 <strong>BNI에 적합한 사업가 1명</strong>을<br>선정합니다</div></div>
+      <div class="step-card"><div class="step-num">STEP 2</div><div class="step-text">해당 사업가를 <strong>BNI 챕터 미팅에 비지터로 초대</strong>합니다</div></div>
+      <div class="step-card"><div class="step-num">STEP 3</div><div class="step-text">비지터가 <strong>BNI 멤버로 입회</strong>하면 챌린지 달성!</div></div>
+      <div class="step-card"><div class="step-num">STEP 4</div><div class="step-text"><strong>INVITE 페이지</strong>에서 정보를 등록하여 기록합니다</div></div>
     </div>
+
 
     <div class="info-grid">
       <div class="info-card">
-        <div class="card-title">점수 체계</div>
-        <ul class="card-list">
-          <li><strong>1점</strong> : 비지터 1명을 데려와 멤버로 가입시킨 경우</li>
-          <li><strong>2점</strong> : 90G2F 해당자를 데려와 멤버로 가입시킨 경우</li>
-          <li>90G2F = <strong>90년생 / Global / 2세 경영자 / Franchise</strong></li>
-          <li>멤버 가입 완료된 경우만 점수 인정</li>
-        </ul>
-      </div>
-      <div class="info-card">
-        <div class="card-title">시상 내역</div>
-        <ul class="card-list">
-          <li><strong>최대 달성율 챕터</strong> : 멤버수 대비 달성율이 가장 높은 챕터</li>
-          <li><strong>최대 영입율 챕터</strong> : 가디언 수가 가장 많은 챕터</li>
-          <li><strong>최대 영입 멤버</strong> : 가장 많은 멤버를 영입한 멤버</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="highlight-box">
-      <div class="big">챌린지 달성 시 <span class="red">특별 인정 & 시상</span></div>
-      <div class="sub">우승자는 누적 점수 최고자 / 동점 시 영입 수 > 최초 달성 시각 순</div>
-    </div>
-
-    <div class="info-grid">
-      <div class="info-card">
-        <div class="card-title">참가 방법</div>
+        <div class="card-title">+1 가디언 챌린지 즐기는 법</div>
         <ul class="card-list">
           <li>상단 <strong>INVITE</strong> 탭에서 영입 정보 등록</li>
           <li>신규 멤버 가입 완료 시 폼 제출</li>
@@ -218,7 +231,7 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
     <a href="invite.html" class="cta-btn">지금 참여하기 &rarr;</a>
 
     <div class="footer">BNI 코리아의 모든 멤버가 함께 만들어가는 성공의 여정! 지금 바로 비지터를 초대하세요!</div>
-    <div style="text-align:right;padding:0 0 8px;font-size:9px;font-weight:700;letter-spacing:1.5px;color:#444;text-transform:uppercase;">Created by Joy Byun</div>
+    <div style="position:fixed;bottom:12px;right:20px;font-size:9px;font-weight:700;letter-spacing:1.5px;color:#444;text-transform:uppercase;z-index:10;">Created by Joy Byun</div>
   </div>
 </div>
 
@@ -232,15 +245,31 @@ function updateClock(){
 setInterval(updateClock, 1000);
 updateClock();
 
+function setCircleProgress(id, value, max){
+  const circ = document.getElementById(id);
+  if(!circ) return;
+  const prog = circ.querySelector('.progress');
+  const circumference = 226;
+  const pct = Math.min(value / max, 1);
+  prog.style.strokeDashoffset = circumference * (1 - pct);
+}
 function updateCountdown(){
   const target = new Date("2027-01-01T00:00:00").getTime();
   const now = new Date().getTime();
   const d = target - now;
   if(d < 0){ document.getElementById("days").textContent="0"; document.getElementById("hours").textContent="0"; document.getElementById("minutes").textContent="0"; document.getElementById("seconds").textContent="0"; return; }
-  document.getElementById("days").textContent = Math.floor(d/(1000*60*60*24));
-  document.getElementById("hours").textContent = Math.floor((d%(1000*60*60*24))/(1000*60*60));
-  document.getElementById("minutes").textContent = Math.floor((d%(1000*60*60))/(1000*60));
-  document.getElementById("seconds").textContent = Math.floor((d%(1000*60))/1000);
+  const days = Math.floor(d/(1000*60*60*24));
+  const hours = Math.floor((d%(1000*60*60*24))/(1000*60*60));
+  const minutes = Math.floor((d%(1000*60*60))/(1000*60));
+  const seconds = Math.floor((d%(1000*60))/1000);
+  document.getElementById("days").textContent = days;
+  document.getElementById("hours").textContent = hours;
+  document.getElementById("minutes").textContent = minutes;
+  document.getElementById("seconds").textContent = seconds;
+  setCircleProgress("circDays", days, 365);
+  setCircleProgress("circHours", hours, 24);
+  setCircleProgress("circMin", minutes, 60);
+  setCircleProgress("circSec", seconds, 60);
 }
 setInterval(updateCountdown, 1000);
 updateCountdown();

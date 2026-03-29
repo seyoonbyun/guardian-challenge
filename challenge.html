@@ -8,7 +8,7 @@
 <meta property="og:title" content="+1 Guardian Challenge">
 <meta property="og:description" content="BNI Korea 2026 +1 Guardian Challenge">
 <meta property="og:url" content="https://guardian-bnikorea.com">
-<meta property="og:image" content="https://guardian-bnikorea.com/bni-logo-white.png">
+<meta property="og:image" content="https://guardian-challenge.vercel.app/og-banner.png">
 <meta property="og:site_name" content="guardian-bnikorea.com">
 <link rel="preconnect" href="https://script.google.com">
 <script>
@@ -23,10 +23,10 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .topbar .brand .icon{width:26px;height:26px;background:#c41a2e;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;}
 .topbar .brand span{font-weight:700;font-size:14px;letter-spacing:4px;color:#c41a2e;}
 .topbar nav{display:flex;gap:4px;position:absolute;left:50%;transform:translateX(-50%);}
-.topbar nav a{color:#555;text-decoration:none;font-size:10px;font-weight:600;letter-spacing:1.5px;padding:5px 12px;border-radius:3px;text-transform:uppercase;transition:all .2s;}
-.topbar nav a:hover{color:#999;}
+.topbar nav a{color:#fff;text-decoration:none;font-size:10px;font-weight:600;letter-spacing:1.5px;padding:5px 12px;border-radius:3px;text-transform:uppercase;transition:all .2s;}
+.topbar nav a:hover{color:#fff;}
 .topbar nav a.active{color:#ccc;background:rgba(255,255,255,0.05);}
-.topbar .clock{color:#555;font-size:11px;font-weight:500;letter-spacing:0.5px;}
+.topbar .clock{color:rgba(255,255,255,0.5);font-size:11px;font-weight:500;letter-spacing:0.5px;}
 
 .main{display:flex;height:calc(100vh - 46px);}
 
@@ -36,24 +36,27 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .left-panel::-webkit-scrollbar-track{background:transparent;}
 .left-panel::-webkit-scrollbar-thumb{background:#333;border-radius:2px;}
 .page-label{font-size:10px;font-weight:700;letter-spacing:3px;color:#c41a2e;text-transform:uppercase;margin-bottom:14px;}
-.page-title{font-size:32px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:16px;}
-.page-desc{font-size:13px;color:#555;line-height:1.8;margin-bottom:24px;}
+.page-title{font-size:26px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:16px;}
+.page-desc{font-size:13px;color:#fff;line-height:1.8;margin-bottom:24px;}
 
-.event-period{padding:14px 16px;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:6px;margin-bottom:20px;}
-.event-period .ep-label{font-size:9px;font-weight:700;letter-spacing:2px;color:#444;text-transform:uppercase;margin-bottom:6px;}
-.event-period .ep-date{font-size:14px;color:#ccc;font-weight:600;}
+.event-period{padding:14px 16px;background:linear-gradient(145deg,#1a1a1a,#141414);border:1px solid rgba(255,255,255,0.1);border-radius:8px;margin-bottom:20px;transition:all .25s ease;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.06);}
+.event-period:hover{border-color:rgba(196,26,46,0.4);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,0.5),0 0 16px rgba(196,26,46,0.15),inset 0 1px 0 rgba(255,255,255,0.08);}
+.event-period .ep-label{font-size:9px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.7);text-transform:uppercase;margin-bottom:6px;}
+.event-period .ep-date{font-size:21px;color:#ccc;font-weight:600;}
 
-.scoring-box{padding:16px;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:6px;margin-bottom:20px;}
-.scoring-title{font-size:10px;font-weight:700;letter-spacing:2px;color:#444;text-transform:uppercase;margin-bottom:10px;}
+.scoring-box{padding:16px;background:linear-gradient(145deg,#1a1a1a,#141414);border:1px solid rgba(255,255,255,0.1);border-radius:8px;margin-bottom:20px;transition:all .25s ease;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.06);}
+.scoring-box:hover{border-color:rgba(196,26,46,0.4);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,0.5),0 0 16px rgba(196,26,46,0.15),inset 0 1px 0 rgba(255,255,255,0.08);}
+.scoring-title{font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.7);text-transform:uppercase;margin-bottom:10px;}
 .scoring-item{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
 .scoring-item:last-child{margin-bottom:0;}
 .scoring-pts{font-size:20px;font-weight:800;color:#c41a2e;min-width:36px;text-align:center;}
-.scoring-desc{font-size:12px;color:#888;}
+.scoring-desc{font-size:12px;color:#fff;}
 
 .total-stats{display:flex;gap:12px;margin-bottom:20px;}
-.total-stat{flex:1;padding:14px;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:6px;text-align:center;}
+.total-stat{flex:1;padding:14px;background:linear-gradient(145deg,#1a1a1a,#141414);border:1px solid rgba(255,255,255,0.1);border-radius:8px;text-align:center;transition:all .25s ease;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.06);}
+.total-stat:hover{border-color:rgba(196,26,46,0.4);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,0.5),0 0 16px rgba(196,26,46,0.15),inset 0 1px 0 rgba(255,255,255,0.08);}
 .total-stat .ts-num{font-size:28px;font-weight:800;color:#c41a2e;line-height:1;}
-.total-stat .ts-label{font-size:8px;font-weight:700;letter-spacing:1.5px;color:#555;text-transform:uppercase;margin-top:4px;}
+.total-stat .ts-label{font-size:8px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,0.7);text-transform:uppercase;margin-top:4px;}
 
 .visual-panel{flex:1;background:linear-gradient(135deg,#1a0a0a,#0a0a0a);border:1px solid #1a1a1a;border-radius:8px;overflow:hidden;position:relative;min-height:60px;}
 .visual-panel::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 3px,rgba(196,26,46,0.03) 3px,rgba(196,26,46,0.03) 4px);pointer-events:none;}
@@ -65,42 +68,59 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .content-area::-webkit-scrollbar-track{background:transparent;}
 .content-area::-webkit-scrollbar-thumb{background:#333;border-radius:2px;}
 
-/* Award cards */
-.award-card{background:#111;border:1px solid #1a1a1a;border-radius:10px;padding:28px;margin-bottom:24px;transition:all .3s;}
-.award-card:hover{border-color:#222;transform:translateY(-2px);}
-.award-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
-.award-badge{display:flex;align-items:center;gap:10px;}
-.award-icon{width:44px;height:44px;background:rgba(196,26,46,0.1);border:1px solid rgba(196,26,46,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;}
-.award-info{display:flex;flex-direction:column;}
+/* Award cards - horizontal layout */
+#awardsContent{display:flex;gap:20px;}
+.award-card{flex:1;background:linear-gradient(145deg,#1e1e1e,#151515);border:1px solid rgba(196,26,46,0.5);border-radius:14px;padding:28px 24px;transition:all .3s;display:flex;flex-direction:column;align-items:center;text-align:center;box-shadow:0 0 12px rgba(196,26,46,0.4),0 0 24px rgba(196,26,46,0.2),0 0 40px rgba(196,26,46,0.1),inset 0 1px 0 rgba(255,255,255,0.08);}
+.award-card:hover{border-color:rgba(196,26,46,0.8);transform:translateY(-4px);box-shadow:0 0 16px rgba(196,26,46,0.6),0 0 32px rgba(196,26,46,0.4),0 0 56px rgba(196,26,46,0.2),inset 0 1px 0 rgba(255,255,255,0.1);}
+.award-header{display:flex;flex-direction:column;align-items:center;margin-bottom:20px;width:100%;}
+.award-badge{display:flex;flex-direction:column;align-items:center;gap:10px;}
+.award-icon{width:56px;height:56px;background:rgba(196,26,46,0.15);border:1px solid rgba(196,26,46,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:6px;}
+.award-info{display:flex;flex-direction:column;align-items:center;}
 .award-category{font-size:9px;font-weight:700;letter-spacing:2px;color:#c41a2e;text-transform:uppercase;}
-.award-name{font-size:18px;font-weight:800;color:#fff;margin-top:2px;}
-.award-metric{text-align:right;}
-.award-metric .am-num{font-size:32px;font-weight:800;color:#c41a2e;line-height:1;}
-.award-metric .am-label{font-size:9px;color:#555;letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+.award-name{font-size:16px;font-weight:800;color:#fff;margin-top:4px;}
+.award-metric{margin-top:14px;}
+.award-metric .am-num{font-size:36px;font-weight:800;color:#c41a2e;line-height:1;}
+.award-metric .am-label{font-size:9px;color:rgba(255,255,255,0.7);letter-spacing:1px;text-transform:uppercase;margin-top:4px;}
 
 /* Winner display */
-.winner-row{display:flex;align-items:center;gap:14px;padding:14px 16px;background:#0a0a0a;border-radius:6px;margin-bottom:8px;border-left:3px solid transparent;transition:all .2s;}
-.winner-row.gold{border-left-color:#ffd700;background:rgba(255,215,0,0.03);}
+.award-winners{width:100%;margin-top:16px;border-top:1px solid #1a1a1a;padding-top:16px;}
+.winner-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:linear-gradient(145deg,#161616,#111);border-radius:6px;margin-bottom:8px;border-left:3px solid transparent;transition:all .2s;text-align:left;box-shadow:0 2px 6px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.04);}
+.winner-row.gold{border-left-color:#c41a2e;background:rgba(196,26,46,0.03);}
 .winner-row.silver{border-left-color:#c0c0c0;background:rgba(192,192,192,0.02);}
 .winner-row.bronze{border-left-color:#cd7f32;background:rgba(205,127,50,0.02);}
 .winner-rank{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;}
-.winner-row.gold .winner-rank{background:rgba(255,215,0,0.15);color:#ffd700;}
+.winner-row.gold .winner-rank{background:rgba(196,26,46,0.15);color:#c41a2e;}
 .winner-row.silver .winner-rank{background:rgba(192,192,192,0.15);color:#c0c0c0;}
 .winner-row.bronze .winner-rank{background:rgba(205,127,50,0.15);color:#cd7f32;}
 .winner-info{flex:1;}
-.winner-name{font-size:14px;font-weight:700;color:#ddd;}
-.winner-detail{font-size:11px;color:#666;margin-top:2px;}
+.winner-name{font-size:18px;font-weight:700;color:#ddd;}
+.winner-detail{font-size:14px;color:rgba(255,255,255,0.6);margin-top:2px;}
 .winner-score{text-align:right;}
-.winner-score .ws-num{font-size:18px;font-weight:800;color:#fff;}
-.winner-score .ws-label{font-size:8px;color:#555;letter-spacing:1px;text-transform:uppercase;}
+.winner-score .ws-num{font-size:22px;font-weight:800;color:#fff;}
+.winner-score .ws-label{font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:1px;text-transform:uppercase;}
 
 /* Loading */
-.loading{text-align:center;padding:40px;color:#555;font-size:13px;}
+.loading{text-align:center;padding:40px;color:rgba(255,255,255,0.7);font-size:13px;}
 .loading::after{content:"";display:inline-block;width:16px;height:16px;border:2px solid #333;border-top-color:#c41a2e;border-radius:50%;animation:spin .8s linear infinite;margin-left:8px;vertical-align:middle;}
 @keyframes spin{to{transform:rotate(360deg);}}
 
 /* Empty state */
-.empty-state{text-align:center;padding:30px;color:#444;font-size:13px;}
+.empty-state{text-align:center;padding:30px;color:rgba(255,255,255,0.7);font-size:13px;}
+
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.info-card{background:linear-gradient(145deg,#1a1a1a,#141414);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:24px;transition:all .25s ease;box-shadow:0 4px 12px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.06);}
+.info-card:hover{border-color:rgba(196,26,46,0.4);transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,0.5),0 0 16px rgba(196,26,46,0.15),inset 0 1px 0 rgba(255,255,255,0.08);}
+.card-title{font-size:14px;font-weight:800;color:#fff;letter-spacing:1px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.card-title::before{content:"";width:3px;height:14px;background:#c41a2e;border-radius:2px;}
+.card-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.card-list li{font-size:13px;color:#fff;line-height:1.6;padding-left:16px;position:relative;}
+.card-list li::before{content:"";position:absolute;left:0;top:8px;width:6px;height:6px;background:#c41a2e;border-radius:50%;}
+.card-list li strong{color:#ccc;}
+.highlight-box{background:linear-gradient(145deg,rgba(196,26,46,0.08),rgba(196,26,46,0.03));border:1px solid rgba(196,26,46,0.2);border-radius:10px;padding:20px 24px;text-align:center;margin-bottom:24px;transition:all .25s ease;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.05);}
+.highlight-box:hover{transform:translateY(-3px);border-color:rgba(196,26,46,0.5);box-shadow:0 8px 24px rgba(0,0,0,0.5),0 0 20px rgba(196,26,46,0.2),inset 0 1px 0 rgba(255,255,255,0.08);}
+.highlight-box .big{font-size:18px;font-weight:800;color:#fff;margin-bottom:6px;}
+.highlight-box .big .red{color:#c41a2e;}
+.highlight-box .sub{font-size:12px;color:rgba(255,255,255,0.7);}
 
 .hamburger{display:none;background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:4px;}
 @media(max-width:1024px){
@@ -115,6 +135,8 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
   .main{flex-direction:column;height:auto;}
   .left-panel{width:100%;padding:24px 20px;}
   .content-area{padding:24px 20px;}
+  #awardsContent{flex-direction:column;}
+  .info-grid{grid-template-columns:1fr;}
 }
 @media(max-width:480px){
   .topbar nav a{font-size:9px;padding:8px 8px;}
@@ -138,8 +160,8 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 <div class="main">
   <div class="left-panel">
     <div class="page-label">CHALLENGE AWARDS</div>
-    <div class="page-title">+1 Guardian<br>Leaderboard</div>
-    <div class="page-desc">실시간 챌린지 현황과 시상 내역을 확인하세요. 데이터는 자동으로 집계됩니다.</div>
+    <div class="page-title">+1 Guardian<br>Leaders in BNI Korea</div>
+    <div class="page-desc">실시간 챌린지 현황과 시상 대상자를 확인하세요 !</div>
 
     <div class="event-period">
       <div class="ep-label">EVENT PERIOD</div>
@@ -148,8 +170,8 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 
     <div class="scoring-box">
       <div class="scoring-title">SCORING</div>
-      <div class="scoring-item"><div class="scoring-pts">1</div><div class="scoring-desc">비지터를 멤버로 가입시킨 경우</div></div>
-      <div class="scoring-item"><div class="scoring-pts">2</div><div class="scoring-desc">90G2F 해당자를 멤버로 가입시킨 경우</div></div>
+      <div class="scoring-item"><div class="scoring-pts">1</div><div class="scoring-desc">90G2F가 아닌 비지터 : 1점</div></div>
+      <div class="scoring-item"><div class="scoring-pts">2</div><div class="scoring-desc">90G2F 해당자를 멤버로 가입시킨 경우 : 2점</div></div>
     </div>
 
     <div class="total-stats">
@@ -166,7 +188,28 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
       <div style="font-size:24px;font-weight:800;color:#fff;">최종 우승자는 누가될까요 ?? :)</div>
     </div>
     <div id="awardsContent"><div class="loading">데이터 로딩 중</div></div>
-    <div style="text-align:right;padding:16px 0 8px;font-size:9px;font-weight:700;letter-spacing:1.5px;color:#444;text-transform:uppercase;">Created by Joy Byun</div>
+
+    <div class="info-grid" style="margin-top:28px;">
+      <div class="info-card">
+        <div class="card-title">점수 체계</div>
+        <ul class="card-list">
+          <li><strong>1점</strong> : 비지터 1명을 데려와 멤버로 가입시킨 경우</li>
+          <li><strong>2점</strong> : 90G2F 해당자를 데려와 멤버로 가입시킨 경우</li>
+          <li>90G2F = <strong>90년생 / Global / 2세 경영자 / Franchise</strong></li>
+          <li>멤버 가입 완료된 경우만 점수 인정</li>
+        </ul>
+      </div>
+      <div class="info-card">
+        <div class="card-title">시상 내역</div>
+        <ul class="card-list">
+          <li><strong>최대 달성율 챕터</strong> : 멤버수 대비 달성율이 가장 높은 챕터</li>
+          <li><strong>최대 영입율 챕터</strong> : 가디언 수가 가장 많은 챕터</li>
+          <li><strong>최대 영입 멤버</strong> : 가장 많은 멤버를 영입한 멤버</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="position:fixed;bottom:12px;right:20px;font-size:9px;font-weight:700;letter-spacing:1.5px;color:#444;text-transform:uppercase;z-index:10;">Created by Joy Byun</div>
   </div>
 </div>
 
@@ -280,42 +323,45 @@ function renderAwards(memberRank, chapterByGuardians, chapterByRate){
   // Award 1: 최대 영입 멤버
   const topMembers = getTied(memberRank, m => m.totalScore);
   html += '<div class="award-card">';
-  html += '<div class="award-header"><div class="award-badge"><div class="award-icon">&#9733;</div><div class="award-info"><div class="award-category">TOP RECRUITER</div><div class="award-name">최대 영입 멤버</div></div></div>';
+  html += '<div class="award-header"><div class="award-badge"><div class="award-icon">🏆</div><div class="award-info"><div class="award-category">TOP RECRUITER</div><div class="award-name">최대 영입 멤버</div></div></div>';
   if(topMembers.length) html += '<div class="award-metric"><div class="am-num">'+topMembers[0].totalScore+'</div><div class="am-label">TOP SCORE</div></div>';
   html += '</div>';
+  html += '<div class="award-winners">';
   if(topMembers.length){
     topMembers.forEach((m,i) => {
       html += '<div class="winner-row gold"><div class="winner-rank">'+(i+1)+'</div><div class="winner-info"><div class="winner-name">'+m.name+'</div><div class="winner-detail">'+m.chapter+' &middot; '+m.totalRecruits+'명 영입</div></div><div class="winner-score"><div class="ws-num">'+m.totalScore+'</div><div class="ws-label">SCORE</div></div></div>';
     });
   } else { html += '<div class="empty-state">아직 데이터가 없습니다</div>'; }
-  html += '</div>';
+  html += '</div></div>';
 
   // Award 2: 최대 영입율 챕터
   const topGuardianChapters = getTied(chapterByGuardians, c => c.guardians.size);
   html += '<div class="award-card">';
-  html += '<div class="award-header"><div class="award-badge"><div class="award-icon">&#9814;</div><div class="award-info"><div class="award-category">MOST GUARDIANS</div><div class="award-name">최대 영입율 챕터</div></div></div>';
+  html += '<div class="award-header"><div class="award-badge"><div class="award-icon">🏆</div><div class="award-info"><div class="award-category">MOST GUARDIANS</div><div class="award-name">최대 영입율 챕터</div></div></div>';
   if(topGuardianChapters.length) html += '<div class="award-metric"><div class="am-num">'+topGuardianChapters[0].guardians.size+'</div><div class="am-label">GUARDIANS</div></div>';
   html += '</div>';
+  html += '<div class="award-winners">';
   if(topGuardianChapters.length){
     topGuardianChapters.forEach((c,i) => {
       html += '<div class="winner-row gold"><div class="winner-rank">'+(i+1)+'</div><div class="winner-info"><div class="winner-name">'+c.name+'</div><div class="winner-detail">'+c.totalRecruits+'명 영입 &middot; '+c.totalScore+'점</div></div><div class="winner-score"><div class="ws-num">'+c.guardians.size+'</div><div class="ws-label">GUARDIANS</div></div></div>';
     });
   } else { html += '<div class="empty-state">아직 데이터가 없습니다</div>'; }
-  html += '</div>';
+  html += '</div></div>';
 
   // Award 3: 최대 달성율 챕터
   const getRateFn = c => c.guardians.size > 0 ? +(c.totalRecruits / c.guardians.size).toFixed(1) : 0;
   const topRateChapters = getTied(chapterByRate, getRateFn);
   html += '<div class="award-card">';
-  html += '<div class="award-header"><div class="award-badge"><div class="award-icon">&#9813;</div><div class="award-info"><div class="award-category">HIGHEST RATE</div><div class="award-name">최대 달성율 챕터</div></div></div>';
+  html += '<div class="award-header"><div class="award-badge"><div class="award-icon">🏆</div><div class="award-info"><div class="award-category">HIGHEST RATE</div><div class="award-name">최대 달성율 챕터</div></div></div>';
   if(topRateChapters.length) html += '<div class="award-metric"><div class="am-num">'+getRateFn(topRateChapters[0])+'</div><div class="am-label">AVG RATE</div></div>';
   html += '</div>';
+  html += '<div class="award-winners">';
   if(topRateChapters.length){
     topRateChapters.forEach((c,i) => {
       html += '<div class="winner-row gold"><div class="winner-rank">'+(i+1)+'</div><div class="winner-info"><div class="winner-name">'+c.name+'</div><div class="winner-detail">'+c.guardians.size+'명 참여 &middot; '+c.totalRecruits+'명 영입</div></div><div class="winner-score"><div class="ws-num">'+getRateFn(c)+'</div><div class="ws-label">PER PERSON</div></div></div>';
     });
   } else { html += '<div class="empty-state">아직 데이터가 없습니다</div>'; }
-  html += '</div>';
+  html += '</div></div>';
 
   container.innerHTML = html;
 }

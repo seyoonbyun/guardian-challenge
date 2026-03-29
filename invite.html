@@ -8,7 +8,7 @@
 <meta property="og:title" content="+1 Guardian Challenge">
 <meta property="og:description" content="BNI Korea 2026 +1 Guardian Challenge">
 <meta property="og:url" content="https://guardian-bnikorea.com">
-<meta property="og:image" content="https://guardian-bnikorea.com/bni-logo-white.png">
+<meta property="og:image" content="https://guardian-challenge.vercel.app/og-banner.png">
 <meta property="og:site_name" content="guardian-bnikorea.com">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -19,7 +19,7 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .topbar .brand .icon{width:26px;height:26px;background:#c41a2e;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;}
 .topbar .brand span{font-weight:700;font-size:14px;letter-spacing:4px;color:#c41a2e;}
 .topbar nav{display:flex;gap:4px;position:absolute;left:50%;transform:translateX(-50%);}
-.topbar nav a{color:rgba(255,255,255,0.5);text-decoration:none;font-size:10px;font-weight:600;letter-spacing:1.5px;padding:5px 12px;border-radius:3px;text-transform:uppercase;transition:all .2s;}
+.topbar nav a{color:#fff;text-decoration:none;font-size:10px;font-weight:600;letter-spacing:1.5px;padding:5px 12px;border-radius:3px;text-transform:uppercase;transition:all .2s;}
 .topbar nav a:hover{color:#fff;}
 .topbar nav a.active{color:#ccc;background:rgba(255,255,255,0.05);}
 .topbar .clock{color:rgba(255,255,255,0.5);font-size:11px;font-weight:500;letter-spacing:0.5px;}
@@ -31,11 +31,13 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .page-label{font-size:10px;font-weight:700;letter-spacing:3px;color:#c41a2e;text-transform:uppercase;margin-bottom:14px;}
 .page-title{font-size:34px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:16px;}
 .page-desc{font-size:14px;color:#fff;line-height:1.8;margin-bottom:28px;}
-.status-bar{display:flex;align-items:center;gap:8px;padding:12px 16px;background:#0a0a0a;border:1px solid rgba(255,255,255,0.1);border-radius:6px;margin-bottom:28px;box-shadow:0 4px 12px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.05);}
+.status-bar{display:flex;align-items:center;gap:8px;padding:12px 16px;background:#0a0a0a;border:1px solid rgba(255,255,255,0.1);border-radius:6px;margin-bottom:28px;box-shadow:0 4px 12px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.05);transition:all .25s ease;cursor:pointer;}
+.status-bar:hover{border-color:rgba(76,175,80,0.4);box-shadow:0 6px 20px rgba(0,0,0,0.5),0 0 15px rgba(76,175,80,0.15);transform:translateY(-2px);}
 .status-dot{width:8px;height:8px;background:#4caf50;border-radius:50%;animation:statusPulse 2s ease-in-out infinite;flex-shrink:0;}
 @keyframes statusPulse{0%,100%{box-shadow:0 0 4px rgba(76,175,80,0.4);}50%{box-shadow:0 0 12px rgba(76,175,80,0.8);}}
 .status-text{font-size:10px;font-weight:600;letter-spacing:1px;color:#4caf50;text-transform:uppercase;}
-.visual-panel{flex:1;background:linear-gradient(135deg,#1a0a0a,#0a0a0a);border:1px solid rgba(255,255,255,0.08);border-radius:8px;overflow:hidden;position:relative;min-height:0;box-shadow:0 8px 24px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.05);}
+.visual-panel{flex:1;background:linear-gradient(135deg,#1a0a0a,#0a0a0a);border:1px solid rgba(255,255,255,0.08);border-radius:8px;overflow:hidden;position:relative;min-height:0;box-shadow:0 8px 24px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.05);transition:all .25s ease;}
+.visual-panel:hover{border-color:rgba(196,26,46,0.3);box-shadow:0 10px 30px rgba(0,0,0,0.6),0 0 20px rgba(196,26,46,0.1);}
 .visual-panel::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 3px,rgba(196,26,46,0.03) 3px,rgba(196,26,46,0.03) 4px);pointer-events:none;}
 .visual-panel::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 30%,rgba(0,0,0,0.6) 100%);pointer-events:none;}
 
@@ -50,22 +52,26 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .section-title{font-size:15px;font-weight:800;color:#fff;letter-spacing:1px;margin-bottom:22px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:8px;text-shadow:0 1px 4px rgba(0,0,0,0.5);}
 .section-title::before{content:"";width:3px;height:16px;background:#c41a2e;border-radius:2px;}
 
-.form-group{margin-bottom:18px;}
+.form-group{margin-bottom:18px;transition:all .25s ease;}
+.form-group:hover .form-label{color:#c41a2e;}
 .form-label{font-size:13px;font-weight:700;letter-spacing:1.5px;color:#fff;text-transform:uppercase;margin-bottom:6px;display:block;}
 .form-label .req{color:#c41a2e;margin-left:2px;}
 
-.form-input{width:100%;padding:11px 14px;background:#0a0a0a;border:1px solid rgba(255,255,255,0.25);border-radius:5px;color:#fff;font-size:13px;font-family:"Segoe UI",sans-serif;transition:all .2s;outline:none;box-shadow:0 2px 8px rgba(0,0,0,0.4),inset 0 1px 2px rgba(255,255,255,0.05);}
-.form-input:focus{border-color:#c41a2e;box-shadow:0 2px 12px rgba(196,26,46,0.3),inset 0 1px 2px rgba(255,255,255,0.05);}
+.form-input{width:100%;padding:11px 14px;background:#0a0a0a;border:1px solid rgba(255,255,255,0.25);border-radius:5px;color:#fff;font-size:13px;font-family:"Segoe UI",sans-serif;transition:all .25s ease;outline:none;box-shadow:0 2px 8px rgba(0,0,0,0.4),inset 0 1px 2px rgba(255,255,255,0.05);}
+.form-input:hover{border-color:rgba(255,255,255,0.5);box-shadow:0 4px 16px rgba(0,0,0,0.5),inset 0 1px 2px rgba(255,255,255,0.08);transform:translateY(-2px);}
+.form-input:focus{border-color:#c41a2e;box-shadow:0 2px 12px rgba(196,26,46,0.3),inset 0 1px 2px rgba(255,255,255,0.05);transform:translateY(0);}
 .form-input::placeholder{color:rgba(255,255,255,0.4);}
 .form-input.error{border-color:#c41a2e;background:rgba(196,26,46,0.03);}
 
 select.form-input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;cursor:pointer;}
 select.form-input option{background:#111;color:#fff;}
 
-.form-notice{font-size:10px;color:rgba(255,255,255,0.7);line-height:1.6;padding:10px 14px;background:rgba(196,26,46,0.06);border-left:2px solid #c41a2e;border-radius:0 4px 4px 0;margin-top:16px;box-shadow:0 2px 6px rgba(0,0,0,0.3);}
+.form-notice{font-size:10px;color:rgba(255,255,255,0.7);line-height:1.6;padding:10px 14px;background:rgba(196,26,46,0.06);border-left:2px solid #c41a2e;border-radius:0 4px 4px 0;margin-top:16px;box-shadow:0 2px 6px rgba(0,0,0,0.3);transition:all .25s ease;}
+.form-notice:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.4),0 0 10px rgba(196,26,46,0.1);border-left-color:#d42a3e;}
 
 .checkbox-group{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
-.checkbox-item{display:flex;align-items:center;gap:8px;cursor:pointer;}
+.checkbox-item{display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 8px;border-radius:4px;transition:all .25s ease;}
+.checkbox-item:hover{background:rgba(255,255,255,0.03);transform:translateX(4px);}
 .checkbox-item input[type="checkbox"]{accent-color:#c41a2e;width:16px;height:16px;cursor:pointer;}
 .checkbox-item label{font-size:12px;color:#fff;cursor:pointer;}
 
@@ -123,9 +129,10 @@ select.form-input option{background:#111;color:#fff;}
 
 <div class="main">
   <div class="left-panel">
-    <div class="page-label">OPERATIVE REGISTRATION</div>
-    <div class="page-title">Member<br>Registration</div>
-    <div class="page-desc">Guardian Protocol 내 신규 멤버 등록 및 가이드 정보를 입력합니다. 모든 필수 항목을 정확히 기입해주세요.</div>
+    <div class="page-label">CHALLENGE IN</div>
+    <div class="page-title">New Member<br>Registration</div>
+    <div style="font-size:28px;font-weight:800;color:#fff;margin-bottom:16px;line-height:1.3;">지금, <span style="color:#c41a2e;">한 명의 연결</span>부터<br>시작해보세요 !</div>
+    <div class="page-desc">Guardian Challenge Protocol 내 신규 멤버 등록 및 가이드 정보를 입력합니다. 모든 필수 항목을 정확히 기입해주세요.</div>
     <div class="status-bar">
       <div class="status-dot"></div>
       <div class="status-text">LIVE NETWORK ACTIVE</div>
@@ -135,7 +142,7 @@ select.form-input option{background:#111;color:#fff;}
   <form id="memberForm" class="form-area">
     <!-- 좌측: 내 정보 -->
     <div class="form-col">
-      <div class="section-title">내 정보</div>
+      <div class="section-title">내 정보 : 가디언</div>
 
       <div class="form-group">
         <label class="form-label">지역명 <span class="req">*</span></label>
@@ -182,7 +189,7 @@ select.form-input option{background:#111;color:#fff;}
 
     <!-- 우측: 신규 멤버 정보 -->
     <div class="form-col">
-      <div class="section-title">신규 멤버 정보</div>
+      <div class="section-title">영입한 멤버 정보</div>
 
       <div class="form-group">
         <label class="form-label">신규 멤버 성함 <span class="req">*</span></label>
@@ -227,7 +234,7 @@ select.form-input option{background:#111;color:#fff;}
       <div class="form-notice">Guardian Protocol 보안 정책에 따라 모든 등록 데이터는 검증됩니다.</div>
 
       <button type="button" class="submit-btn" id="submitBtn" onclick="submitForm()">
-        정보 저장 <span class="arrow">&rarr;</span>
+        +1 챌린지 참가 <span class="arrow">&rarr;</span>
       </button>
     </div>
   </form>
@@ -351,7 +358,7 @@ function submitForm(){
   setTimeout(()=>{ if(document.body.contains(iframe)) document.body.removeChild(iframe); }, 1000);
   setTimeout(()=>{ window.location.href = "map-preview-svg.html"; }, 2000);
   btn.disabled = false;
-  btn.innerHTML = '정보 저장 <span class="arrow">&rarr;</span>';
+  btn.innerHTML = '+1 챌린지 참가 <span class="arrow">&rarr;</span>';
 }
 </script>
 </body>
