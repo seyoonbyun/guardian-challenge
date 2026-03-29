@@ -66,14 +66,16 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 @keyframes scanMove{0%{top:0;}100%{top:100%;}}
 .map-svg-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
 .map-svg-wrap svg{height:88%;width:auto;transition:transform .2s;filter:drop-shadow(4px 8px 16px rgba(0,0,0,0.8)) drop-shadow(0 0 40px rgba(196,26,46,0.08));}
-.province{fill:#1e1e1e;stroke:#fff;stroke-width:1.5;transition:all .3s ease;cursor:pointer;filter:drop-shadow(2px 3px 3px rgba(0,0,0,0.5));transform-box:fill-box;transform-origin:center;}
-.province:hover{fill:#2d2d2d;stroke:#666;filter:drop-shadow(3px 5px 8px rgba(0,0,0,0.7)) drop-shadow(0 0 6px rgba(255,255,255,0.05));}
+/* 데이터 없는 지역: 낮고 어둡게 */
+.province{fill:#141414;stroke:#fff;stroke-width:1;transition:all .3s ease;cursor:pointer;filter:drop-shadow(1px 1px 2px rgba(0,0,0,0.4));transform-box:fill-box;transform-origin:center;}
+.province:hover{fill:#1e1e1e;stroke:rgba(255,255,255,0.4);filter:drop-shadow(2px 3px 5px rgba(0,0,0,0.6));}
+/* 데이터 있는 지역: 높고 밝게 + 네온 레드 엣지 */
+.province.has-data{fill:#252525;stroke:#c41a2e;stroke-width:1.5;filter:drop-shadow(3px 5px 8px rgba(0,0,0,0.8)) drop-shadow(0 0 4px rgba(196,26,46,0.5)) drop-shadow(0 0 10px rgba(196,26,46,0.2));}
+.province.has-data:hover{fill:#2a1015;stroke:#c41a2e;stroke-width:2.5;filter:drop-shadow(4px 7px 12px rgba(0,0,0,0.9)) drop-shadow(0 0 10px rgba(196,26,46,0.8)) drop-shadow(0 0 20px rgba(196,26,46,0.5)) drop-shadow(0 0 36px rgba(196,26,46,0.3));transform:scale(1.12);z-index:50;}
 .province.highlight{fill:#2a1015;stroke:#c41a2e;stroke-width:3;filter:drop-shadow(0 0 12px rgba(196,26,46,0.9)) drop-shadow(0 0 24px rgba(196,26,46,0.5)) drop-shadow(0 0 40px rgba(196,26,46,0.3));}
-/* Provinces with data (red glow + zoom) */
-.province.has-data:hover{fill:#2a1015;stroke:#c41a2e;stroke-width:2.5;filter:drop-shadow(0 0 10px rgba(196,26,46,0.8)) drop-shadow(0 0 20px rgba(196,26,46,0.4)) drop-shadow(0 0 36px rgba(196,26,46,0.2));transform:scale(1.12);z-index:50;}
-/* Provinces with detail map - Seoul/Gyeonggi (green glow + zoom) */
-.province.has-detail{cursor:pointer;}
-.province.has-detail:hover{fill:#122a12;stroke:#4c4;stroke-width:2.5;filter:drop-shadow(0 0 10px rgba(74,204,74,0.8)) drop-shadow(0 0 20px rgba(74,204,74,0.4)) drop-shadow(0 0 36px rgba(74,204,74,0.2));transform:scale(1.12);z-index:50;}
+/* 상세지도 있는 지역 - 서울/경기 네온 그린 엣지 */
+.province.has-detail{fill:#1a2a1a;stroke:rgba(74,204,74,0.6);stroke-width:1.5;cursor:pointer;filter:drop-shadow(3px 5px 8px rgba(0,0,0,0.8)) drop-shadow(0 0 4px rgba(74,204,74,0.4)) drop-shadow(0 0 10px rgba(74,204,74,0.15));}
+.province.has-detail:hover{fill:#122a12;stroke:#4c4;stroke-width:2.5;filter:drop-shadow(4px 7px 12px rgba(0,0,0,0.9)) drop-shadow(0 0 10px rgba(74,204,74,0.8)) drop-shadow(0 0 20px rgba(74,204,74,0.5)) drop-shadow(0 0 36px rgba(74,204,74,0.3));transform:scale(1.12);z-index:50;}
 
 .marker-overlay{position:absolute;inset:0;pointer-events:none;}
 /* Map dot (on-map pin) */
@@ -192,14 +194,19 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .detail-map{flex:1;position:relative;display:flex;align-items:center;justify-content:center;}
 .detail-map::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,0.6) 100%);pointer-events:none;z-index:1;}
 .detail-map svg{height:85%;width:auto;filter:drop-shadow(4px 8px 16px rgba(0,0,0,0.8)) drop-shadow(0 0 40px rgba(196,26,46,0.08));}
-.district{fill:#1e1e1e;stroke:#555;stroke-width:1.5;transition:all .25s;cursor:pointer;filter:drop-shadow(2px 3px 3px rgba(0,0,0,0.5));}
-.district:hover{fill:#2d2d2d;stroke:#666;filter:drop-shadow(3px 5px 8px rgba(0,0,0,0.7)) drop-shadow(0 0 6px rgba(255,255,255,0.05));}
-.district:hover{fill:#2a2a2a;}
+.district{fill:#141414;stroke:#fff;stroke-width:1;transition:all .25s;cursor:pointer;filter:drop-shadow(1px 1px 2px rgba(0,0,0,0.4));}
+.district.has-data{fill:#252525;stroke:#c41a2e;stroke-width:1.5;filter:drop-shadow(3px 5px 8px rgba(0,0,0,0.8)) drop-shadow(0 0 4px rgba(196,26,46,0.5)) drop-shadow(0 0 10px rgba(196,26,46,0.2));}
+.district:hover{fill:#1e1e1e;stroke:rgba(255,255,255,0.4);filter:drop-shadow(2px 3px 5px rgba(0,0,0,0.6));}
+.district.has-data:hover{fill:#2a1015;stroke:#c41a2e;stroke-width:2.5;filter:drop-shadow(4px 7px 12px rgba(0,0,0,0.9)) drop-shadow(0 0 10px rgba(196,26,46,0.8)) drop-shadow(0 0 20px rgba(196,26,46,0.5)) drop-shadow(0 0 36px rgba(196,26,46,0.3));}
 .district.highlight{fill:#2a1015 !important;stroke:#c41a2e !important;stroke-width:2 !important;filter:drop-shadow(0 0 8px rgba(196,26,46,0.8)) drop-shadow(0 0 16px rgba(196,26,46,0.5));}
 #detailSvg .district.highlight{stroke-width:6 !important;filter:drop-shadow(0 0 8px rgba(196,26,46,0.8)) drop-shadow(0 0 16px rgba(196,26,46,0.5)) !important;}
 /* Gyeonggi detail map */
-#gyeonggiDetailSvg polygon[fill="#B9B9B9"]{fill:#1e1e1e !important;stroke:#444 !important;stroke-width:0.8 !important;transition:fill .15s;cursor:pointer;}
-#gyeonggiDetailSvg polygon[fill="#B9B9B9"]:hover{fill:#2a2a2a !important;}
+#gyeonggiDetailSvg polygon[fill="#B9B9B9"]{fill:#141414 !important;stroke:#fff !important;stroke-width:0.8 !important;transition:all .25s;cursor:pointer;}
+#gyeonggiDetailSvg polygon[fill="#B9B9B9"]:hover{fill:#1e1e1e !important;}
+#gyeonggiDetailSvg polygon[fill="#B9B9B9"].district.has-data,
+#gyeonggiDetailSvg .district.has-data{fill:#252525 !important;stroke:#c41a2e !important;stroke-width:1.5 !important;filter:drop-shadow(3px 5px 8px rgba(0,0,0,0.8)) drop-shadow(0 0 4px rgba(196,26,46,0.5)) drop-shadow(0 0 10px rgba(196,26,46,0.2));}
+#gyeonggiDetailSvg polygon[fill="#B9B9B9"].district.has-data:hover,
+#gyeonggiDetailSvg .district.has-data:hover{fill:#2a1015 !important;stroke:#c41a2e !important;stroke-width:2.5 !important;filter:drop-shadow(4px 7px 12px rgba(0,0,0,0.9)) drop-shadow(0 0 10px rgba(196,26,46,0.8)) drop-shadow(0 0 20px rgba(196,26,46,0.5));}
 #gyeonggiDetailSvg polygon[fill="#7FB1CC"]{fill:#111 !important;stroke:none !important;}
 #gyeonggiDetailSvg polygon[fill="#1e1e1e"].district.highlight{fill:#2a1015 !important;stroke:#c41a2e !important;stroke-width:2 !important;filter:drop-shadow(0 0 8px rgba(196,26,46,0.8)) drop-shadow(0 0 16px rgba(196,26,46,0.5));}
 #gyeonggiDetailSvg path{fill:none !important;stroke:none !important;}
@@ -2980,7 +2987,6 @@ const API_URL = "https://script.google.com/macros/s/AKfycbysr8Ur6HiwmM3suSHrhiyU
 // Non-Seoul cities shown directly on national map
 const NATIONAL_MARKERS = {
   "인천": {x:190,y:257},
-  "천안": {x:275,y:395},
   "대전": {x:332,y:503},
   "대구": {x:520,y:624},
   "부산": {x:618,y:750}
@@ -2993,8 +2999,7 @@ const GYEONGGI_LABEL_POS = {x:300,y:330};
 const BOX_LAYOUT = {
   "서울":  {side:"left",  rank:0},
   "인천":  {side:"left",  rank:1},
-  "천안":  {side:"left",  rank:2},
-  "대전":  {side:"left",  rank:3},
+  "대전":  {side:"left",  rank:2},
   "경기":  {side:"right", rank:0, offsetY:-80},
   "대구":  {side:"right", rank:1, offsetY:-100},
   "부산":  {side:"right", rank:2, offsetY:0}
@@ -3048,7 +3053,6 @@ const PROVINCE_DETAIL = {
 // Province SVG id -> cities (for provinces without detail maps)
 const PROVINCE_CITY_MAP = {
   "incheon": ["인천"],
-  "chungnam": ["천안"],
   "daejeon": ["대전"],
   "daegu": ["대구"],
   "busan": ["부산"]
@@ -3058,7 +3062,7 @@ const EN_NAMES = {
   "강남":"GANGNAM","대구":"DAEGU","대전":"DAEJEON","서초":"SEOCHO","성동":"SEONGDONG",
   "마포":"MAPO","부산":"BUSAN","송파":"SONGPA","수원":"SUWON","용인":"YONGIN",
   "영등포":"YEONGDEUNGPO","인천":"INCHEON","고양":"GOYANG","화성":"HWASEONG",
-  "중구":"JUNGGU","천안":"CHEONAN","성남":"SEONGNAM","경기":"GYEONGGI"
+  "중구":"JUNGGU","성남":"SEONGNAM","경기":"GYEONGGI"
 };
 
 let regionData = {};
@@ -3547,6 +3551,19 @@ function renderDetailMap(key){
   // Helper: get SVG IDs as array (supports single string or array)
   function getIds(val){ return Array.isArray(val) ? val : [val]; }
 
+  // Mark districts with data
+  Object.entries(cfg.districtMap).forEach(([city, val])=>{
+    getIds(val).forEach(svgId=>{
+      const el = document.getElementById(svgId);
+      if(el){
+        const inner = el.querySelector(".district");
+        const target = inner || el;
+        if(regionData[city]) target.classList.add("has-data");
+        else target.classList.remove("has-data");
+      }
+    });
+  });
+
   // Highlight selected district
   document.querySelectorAll(".district").forEach(el=>el.classList.remove("highlight"));
   if(detailSelectedCity && cfg.districtMap[detailSelectedCity]){
@@ -3556,9 +3573,28 @@ function renderDetailMap(key){
         const inner = el.querySelector(".district");
         const target = inner || el;
         target.classList.add("highlight");
-        const parent = (inner ? el : target).parentNode;
-        if(parent) parent.appendChild(inner ? el : target);
       }
+    });
+  }
+
+  // Stroke overlay: has-data와 highlight의 테두리를 SVG 최상단에 다시 그려서 가려짐 방지
+  const detailSvg = document.getElementById(cfg.svgId);
+  if(detailSvg){
+    detailSvg.querySelectorAll(".district-stroke-overlay").forEach(e=>e.remove());
+    detailSvg.querySelectorAll(".district.has-data, .district.highlight").forEach(src=>{
+      const clone = src.cloneNode(false);
+      clone.removeAttribute("id");
+      clone.setAttribute("class","district-stroke-overlay");
+      clone.setAttribute("fill","none");
+      clone.setAttribute("pointer-events","none");
+      if(src.classList.contains("highlight")){
+        clone.setAttribute("stroke","#c41a2e");
+        clone.setAttribute("stroke-width", cfg.svgId==="detailSvg" ? "6" : "2.5");
+      } else {
+        clone.setAttribute("stroke","#c41a2e");
+        clone.setAttribute("stroke-width","1.5");
+      }
+      detailSvg.appendChild(clone);
     });
   }
 
