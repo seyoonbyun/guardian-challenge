@@ -3073,6 +3073,7 @@ let regionMemberCount = {};
 let chaptersByRegion = {};
 let chapterMembersByRegion = {};
 let g2fCounts = {born90:0, global:0, secondGen:0, franchise:0};
+let totalGuardians = 0;
 let rawRows = [];
 let selectedRegion = "송파";
 let zoomLevel = 1;
@@ -3187,6 +3188,13 @@ function processRows(rows){
     if(!chapterMembersByRegion[region]) chapterMembersByRegion[region] = {};
     if(chapter) chapterMembersByRegion[region][chapter] = (chapterMembersByRegion[region][chapter]||0) + 1;
   });
+  // Count unique guardians by referrer contact
+  const guardianSet = new Set();
+  rows.forEach(r => {
+    const contact = (r.myContact || r.referrerContact || "").replace(/[\s-]/g,"");
+    if(contact) guardianSet.add(contact);
+  });
+  totalGuardians = guardianSet.size;
 }
 
 function hideLoading(){
@@ -3459,9 +3467,8 @@ function showChapterDetail(chapterName){
 }
 
 function updateTotals(){
-  const totalMembers = Object.values(regionMemberCount).reduce((a,b)=>a+b,0);
-  document.getElementById("totalCount").textContent = totalMembers;
-  const rate = (totalMembers / 3130 * 100).toFixed(1);
+  document.getElementById("totalCount").textContent = totalGuardians;
+  const rate = (totalGuardians / 3130 * 100).toFixed(1);
   document.getElementById("activeRate").textContent = rate + "%";
   document.getElementById("g2fBorn90").textContent = g2fCounts.born90;
   document.getElementById("g2fGlobal").textContent = g2fCounts.global;
