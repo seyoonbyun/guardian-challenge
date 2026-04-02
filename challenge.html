@@ -355,7 +355,7 @@ function renderAwards(memberRank, chapterByGuardians, chapterByRate){
   const topMembers = getTied(memberRank, m => m.totalScore);
   html += '<div class="award-card">';
   html += '<div class="award-header"><div class="award-badge"><div class="award-icon">🏆</div><div class="award-info"><div class="award-category">TOP RECRUITER</div><div class="award-name">최대 영입 멤버</div></div></div>';
-  if(topMembers.length) html += '<div class="award-metric"><div class="am-num">'+topMembers[0].totalScore+'</div><div class="am-label">TOP SCORE</div></div>';
+  if(topMembers.length) html += '<div class="award-metric"><div class="am-num" style="font-size:26px;">'+topMembers[0].name+'</div><div class="am-label">TOP MEMBER</div></div>';
   html += '</div>';
   html += '<div class="award-winners">';
   if(topMembers.length){
@@ -369,7 +369,7 @@ function renderAwards(memberRank, chapterByGuardians, chapterByRate){
   const topGuardianChapters = getTied(chapterByGuardians, c => c.guardians.size);
   html += '<div class="award-card">';
   html += '<div class="award-header"><div class="award-badge"><div class="award-icon">🏆</div><div class="award-info"><div class="award-category">MOST GUARDIANS</div><div class="award-name">최대 영입율 챕터</div></div></div>';
-  if(topGuardianChapters.length) html += '<div class="award-metric"><div class="am-num">'+topGuardianChapters[0].guardians.size+'</div><div class="am-label">GUARDIANS</div></div>';
+  if(topGuardianChapters.length) html += '<div class="award-metric"><div class="am-num" style="font-size:26px;">'+topGuardianChapters[0].name+'</div><div class="am-label">TOP CHAPTER</div></div>';
   html += '</div>';
   html += '<div class="award-winners">';
   if(topGuardianChapters.length){
