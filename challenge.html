@@ -282,9 +282,9 @@ function processData(rows){
   let totalScoreSum = 0;
 
   rows.forEach(r => {
-    // 90G2F check: new field or legacy memberType
-    const type90 = ["90년생 사업가","글로벌 비즈니스 사업가","비즈니스 2세 경영자","프랜차이즈 경영자"];
-    const is90G2F = r.is90G2FQualified === true || r.is90G2FQualified === "true" || type90.includes(r.memberType);
+    // 90G2F check: 복수 선택 지원 (쉼표 구분)
+    const mType = (r.memberType || r.g2fType || "").trim();
+    const is90G2F = r.is90G2FQualified === true || r.is90G2FQualified === "true" || mType !== "";
     const score = r.score ? Number(r.score) : (is90G2F ? 2 : 1);
     const referrer = (r.referrerName || r.myName || "").trim();
     const chapter = (r.referrerChapter || r.myChapter || "").trim();

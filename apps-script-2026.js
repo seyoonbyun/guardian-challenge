@@ -122,7 +122,7 @@ function addData(e) {
       success: true,
       message: "Data saved successfully.",
       score: score,
-      is90G2FQualified: is90G2FQualified
+      is90G2FQualified: (g2fType !== "")
     });
 
   } catch (error) {

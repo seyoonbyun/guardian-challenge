@@ -3167,15 +3167,14 @@ function processRows(rows){
     const chapter = (r.myChapter || r.referrerChapter || "").trim();
     if(!region) return;
 
-    const type90 = ["90년생 사업가","글로벌 비즈니스 사업가","비즈니스 2세 경영자","프랜차이즈 경영자"];
     const memberType = (r.memberType || r.g2fType || "").trim();
-    const is90G2F = r.is90G2FQualified === true || r.is90G2FQualified === "true" || type90.includes(memberType);
+    const is90G2F = r.is90G2FQualified === true || r.is90G2FQualified === "true" || memberType !== "";
     const score = is90G2F ? 2 : 1;
 
-    if(memberType === "90년생 사업가") g2fCounts.born90++;
-    else if(memberType === "글로벌 비즈니스 사업가") g2fCounts.global++;
-    else if(memberType === "비즈니스 2세 경영자") g2fCounts.secondGen++;
-    else if(memberType === "프랜차이즈 경영자") g2fCounts.franchise++;
+    if(memberType.includes("90년생 사업가")) g2fCounts.born90++;
+    if(memberType.includes("글로벌 비즈니스 사업가")) g2fCounts.global++;
+    if(memberType.includes("비즈니스 2세 경영자")) g2fCounts.secondGen++;
+    if(memberType.includes("프랜차이즈 경영자")) g2fCounts.franchise++;
 
     regionData[region] = (regionData[region]||0) + score;
     regionMemberCount[region] = (regionMemberCount[region]||0) + 1;
@@ -3422,7 +3421,8 @@ function showChapterDetail(chapterName){
     if(region !== selectedRegion) return;
     const name = (r.referrerName || r.myName || "").trim();
     if(!name) return;
-    const is90G2F = r.is90G2FQualified === true || r.is90G2FQualified === "true" || type90.includes(r.memberType);
+    const mType = (r.memberType || r.g2fType || "").trim();
+    const is90G2F = r.is90G2FQualified === true || r.is90G2FQualified === "true" || mType !== "";
     const score = is90G2F ? 2 : 1;
     if(!memberMap[name]) memberMap[name] = {name:name, recruits:0, score:0};
     memberMap[name].recruits++;
@@ -3790,7 +3790,8 @@ function showDetailPanelChapter(chapterName, regionName){
     if(ch !== chapterName || region !== regionName) return;
     const name = (r.referrerName || r.myName || "").trim();
     if(!name) return;
-    const is90G2F = r.is90G2FQualified === true || r.is90G2FQualified === "true" || type90.includes(r.memberType);
+    const mType = (r.memberType || r.g2fType || "").trim();
+    const is90G2F = r.is90G2FQualified === true || r.is90G2FQualified === "true" || mType !== "";
     const score = is90G2F ? 2 : 1;
     if(!memberMap[name]) memberMap[name] = {name:name, recruits:0, score:0};
     memberMap[name].recruits++;
@@ -3866,7 +3867,8 @@ function showMobileChapterDetail(chapterName, regionName){
     if(ch !== chapterName || region !== regionName) return;
     const name = (r.referrerName || r.myName || "").trim();
     if(!name) return;
-    const is90G2F = r.is90G2FQualified === true || r.is90G2FQualified === "true" || type90.includes(r.memberType);
+    const mType = (r.memberType || r.g2fType || "").trim();
+    const is90G2F = r.is90G2FQualified === true || r.is90G2FQualified === "true" || mType !== "";
     const score = is90G2F ? 2 : 1;
     if(!memberMap[name]) memberMap[name] = {name:name, recruits:0, score:0};
     memberMap[name].recruits++;
