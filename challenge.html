@@ -384,7 +384,7 @@ function renderAwards(memberRank, chapterByGuardians, chapterByRate){
   const topRateChapters = getTied(chapterByRate, getRateFn);
   html += '<div class="award-card">';
   html += '<div class="award-header"><div class="award-badge"><div class="award-icon">🏆</div><div class="award-info"><div class="award-category">HIGHEST RATE</div><div class="award-name">최대 달성율 챕터</div></div></div>';
-  if(topRateChapters.length) html += '<div class="award-metric"><div class="am-num">'+getRateFn(topRateChapters[0])+'</div><div class="am-label">AVG RATE</div></div>';
+  if(topRateChapters.length) html += '<div class="award-metric"><div class="am-num" style="font-size:26px;">'+topRateChapters[0].name+'</div><div class="am-label">TOP CHAPTER</div></div>';
   html += '</div>';
   html += '<div class="award-winners">';
   if(topRateChapters.length){
