@@ -248,7 +248,7 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 #diSelectedRegion .dsr-ch-name{width:70px;font-size:14px;color:#fff;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 #diSelectedRegion .dsr-ch-bar{flex:1;height:8px;background:#1a1a1a;border-radius:4px;overflow:hidden;}
 #diSelectedRegion .dsr-ch-fill{height:100%;background:#c41a2e;border-radius:4px;transition:width .5s;}
-#diSelectedRegion .dsr-ch-count{font-size:14px;color:#fff;font-weight:600;width:30px;text-align:right;flex-shrink:0;}
+#diSelectedRegion .dsr-ch-count{font-size:14px;color:#fff;font-weight:600;white-space:nowrap;text-align:right;flex-shrink:0;}
 #diSelectedRegion .dsr-detail{margin-top:10px;padding:12px 14px;background:rgba(196,26,46,0.05);border:1px solid rgba(196,26,46,0.15);border-radius:6px;}
 #diSelectedRegion .dsr-detail-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
 #diSelectedRegion .dsr-detail-title{font-size:13px;font-weight:700;color:#c41a2e;letter-spacing:0.5px;}
@@ -372,7 +372,7 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .mobile-region-content .mr-ch-name{width:60px;font-size:12px;color:#fff;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .mobile-region-content .mr-ch-bar{flex:1;height:8px;background:#1a1a1a;border-radius:3px;overflow:hidden;}
 .mobile-region-content .mr-ch-fill{height:100%;background:#c41a2e;border-radius:3px;transition:width .5s;}
-.mobile-region-content .mr-ch-count{font-size:12px;color:#fff;font-weight:600;width:28px;text-align:right;flex-shrink:0;}
+.mobile-region-content .mr-ch-count{font-size:12px;color:#fff;font-weight:600;white-space:nowrap;text-align:right;flex-shrink:0;}
 .mobile-region-content .mr-ch-item{cursor:pointer;padding:4px 0;border-radius:4px;transition:background .15s;}
 .mobile-region-content .mr-ch-item:hover{background:rgba(255,255,255,0.03);}
 .mobile-region-content .mr-ch-item:hover .mr-ch-name{color:#c41a2e;}
@@ -3071,6 +3071,7 @@ const EN_NAMES = {
 let regionData = {};
 let regionMemberCount = {};
 let chaptersByRegion = {};
+let chapterMembersByRegion = {};
 let g2fCounts = {born90:0, global:0, secondGen:0, franchise:0};
 let rawRows = [];
 let selectedRegion = "송파";
@@ -3080,6 +3081,7 @@ let isPanning = false, panStartX = 0, panStartY = 0;
 let detailSelectedCity = null;
 let activeTab = "national";
 let glowRegion = null; // currently glowing region name (e.g. "대구")
+const ALL_REGIONS = ["강남","서초","성동","마포","송파","중구","영등포","고양","화성","성남","수원","용인","부산","대구","대전","인천"];
 const REGIONAL_CITIES = ["마포","서초","영등포","대구","수원","성남"];
 
 // ── Clock ──
@@ -3161,7 +3163,9 @@ function processRows(rows){
   regionData = {};
   regionMemberCount = {};
   chaptersByRegion = {};
+  chapterMembersByRegion = {};
   g2fCounts = {born90:0, global:0, secondGen:0, franchise:0};
+  ALL_REGIONS.forEach(r => { regionData[r] = 0; regionMemberCount[r] = 0; });
   rows.forEach(r => {
     const region = (r.myRegion || r.referrerRegion || "").trim();
     const chapter = (r.myChapter || r.referrerChapter || "").trim();
@@ -3180,6 +3184,8 @@ function processRows(rows){
     regionMemberCount[region] = (regionMemberCount[region]||0) + 1;
     if(!chaptersByRegion[region]) chaptersByRegion[region] = {};
     if(chapter) chaptersByRegion[region][chapter] = (chaptersByRegion[region][chapter]||0) + score;
+    if(!chapterMembersByRegion[region]) chapterMembersByRegion[region] = {};
+    if(chapter) chapterMembersByRegion[region][chapter] = (chapterMembersByRegion[region][chapter]||0) + 1;
   });
 }
 
@@ -3216,6 +3222,7 @@ async function loadData(){
     render();
   } catch(e) {
     console.warn("GAS API also failed:", e);
+    processRows([]);
     render();
   }
   hideLoading();
@@ -3292,20 +3299,21 @@ function renderMarkers(){
   }
 
   const items = [];
-  Object.entries(regionData).forEach(([name, count])=>{
+  Object.entries(regionData).forEach(([name])=>{
     const pos = NATIONAL_MARKERS[name];
     if(!pos) return;
     if(isMobile && detailCities.has(name)) return;
+    const count = regionMemberCount[name]||0;
     items.push({name, count, svgX: pos.x, svgY: pos.y, pinX: svgRect.left - areaRect.left + pos.x * scaleX, pinY: svgRect.top - areaRect.top + pos.y * scaleY, isActive: name===selectedRegion, onClick: ()=>{ if(!openMobileRegionModal(name)) selectRegion(name); }, chapters: chaptersByRegion[name]});
   });
   const seoulCfg = DETAIL_MAPS["seoul"];
   if(seoulCfg){
-    const seoulTotal = seoulCfg.cities.reduce((sum,c)=>(sum + (regionData[c]||0)), 0);
+    const seoulTotal = seoulCfg.cities.reduce((sum,c)=>(sum + (regionMemberCount[c]||0)), 0);
     items.push({name: "서울", count: seoulTotal, svgX: SEOUL_LABEL_POS.x, svgY: SEOUL_LABEL_POS.y, pinX: svgRect.left - areaRect.left + SEOUL_LABEL_POS.x * scaleX, pinY: svgRect.top - areaRect.top + SEOUL_LABEL_POS.y * scaleY, isActive: seoulCfg.cities.includes(selectedRegion), onClick: ()=>openDetailMap("seoul"), chapters: null, isDetail: true});
   }
   const ggCfg = DETAIL_MAPS["gyeonggi"];
   if(ggCfg){
-    const ggTotal = ggCfg.cities.reduce((sum,c)=>(sum + (regionData[c]||0)), 0);
+    const ggTotal = ggCfg.cities.reduce((sum,c)=>(sum + (regionMemberCount[c]||0)), 0);
     items.push({name: "경기", count: ggTotal, svgX: GYEONGGI_LABEL_POS.x, svgY: GYEONGGI_LABEL_POS.y, pinX: svgRect.left - areaRect.left + GYEONGGI_LABEL_POS.x * scaleX, pinY: svgRect.top - areaRect.top + GYEONGGI_LABEL_POS.y * scaleY, isActive: ggCfg.cities.includes(selectedRegion), onClick: ()=>openDetailMap("gyeonggi"), chapters: null, isDetail: true});
   }
 
@@ -3672,7 +3680,7 @@ function renderDetailMap(key){
     let cy = (minY + maxY) / 2;
     const ADJ = {"\uC11C\uCD08":{dx:-60, dy:-35}, "\uAC15\uB0A8":{dy:40}};
     if(ADJ[city]){ cx += (ADJ[city].dx||0); cy += (ADJ[city].dy||0); }
-    const count = regionData[city] || 0;
+    const count = regionMemberCount[city] || 0;
     const isActive = city === detailSelectedCity;
     const countColor = isActive ? "#fff" : "#c41a2e";
     const labelColor = isActive ? "#fff" : "#999";
@@ -3714,7 +3722,7 @@ function renderDetailMap(key){
   });
 
   // Render detail info panel
-  const totalInRegion = cfg.cities.reduce((s,c)=>s+(regionData[c]||0),0);
+  const totalInRegion = cfg.cities.reduce((s,c)=>s+(regionMemberCount[c]||0),0);
   document.getElementById("diRegion").textContent = cfg.title;
   document.getElementById("diCount").textContent = totalInRegion;
 }
@@ -3744,13 +3752,14 @@ function showRegionInDetailPanel(regionName){
   if(!container) return;
 
   const en = EN_NAMES[regionName] || regionName;
-  const count = regionData[regionName] || 0;
-  const total = Object.values(regionData).reduce((a,b)=>a+b,0);
+  const count = regionMemberCount[regionName] || 0;
+  const total = Object.values(regionMemberCount).reduce((a,b)=>a+b,0);
   const pct = total > 0 ? ((count/total)*100).toFixed(1) : 0;
   const quota = 100;
   const fulfillment = Math.round((count/quota)*100);
 
   const chapters = chaptersByRegion[regionName] || {};
+  const chapterMembers = chapterMembersByRegion[regionName] || {};
   const top5 = Object.entries(chapters).sort((a,b)=>b[1]-a[1]).slice(0,5);
   const maxVal = top5.length ? top5[0][1] : 1;
 
@@ -3760,9 +3769,10 @@ function showRegionInDetailPanel(regionName){
   html += '<div class="dsr-label">GUARDIANS IN REGION</div>';
   html += '<div class="dsr-quota"><div class="dsr-quota-title">QUOTA FULFILLMENT</div><div class="dsr-quota-bar"><div class="dsr-quota-fill" style="width:'+fulfillment+'%"></div></div><div class="dsr-quota-pct">'+fulfillment+'%</div></div>';
   html += '<div class="dsr-chapters"><div class="dsr-ch-title">TOP 5 CHAPTERS</div>';
-  html += top5.map(([name,cnt])=>
-    '<div class="dsr-ch-item" data-chapter="'+name+'" data-region="'+regionName+'"><div class="dsr-ch-name">'+name+'</div><div class="dsr-ch-bar"><div class="dsr-ch-fill" style="width:'+(cnt/maxVal)*100+'%"></div></div><div class="dsr-ch-count">'+cnt+'</div></div>'
-  ).join("");
+  html += top5.map(([name,cnt])=>{
+    const members = chapterMembers[name]||0;
+    return '<div class="dsr-ch-item" data-chapter="'+name+'" data-region="'+regionName+'"><div class="dsr-ch-name">'+name+'</div><div class="dsr-ch-bar"><div class="dsr-ch-fill" style="width:'+(cnt/maxVal)*100+'%"></div></div><div class="dsr-ch-count">'+members+'명 '+cnt+'점</div></div>';
+  }).join("");
   html += '</div>';
 
   container.innerHTML = html;
@@ -3825,8 +3835,8 @@ function openMobileRegionModal(regionName){
   if(oldDetail) oldDetail.remove();
 
   const en = EN_NAMES[regionName] || regionName;
-  const count = regionData[regionName] || 0;
-  const total = Object.values(regionData).reduce((a,b)=>a+b,0);
+  const count = regionMemberCount[regionName] || 0;
+  const total = Object.values(regionMemberCount).reduce((a,b)=>a+b,0);
   const pct = total > 0 ? ((count/total)*100).toFixed(1) : 0;
   const quota = 100;
   const fulfillment = Math.round((count/quota)*100);
@@ -3838,11 +3848,13 @@ function openMobileRegionModal(regionName){
   document.getElementById("mrQuotaPct").textContent = fulfillment + "%";
 
   const chapters = chaptersByRegion[regionName] || {};
+  const chapterMembers = chapterMembersByRegion[regionName] || {};
   const top5 = Object.entries(chapters).sort((a,b)=>b[1]-a[1]).slice(0,5);
   const maxVal = top5.length ? top5[0][1] : 1;
-  document.getElementById("mrChaptersList").innerHTML = top5.map(([name,cnt])=>
-    '<div class="mr-ch-item" data-chapter="'+name+'"><div class="mr-ch-name">'+name+'</div><div class="mr-ch-bar"><div class="mr-ch-fill" style="width:'+(cnt/maxVal)*100+'%"></div></div><div class="mr-ch-count">'+cnt+'</div></div>'
-  ).join("");
+  document.getElementById("mrChaptersList").innerHTML = top5.map(([name,cnt])=>{
+    const members = chapterMembers[name]||0;
+    return '<div class="mr-ch-item" data-chapter="'+name+'"><div class="mr-ch-name">'+name+'</div><div class="mr-ch-bar"><div class="mr-ch-fill" style="width:'+(cnt/maxVal)*100+'%"></div></div><div class="mr-ch-count">'+members+'명 '+cnt+'점</div></div>';
+  }).join("");
   document.querySelectorAll("#mrChaptersList .mr-ch-item").forEach(el=>{
     el.onclick = ()=> showMobileChapterDetail(el.dataset.chapter, regionName);
   });
@@ -3966,14 +3978,14 @@ function getMarkerNames(provId){
       // Seoul/Gyeonggi: aggregate
       const name = info.title === "SEOUL" ? "서울" : info.title === "GYEONGGI" ? "경기" : provId;
       const en = EN_NAMES[name] || info.title;
-      const total = info.cities.reduce((s,c)=>s+(regionData[c]||0),0);
-      const top3 = info.cities.map(c=>[c, regionData[c]||0]).sort((a,b)=>b[1]-a[1]).slice(0,3);
+      const total = info.cities.reduce((s,c)=>s+(regionMemberCount[c]||0),0);
+      const top3 = info.cities.map(c=>[c, regionMemberCount[c]||0]).sort((a,b)=>b[1]-a[1]).slice(0,3);
       let chHtml = top3.length ? '<div class="hb-chapters">' + top3.map(([c,v])=>'<div class="hb-ch">'+c+' <span>'+v+'</span></div>').join("") + '</div>' : '';
       return '<div class="hb-header"><div class="hb-dot"></div><div class="hb-name">'+name+'</div></div><div class="hb-en">'+en+'</div><div class="hb-count">'+total+'</div><div class="hb-label">MEMBERS</div>' + chHtml + '<div class="hb-hint">▶ Click to expand map</div>';
     } else {
       const city = info.cities[0];
       const en = EN_NAMES[city] || city;
-      const count = regionData[city] || 0;
+      const count = regionMemberCount[city] || 0;
       const chapters = chaptersByRegion[city] || {};
       const top3 = Object.entries(chapters).sort((a,b)=>b[1]-a[1]).slice(0,3);
       let chHtml = top3.length ? '<div class="hb-chapters">' + top3.map(([c,v])=>'<div class="hb-ch">'+c+' <span>'+v+'</span></div>').join("") + '</div>' : '';
