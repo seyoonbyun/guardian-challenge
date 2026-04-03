@@ -200,7 +200,7 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
         <div class="card-title">시상 내역</div>
         <ul class="card-list">
           <li><strong>최대 달성율 챕터</strong> : 멤버수 대비 달성율이 가장 높은 챕터</li>
-          <li><strong>최대 영입율 챕터</strong> : 가디언 수가 가장 많은 챕터</li>
+          <li><strong>최대 영입 챕터</strong> : 가디언 수가 가장 많은 챕터</li>
           <li><strong>최대 영입 멤버</strong> : 가장 많은 멤버를 영입한 멤버</li>
         </ul>
       </div>
@@ -325,7 +325,7 @@ function processData(rows){
     return (a.firstAt||"").localeCompare(b.firstAt||"");
   });
 
-  // 2. 최대 영입율 챕터: guardians count desc
+  // 2. 최대 영입 챕터: guardians count desc
   const chapterByGuardians = Object.values(chapterStats).sort((a,b) => b.guardians.size - a.guardians.size);
 
   // 3. 최대 달성율 챕터: recruits / estimated members (use guardians*3 as proxy)
@@ -365,10 +365,10 @@ function renderAwards(memberRank, chapterByGuardians, chapterByRate){
   } else { html += '<div class="empty-state">아직 데이터가 없습니다</div>'; }
   html += '</div></div>';
 
-  // Award 2: 최대 영입율 챕터
+  // Award 2: 최대 영입 챕터
   const topGuardianChapters = getTied(chapterByGuardians, c => c.guardians.size);
   html += '<div class="award-card">';
-  html += '<div class="award-header"><div class="award-badge"><div class="award-icon">🏆</div><div class="award-info"><div class="award-category">MOST GUARDIANS</div><div class="award-name">최대 영입율 챕터</div></div></div>';
+  html += '<div class="award-header"><div class="award-badge"><div class="award-icon">🏆</div><div class="award-info"><div class="award-category">MOST GUARDIANS</div><div class="award-name">최대 영입 챕터</div></div></div>';
   if(topGuardianChapters.length) html += '<div class="award-metric"><div class="am-num" style="font-size:26px;">'+topGuardianChapters[0].name+'</div><div class="am-label">TOP CHAPTER</div></div>';
   html += '</div>';
   html += '<div class="award-winners">';
