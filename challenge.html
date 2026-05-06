@@ -220,6 +220,7 @@ setInterval(updateClock, 1000);
 updateClock();
 
 const GAS_API_URL = "https://script.google.com/macros/s/AKfycbysr8Ur6HiwmM3suSHrhiyUl9-zYryB_luyhQOXpDyULv83PEbWL1umV1LzTOTYC-3JrQ/exec?action=getData";
+const GAS_MEMBERS_URL = "https://script.google.com/macros/s/AKfycbysr8Ur6HiwmM3suSHrhiyUl9-zYryB_luyhQOXpDyULv83PEbWL1umV1LzTOTYC-3JrQ/exec?action=getChapterMembers";
 const SUPABASE_URL = "https://gyaonqcpbmuqlxdfleby.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5YW9ucWNwYm11cWx4ZGZsZWJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3ODk3OTQsImV4cCI6MjA5MDM2NTc5NH0.TOaj-OfRcsTNNPRRF6cobSbfCtp_k-e0TUYqK6k4hXc";
 
@@ -241,7 +242,24 @@ function mapSupabaseRow(r) {
   };
 }
 
+async function loadChapterMembers(){
+  try {
+    const res = await fetch(GAS_MEMBERS_URL);
+    const data = await res.json();
+    const map = {};
+    (data.chapters || []).forEach(c => {
+      if(c.chapter && c.memberCount > 0) map[c.chapter] = c.memberCount;
+    });
+    return { map, snapshotDate: data.snapshotDate || "" };
+  } catch(e) {
+    console.warn("Chapter members fetch failed:", e);
+    return { map: {}, snapshotDate: "" };
+  }
+}
+
 async function loadData(){
+  const membersPromise = loadChapterMembers();
+
   // 1) Supabase (primary, fast)
   try {
     const res = await fetch(SUPABASE_URL + "/rest/v1/guardians?select=*", {
@@ -251,7 +269,8 @@ async function loadData(){
     const sbRows = await res.json();
     if(!sbRows || !sbRows.length) throw new Error("No data from Supabase");
     const rows = sbRows.map(mapSupabaseRow);
-    processData(rows);
+    const members = await membersPromise;
+    processData(rows, members.map, members.snapshotDate);
     return;
   } catch(e) {
     console.warn("Supabase failed, falling back to GAS:", e);
@@ -263,14 +282,18 @@ async function loadData(){
     const data = await res.json();
     const rows = data.data || data;
     if(!rows || !rows.length) throw new Error("No data");
-    processData(rows);
+    const members = await membersPromise;
+    processData(rows, members.map, members.snapshotDate);
   } catch(e) {
     console.warn("GAS API also failed:", e);
-    processData([]);
+    const members = await membersPromise;
+    processData([], members.map, members.snapshotDate);
   }
 }
 
-function processData(rows){
+function processData(rows, chapterMemberMap, memberSnapshotDate){
+  chapterMemberMap = chapterMemberMap || {};
+  const hasRealMemberData = Object.keys(chapterMemberMap).length > 0;
   const EVENT_START = new Date("2026-01-01");
   const EVENT_END = new Date("2026-12-31T23:59:59");
 
@@ -328,18 +351,28 @@ function processData(rows){
   // 2. 최대 영입 챕터: guardians count desc
   const chapterByGuardians = Object.values(chapterStats).sort((a,b) => b.guardians.size - a.guardians.size);
 
-  // 3. 최대 달성율 챕터: recruits / estimated members (use guardians*3 as proxy)
-  // Since we don't have total member count, use achievement = totalRecruits / guardians as rate
+  // 3. 최대 달성율 챕터: recruits / chapter total members
+  // 챕터멤버수 시트 데이터가 있을 때 = 진짜 달성율(%), 없을 때 = 가디언 1인당 영입 수(fallback)
+  Object.values(chapterStats).forEach(c => {
+    c.memberCount = chapterMemberMap[c.name] || 0;
+  });
   const chapterByRate = Object.values(chapterStats).sort((a,b) => {
-    const rateA = a.guardians.size > 0 ? a.totalRecruits / a.guardians.size : 0;
-    const rateB = b.guardians.size > 0 ? b.totalRecruits / b.guardians.size : 0;
+    const rateA = computeRate(a, hasRealMemberData);
+    const rateB = computeRate(b, hasRealMemberData);
     return rateB - rateA;
   });
 
-  renderAwards(memberRank, chapterByGuardians, chapterByRate);
+  renderAwards(memberRank, chapterByGuardians, chapterByRate, hasRealMemberData, memberSnapshotDate);
 }
 
-function renderAwards(memberRank, chapterByGuardians, chapterByRate){
+function computeRate(c, hasRealMemberData){
+  if(hasRealMemberData){
+    return c.memberCount > 0 ? c.totalRecruits / c.memberCount : 0;
+  }
+  return c.guardians.size > 0 ? c.totalRecruits / c.guardians.size : 0;
+}
+
+function renderAwards(memberRank, chapterByGuardians, chapterByRate, hasRealMemberData, memberSnapshotDate){
   const container = document.getElementById("awardsContent");
 
   // Helper: get tied winners (all entries matching rank 1's score)
@@ -380,8 +413,18 @@ function renderAwards(memberRank, chapterByGuardians, chapterByRate){
   html += '</div></div>';
 
   // Award 3: 최대 달성율 챕터
-  const getRateFn = c => c.guardians.size > 0 ? +(c.totalRecruits / c.guardians.size).toFixed(1) : 0;
-  const topRateChapters = getTied(chapterByRate, getRateFn);
+  // hasRealMemberData=true: 영입수 / 챕터 멤버수 (% 표기), false: 가디언 1인당 영입 수 (fallback)
+  const getRateRaw = c => hasRealMemberData
+    ? (c.memberCount > 0 ? c.totalRecruits / c.memberCount : 0)
+    : (c.guardians.size > 0 ? c.totalRecruits / c.guardians.size : 0);
+  const getRateKey = c => hasRealMemberData
+    ? +(getRateRaw(c) * 100).toFixed(2)
+    : +getRateRaw(c).toFixed(2);
+  const formatRate = c => hasRealMemberData
+    ? (getRateRaw(c) * 100).toFixed(1) + '%'
+    : getRateRaw(c).toFixed(1);
+  const rateLabel = hasRealMemberData ? 'ACHIEVEMENT' : 'PER PERSON';
+  const topRateChapters = getTied(chapterByRate, getRateKey);
   html += '<div class="award-card">';
   html += '<div class="award-header"><div class="award-badge"><div class="award-icon">🏆</div><div class="award-info"><div class="award-category">HIGHEST RATE</div><div class="award-name">최대 달성율 챕터</div></div></div>';
   if(topRateChapters.length) html += '<div class="award-metric"><div class="am-num" style="font-size:26px;">'+topRateChapters[0].name+'</div><div class="am-label">TOP CHAPTER</div></div>';
@@ -389,9 +432,16 @@ function renderAwards(memberRank, chapterByGuardians, chapterByRate){
   html += '<div class="award-winners">';
   if(topRateChapters.length){
     topRateChapters.forEach((c,i) => {
-      html += '<div class="winner-row gold"><div class="winner-rank">'+(i+1)+'</div><div class="winner-info"><div class="winner-name">'+c.name+'</div><div class="winner-detail">'+c.guardians.size+'명 참여 &middot; '+c.totalRecruits+'명 영입</div></div><div class="winner-score"><div class="ws-num">'+getRateFn(c)+'</div><div class="ws-label">PER PERSON</div></div></div>';
+      const detail = hasRealMemberData
+        ? (c.memberCount + '명 멤버 &middot; ' + c.totalRecruits + '명 영입')
+        : (c.guardians.size + '명 참여 &middot; ' + c.totalRecruits + '명 영입');
+      const rateStyle = hasRealMemberData ? ' style="font-size:18px;"' : '';
+      html += '<div class="winner-row gold"><div class="winner-rank">'+(i+1)+'</div><div class="winner-info"><div class="winner-name">'+c.name+'</div><div class="winner-detail">'+detail+'</div></div><div class="winner-score"><div class="ws-num"'+rateStyle+'>'+formatRate(c)+'</div><div class="ws-label">'+rateLabel+'</div></div></div>';
     });
   } else { html += '<div class="empty-state">아직 데이터가 없습니다</div>'; }
+  if(hasRealMemberData && memberSnapshotDate){
+    html += '<div style="font-size:10px;color:rgba(255,255,255,0.4);text-align:right;margin-top:8px;letter-spacing:0.5px;">기준: '+memberSnapshotDate+' 멤버수</div>';
+  }
   html += '</div></div>';
 
   container.innerHTML = html;
