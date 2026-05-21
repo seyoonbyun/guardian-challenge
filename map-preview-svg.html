@@ -242,6 +242,11 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 #diSelectedRegion .dsr-quota-pct{font-size:14px;color:#fff;margin-top:4px;text-align:right;font-weight:600;}
 #diSelectedRegion .dsr-chapters{margin-top:16px;}
 #diSelectedRegion .dsr-ch-title{font-size:12px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.7);text-transform:uppercase;margin-bottom:10px;}
+#diSelectedRegion .dsr-ch-list{max-height:260px;overflow-y:auto;padding-right:6px;}
+#diSelectedRegion .dsr-ch-list::-webkit-scrollbar{width:6px;}
+#diSelectedRegion .dsr-ch-list::-webkit-scrollbar-track{background:transparent;}
+#diSelectedRegion .dsr-ch-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:3px;}
+#diSelectedRegion .dsr-ch-list::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.3);}
 #diSelectedRegion .dsr-ch-item{display:flex;align-items:center;margin-bottom:8px;gap:10px;cursor:pointer;padding:4px 0;border-radius:4px;transition:background .15s;}
 #diSelectedRegion .dsr-ch-item:hover{background:rgba(255,255,255,0.03);}
 #diSelectedRegion .dsr-ch-item:hover .dsr-ch-name{color:#c41a2e;}
@@ -368,6 +373,10 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .mobile-region-content .mr-quota-pct{font-size:13px;color:#fff;margin-top:4px;text-align:right;font-weight:600;}
 .mobile-region-content .mr-chapters{margin-top:16px;}
 .mobile-region-content .mr-ch-title{font-size:11px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.7);text-transform:uppercase;margin-bottom:10px;}
+.mobile-region-content #mrChaptersList{max-height:240px;overflow-y:auto;padding-right:6px;}
+.mobile-region-content #mrChaptersList::-webkit-scrollbar{width:5px;}
+.mobile-region-content #mrChaptersList::-webkit-scrollbar-track{background:transparent;}
+.mobile-region-content #mrChaptersList::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:3px;}
 .mobile-region-content .mr-ch-item{display:flex;align-items:center;margin-bottom:8px;gap:10px;}
 .mobile-region-content .mr-ch-name{width:60px;font-size:12px;color:#fff;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .mobile-region-content .mr-ch-bar{flex:1;height:8px;background:#1a1a1a;border-radius:3px;overflow:hidden;}
@@ -2975,7 +2984,7 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
       <div class="mr-quota-pct" id="mrQuotaPct">0%</div>
     </div>
     <div class="mr-chapters">
-      <div class="mr-ch-title">TOP 5 CHAPTERS</div>
+      <div class="mr-ch-title">CHAPTERS</div>
       <div id="mrChaptersList"></div>
     </div>
   </div>
@@ -3797,20 +3806,21 @@ function showRegionInDetailPanel(regionName){
 
   const chapters = chaptersByRegion[regionName] || {};
   const chapterMembers = chapterMembersByRegion[regionName] || {};
-  const top5 = Object.entries(chapters).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  const maxVal = top5.length ? top5[0][1] : 1;
+  const sortedChapters = Object.entries(chapters).sort((a,b)=>b[1]-a[1]);
+  const maxVal = sortedChapters.length ? sortedChapters[0][1] : 1;
 
   let html = '<div class="dsr-header">SELECTED REGION</div>';
   html += '<div class="dsr-name">'+en+'</div>';
   html += '<div class="dsr-big"><div class="dsr-num">'+count+'</div><div class="dsr-badge">+'+pct+'%</div></div>';
   html += '<div class="dsr-label">GUARDIANS IN REGION</div>';
   html += '<div class="dsr-quota"><div class="dsr-quota-title">QUOTA FULFILLMENT</div><div class="dsr-quota-bar"><div class="dsr-quota-fill" style="width:'+fulfillment+'%"></div></div><div class="dsr-quota-pct">'+fulfillment+'%</div></div>';
-  html += '<div class="dsr-chapters"><div class="dsr-ch-title">TOP 5 CHAPTERS</div>';
-  html += top5.map(([name,cnt])=>{
+  html += '<div class="dsr-chapters"><div class="dsr-ch-title">CHAPTERS</div>';
+  html += '<div class="dsr-ch-list">';
+  html += sortedChapters.map(([name,cnt])=>{
     const members = chapterMembers[name]||0;
     return '<div class="dsr-ch-item" data-chapter="'+name+'" data-region="'+regionName+'"><div class="dsr-ch-name">'+name+'</div><div class="dsr-ch-bar"><div class="dsr-ch-fill" style="width:'+(cnt/maxVal)*100+'%"></div></div><div class="dsr-ch-count">'+members+'명 '+cnt+'점</div></div>';
   }).join("");
-  html += '</div>';
+  html += '</div></div>';
 
   container.innerHTML = html;
 
@@ -3886,9 +3896,9 @@ function openMobileRegionModal(regionName){
 
   const chapters = chaptersByRegion[regionName] || {};
   const chapterMembers = chapterMembersByRegion[regionName] || {};
-  const top5 = Object.entries(chapters).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  const maxVal = top5.length ? top5[0][1] : 1;
-  document.getElementById("mrChaptersList").innerHTML = top5.map(([name,cnt])=>{
+  const sortedChapters = Object.entries(chapters).sort((a,b)=>b[1]-a[1]);
+  const maxVal = sortedChapters.length ? sortedChapters[0][1] : 1;
+  document.getElementById("mrChaptersList").innerHTML = sortedChapters.map(([name,cnt])=>{
     const members = chapterMembers[name]||0;
     return '<div class="mr-ch-item" data-chapter="'+name+'"><div class="mr-ch-name">'+name+'</div><div class="mr-ch-bar"><div class="mr-ch-fill" style="width:'+(cnt/maxVal)*100+'%"></div></div><div class="mr-ch-count">'+members+'명 '+cnt+'점</div></div>';
   }).join("");
