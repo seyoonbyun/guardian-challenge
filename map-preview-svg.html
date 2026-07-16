@@ -240,6 +240,7 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 #diSelectedRegion .dsr-label{font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:1.5px;text-transform:uppercase;margin-top:3px;}
 #diSelectedRegion .dsr-quota{margin-top:16px;}
 #diSelectedRegion .dsr-quota-title{font-size:12px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.7);text-transform:uppercase;margin-bottom:8px;}
+#diSelectedRegion .dsr-quota-note{font-size:11px;color:rgba(255,255,255,0.45);margin-top:6px;line-height:1.5;text-align:right;}
 #diSelectedRegion .dsr-quota-bar{height:8px;background:#1a1a1a;border-radius:4px;overflow:hidden;}
 #diSelectedRegion .dsr-quota-fill{height:100%;background:#c41a2e;border-radius:4px;transition:width .5s;}
 #diSelectedRegion .dsr-quota-pct{font-size:14px;color:#fff;margin-top:4px;text-align:right;font-weight:600;}
@@ -371,6 +372,7 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .mobile-region-content .mr-label{font-size:10px;color:rgba(255,255,255,0.7);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;}
 .mobile-region-content .mr-quota{margin-top:16px;}
 .mobile-region-content .mr-quota-title{font-size:11px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.7);text-transform:uppercase;margin-bottom:8px;}
+.mobile-region-content .mr-quota-note{font-size:11px;color:rgba(255,255,255,0.45);margin-top:6px;line-height:1.5;text-align:right;}
 .mobile-region-content .mr-quota-bar{height:8px;background:#1a1a1a;border-radius:4px;overflow:hidden;}
 .mobile-region-content .mr-quota-fill{height:100%;background:#c41a2e;border-radius:4px;transition:width .5s;}
 .mobile-region-content .mr-quota-pct{font-size:13px;color:#fff;margin-top:4px;text-align:right;font-weight:600;}
@@ -2982,9 +2984,10 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
     <div class="mr-big"><div class="mr-num" id="mrCount">0</div><div class="mr-badge" id="mrBadge">+0%</div></div>
     <div class="mr-label">GUARDIANS IN REGION</div>
     <div class="mr-quota">
-      <div class="mr-quota-title">QUOTA FULFILLMENT</div>
+      <div class="mr-quota-title">ACHIEVEMENT SHARE</div>
       <div class="mr-quota-bar"><div class="mr-quota-fill" id="mrQuotaBar" style="width:0%"></div></div>
       <div class="mr-quota-pct" id="mrQuotaPct">0%</div>
+      <div class="mr-quota-note" id="mrQuotaNote"></div>
     </div>
     <div class="mr-chapters">
       <div class="mr-ch-title">CHAPTERS</div>
@@ -3803,9 +3806,7 @@ function showRegionInDetailPanel(regionName){
   const en = EN_NAMES[regionName] || regionName;
   const count = regionMemberCount[regionName] || 0;
   const total = Object.values(regionMemberCount).reduce((a,b)=>a+b,0);
-  const pct = total > 0 ? ((count/total)*100).toFixed(1) : 0;
-  const quota = 100;
-  const fulfillment = Math.round((count/quota)*100);
+  const pct = total > 0 ? ((count/total)*100).toFixed(1) : "0.0";
 
   const chapters = chaptersByRegion[regionName] || {};
   const chapterMembers = chapterMembersByRegion[regionName] || {};
@@ -3814,9 +3815,9 @@ function showRegionInDetailPanel(regionName){
 
   let html = '<div class="dsr-header">SELECTED REGION</div>';
   html += '<div class="dsr-name">'+en+'</div>';
-  html += '<div class="dsr-big"><div class="dsr-num">'+count+'</div><div class="dsr-badge">+'+pct+'%</div></div>';
+  html += '<div class="dsr-big"><div class="dsr-num">'+count+'</div><div class="dsr-badge">'+pct+'%</div></div>';
   html += '<div class="dsr-label">GUARDIANS IN REGION</div>';
-  html += '<div class="dsr-quota"><div class="dsr-quota-title">QUOTA FULFILLMENT</div><div class="dsr-quota-bar"><div class="dsr-quota-fill" style="width:'+fulfillment+'%"></div></div><div class="dsr-quota-pct">'+fulfillment+'%</div></div>';
+  html += '<div class="dsr-quota"><div class="dsr-quota-title">ACHIEVEMENT SHARE</div><div class="dsr-quota-bar"><div class="dsr-quota-fill" style="width:'+pct+'%"></div></div><div class="dsr-quota-pct">'+count+'명 / '+total+'명 · '+pct+'%</div><div class="dsr-quota-note">* 전국 달성 인원 대비 '+regionName+' 지역 달성 비중을 나타냅니다</div></div>';
   html += '<div class="dsr-chapters"><div class="dsr-ch-title">CHAPTERS</div>';
   html += '<div class="dsr-ch-list">';
   html += sortedChapters.map(([name,cnt])=>{
@@ -3887,15 +3888,14 @@ function openMobileRegionModal(regionName){
   const en = EN_NAMES[regionName] || regionName;
   const count = regionMemberCount[regionName] || 0;
   const total = Object.values(regionMemberCount).reduce((a,b)=>a+b,0);
-  const pct = total > 0 ? ((count/total)*100).toFixed(1) : 0;
-  const quota = 100;
-  const fulfillment = Math.round((count/quota)*100);
+  const pct = total > 0 ? ((count/total)*100).toFixed(1) : "0.0";
 
   document.getElementById("mrName").textContent = en;
   document.getElementById("mrCount").textContent = count;
-  document.getElementById("mrBadge").textContent = "+" + pct + "%";
-  document.getElementById("mrQuotaBar").style.width = fulfillment + "%";
-  document.getElementById("mrQuotaPct").textContent = fulfillment + "%";
+  document.getElementById("mrBadge").textContent = pct + "%";
+  document.getElementById("mrQuotaBar").style.width = pct + "%";
+  document.getElementById("mrQuotaPct").textContent = count + "명 / " + total + "명 · " + pct + "%";
+  document.getElementById("mrQuotaNote").textContent = "* 전국 달성 인원 대비 " + regionName + " 지역 달성 비중을 나타냅니다";
 
   const chapters = chaptersByRegion[regionName] || {};
   const chapterMembers = chapterMembersByRegion[regionName] || {};
