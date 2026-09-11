@@ -57,6 +57,10 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 .region-score{color:#fff;background:#1a1a1a;}
 .region-item.active .region-members{background:rgba(255,255,255,0.1);color:#ccc;}
 .region-item.active .region-score{background:rgba(196,26,46,0.2);color:#e88;}
+.region-rate{font-size:14px;font-weight:700;padding:3px 8px;border-radius:8px;text-align:center;white-space:nowrap;min-width:58px;color:#e88;background:rgba(196,26,46,0.12);}
+.region-item.active .region-rate{background:rgba(196,26,46,0.28);color:#fff;}
+.rate-note{padding:0 24px 10px;margin-top:-4px;font-size:12px;color:rgba(255,255,255,0.6);letter-spacing:0.3px;}
+.ch-rate{color:#e88;margin-left:4px;}
 .deploy-btn{margin:8px 18px;padding:14px;background:#c41a2e;color:#fff;border:none;border-radius:5px;font-size:13px;font-weight:700;letter-spacing:2px;cursor:pointer;text-transform:uppercase;transition:all .2s;}
 .deploy-btn:hover{background:#d42a3e;}
 
@@ -435,6 +439,7 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
       <button class="tab-btn" id="tabRegional">REGIONAL</button>
     </div>
     <div class="section-header">NATIONAL ASSETS</div>
+    <div class="rate-note" id="rateNote">달성율 = 영입 인원 ÷ 기존 멤버 수</div>
     <div class="region-list" id="regionList"></div>
     <button class="deploy-btn">BNI Korea 2026</button>
     <div style="text-align:center;font-size:9px;font-weight:700;letter-spacing:1.5px;color:#444;text-transform:uppercase;margin-top:2px;padding-bottom:10px;" class="pc-credit">Created by Joy Byun</div>
@@ -476,7 +481,7 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 
   <div class="sidebar-right">
     <div class="stat-card"><div class="sc-val" id="totalCount">0</div><div class="sc-label">BNI Korea All.TOTAL GUARDIANS</div></div>
-    <div class="stat-card"><div class="sc-val" id="activeRate">0%</div><div class="sc-label">BNI Korea All.ACTIVE RATE</div><div style="font-size:9px;color:rgba(255,255,255,0.4);margin-top:-4px;letter-spacing:0.5px;">전국 3,130명 멤버 기준, 현시점 참가비율</div></div>
+    <div class="stat-card"><div class="sc-val" id="activeRate">0%</div><div class="sc-label">BNI Korea All.ACTIVE RATE</div><div style="font-size:9px;color:rgba(255,255,255,0.4);margin-top:-4px;letter-spacing:0.5px;">전국 3,319명 멤버 기준, 현시점 참가비율</div></div>
     <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:0.5px;text-align:center;">BNI Korea All.90G2F 합류 현황</div>
     <div class="g2f-grid">
       <div class="g2f-card"><div class="g2f-val" id="g2fBorn90">0</div><div class="g2f-label">90년생 사업가</div></div>
@@ -3100,6 +3105,8 @@ let chapterMembersByRegion = {};
 let g2fCounts = {born90:0, global:0, secondGen:0, franchise:0};
 let totalGuardians = 0;
 let rawRows = [];
+let chapterSize = {};   // 챕터명 → 기존 멤버 수 (챕터사이즈 시트)
+let regionSize = {};    // 지역명 → 기존 멤버 수 합계
 let selectedRegion = "송파";
 let zoomLevel = 1;
 let panX = 0, panY = 0;
@@ -3165,6 +3172,58 @@ Object.keys(PROVINCE_CITY_MAP).forEach(provId => {
 const SUPABASE_URL = "https://gyaonqcpbmuqlxdfleby.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5YW9ucWNwYm11cWx4ZGZsZWJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3ODk3OTQsImV4cCI6MjA5MDM2NTc5NH0.TOaj-OfRcsTNNPRRF6cobSbfCtp_k-e0TUYqK6k4hXc";
 const GAS_API_URL = API_URL;
+const GAS_MEMBERS_URL = API_URL.replace("action=getData", "action=getChapterMembers");
+// 폼 입력명 → 챕터사이즈 시트 이름 (달성율 리포트 make_report.py CHAPTER_ALIAS 와 동일)
+const CHAPTER_ALIAS = {"D100":"디백"};
+// 챕터사이즈 시트에 빠진 챕터의 기존 멤버 수 (make_report.py SUPPLEMENT 와 동일 · 2026-06-01 활동중 명단)
+const SIZE_SUPPLEMENT = {"스타":{region:"수원",count:32}, "오메가":{region:"안양",count:37}, "온리원":{region:"서초",count:31}};
+let sizeSnapshot = "";
+
+async function loadChapterSizes(){
+  try {
+    const res = await fetch(GAS_MEMBERS_URL);
+    const data = await res.json();
+    const cs = {}, rs = {};
+    (data.chapters || []).forEach(c => {
+      if(!c.chapter || !(c.memberCount > 0)) return;
+      cs[c.chapter] = c.memberCount;
+      rs[c.region] = (rs[c.region]||0) + c.memberCount;
+    });
+    if(!Object.keys(cs).length) return false;
+    Object.entries(SIZE_SUPPLEMENT).forEach(([ch, s]) => {
+      if(cs[ch]) return; // 시트에 추가되면 시트 값을 쓴다
+      cs[ch] = s.count;
+      rs[s.region] = (rs[s.region]||0) + s.count;
+    });
+    chapterSize = cs;
+    regionSize = rs;
+    sizeSnapshot = data.snapshotDate || "";
+    return true;
+  } catch(e) {
+    console.warn("Chapter size fetch failed:", e);
+    return false;
+  }
+}
+
+// 달성율 = 영입 인원 ÷ 기존 멤버 수
+function achievementRate(recruits, size){
+  return size > 0 ? (recruits / size * 100).toFixed(1) + "%" : "–";
+}
+function chapterRate(name, recruits){
+  return achievementRate(recruits, chapterSize[CHAPTER_ALIAS[name] || name] || 0);
+}
+
+// 멤버 수는 GAS 라 늦게 온다 → 도착하면 목록과 열린 패널을 다시 그린다
+async function applySizes(sizesPromise){
+  if(!(await sizesPromise)) return;
+  const note = document.getElementById("rateNote");
+  if(note && sizeSnapshot) note.textContent = "달성율 = 영입 인원 ÷ 기존 멤버 수 (" + sizeSnapshot + " 기준)";
+  render();
+  const di = document.getElementById("diSelectedRegion");
+  if(window.innerWidth > 1024 && di && di.dataset.region) showRegionInDetailPanel(di.dataset.region);
+  const mm = document.getElementById("mobileRegionModal");
+  if(mm && mm.classList.contains("open")) openMobileRegionModal(selectedRegion);
+}
 
 function mapSupabaseRow(r) {
   return {
@@ -3228,6 +3287,7 @@ function hideLoading(){
 }
 
 async function loadData(){
+  const sizesPromise = loadChapterSizes();
   // 1) Supabase (primary, fast)
   try {
     const res = await fetch(SUPABASE_URL + "/rest/v1/guardians?select=*", {
@@ -3240,6 +3300,7 @@ async function loadData(){
     processRows(rows);
     render();
     hideLoading();
+    applySizes(sizesPromise);
     return;
   } catch(e) {
     console.warn("Supabase failed, falling back to GAS:", e);
@@ -3259,6 +3320,7 @@ async function loadData(){
     render();
   }
   hideLoading();
+  applySizes(sizesPromise);
 }
 
 // ── Render national map ──
@@ -3307,7 +3369,9 @@ function renderRegionList(){
   list.innerHTML = sorted.map(([name, count])=>{
     const ac = name===selectedRegion?" active":"";
     const members = regionMemberCount[name]||0;
-    return '<div class="region-item'+ac+'" data-rg="'+name+'"><div class="region-dot"></div><div class="region-name">'+name+'</div><div class="region-stats"><div class="region-members">'+members+'명</div><div class="region-score">'+count+'점</div></div></div>';
+    const size = regionSize[name]||0;
+    const tip = size ? '달성율 = 영입 '+members+'명 ÷ 기존 멤버 '+size+'명' : '기존 멤버 수 정보 없음';
+    return '<div class="region-item'+ac+'" data-rg="'+name+'"><div class="region-dot"></div><div class="region-name">'+name+'</div><div class="region-stats"><div class="region-members">'+members+'명</div><div class="region-score">'+count+'점</div><div class="region-rate" title="'+tip+'">'+achievementRate(members, size)+'</div></div></div>';
   }).join("");
   list.querySelectorAll(".region-item").forEach(el=>{
     el.onclick = ()=> selectRegion(el.dataset.rg);
@@ -3493,7 +3557,7 @@ function showChapterDetail(chapterName){
 
 function updateTotals(){
   document.getElementById("totalCount").textContent = totalGuardians;
-  const rate = (totalGuardians / 3130 * 100).toFixed(1);
+  const rate = (totalGuardians / 3319 * 100).toFixed(1);
   document.getElementById("activeRate").textContent = rate + "%";
   document.getElementById("g2fBorn90").textContent = g2fCounts.born90;
   document.getElementById("g2fGlobal").textContent = g2fCounts.global;
@@ -3802,6 +3866,7 @@ function showRegionInDetailPanel(regionName){
   // PC: render into #diSelectedRegion
   const container = document.getElementById("diSelectedRegion");
   if(!container) return;
+  container.dataset.region = regionName;
 
   const en = EN_NAMES[regionName] || regionName;
   const count = regionMemberCount[regionName] || 0;
@@ -3822,7 +3887,7 @@ function showRegionInDetailPanel(regionName){
   html += '<div class="dsr-ch-list">';
   html += sortedChapters.map(([name,cnt])=>{
     const members = chapterMembers[name]||0;
-    return '<div class="dsr-ch-item" data-chapter="'+name+'" data-region="'+regionName+'"><div class="dsr-ch-name">'+name+'</div><div class="dsr-ch-bar"><div class="dsr-ch-fill" style="width:'+(cnt/maxVal)*100+'%"></div></div><div class="dsr-ch-count">'+members+'명 '+cnt+'점</div></div>';
+    return '<div class="dsr-ch-item" data-chapter="'+name+'" data-region="'+regionName+'"><div class="dsr-ch-name">'+name+'</div><div class="dsr-ch-bar"><div class="dsr-ch-fill" style="width:'+(cnt/maxVal)*100+'%"></div></div><div class="dsr-ch-count">'+members+'명 '+cnt+'점<span class="ch-rate">'+chapterRate(name, members)+'</span></div></div>';
   }).join("");
   html += '</div></div>';
 
@@ -3903,7 +3968,7 @@ function openMobileRegionModal(regionName){
   const maxVal = sortedChapters.length ? sortedChapters[0][1] : 1;
   document.getElementById("mrChaptersList").innerHTML = sortedChapters.map(([name,cnt])=>{
     const members = chapterMembers[name]||0;
-    return '<div class="mr-ch-item" data-chapter="'+name+'"><div class="mr-ch-name">'+name+'</div><div class="mr-ch-bar"><div class="mr-ch-fill" style="width:'+(cnt/maxVal)*100+'%"></div></div><div class="mr-ch-count">'+members+'명 '+cnt+'점</div></div>';
+    return '<div class="mr-ch-item" data-chapter="'+name+'"><div class="mr-ch-name">'+name+'</div><div class="mr-ch-bar"><div class="mr-ch-fill" style="width:'+(cnt/maxVal)*100+'%"></div></div><div class="mr-ch-count">'+members+'명 '+cnt+'점<span class="ch-rate">'+chapterRate(name, members)+'</span></div></div>';
   }).join("");
   document.querySelectorAll("#mrChaptersList .mr-ch-item").forEach(el=>{
     el.onclick = ()=> showMobileChapterDetail(el.dataset.chapter, regionName);
