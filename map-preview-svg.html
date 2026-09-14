@@ -3065,13 +3065,15 @@ const DETAIL_MAPS = {
       "수원": "수원시",
       "용인": "용인시",
       "화성": "화성시",
-      "안양": "안양시"
+      "안양": "안양시",
+      "하남": "하남시"
     },
     // Fallback marker positions for cities without SVG district polygons
     markerOverrides: {
-      "안양": {x:285, y:335}
+      "안양": {x:285, y:335},
+      "하남": {x:381, y:330}
     },
-    cities: ["고양","성남","수원","용인","화성","안양"]
+    cities: ["고양","성남","수원","용인","화성","안양","하남"]
   }
 };
 
@@ -3095,7 +3097,7 @@ const EN_NAMES = {
   "마포":"MAPO","부산":"BUSAN","송파":"SONGPA","수원":"SUWON","용인":"YONGIN",
   "영등포":"YEONGDEUNGPO","인천":"INCHEON","고양":"GOYANG","화성":"HWASEONG",
   "중구":"JUNGGU","성남":"SEONGNAM","경기":"GYEONGGI",
-  "강서":"GANGSEO","안양":"ANYANG","창원":"CHANGWON"
+  "강서":"GANGSEO","안양":"ANYANG","창원":"CHANGWON","하남":"HANAM"
 };
 
 let regionData = {};
@@ -3114,7 +3116,7 @@ let isPanning = false, panStartX = 0, panStartY = 0;
 let detailSelectedCity = null;
 let activeTab = "national";
 let glowRegion = null; // currently glowing region name (e.g. "대구")
-const ALL_REGIONS = ["강남","서초","성동","마포","송파","중구","영등포","강서","고양","화성","성남","수원","용인","안양","부산","대구","대전","인천","창원"];
+const ALL_REGIONS = ["강남","서초","성동","마포","송파","중구","영등포","강서","고양","화성","성남","수원","용인","안양","하남","부산","대구","대전","인천","창원"];
 const REGIONAL_CITIES = ["마포","서초","영등포","대구","수원","성남"];
 
 // ── Clock ──
