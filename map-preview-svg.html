@@ -3066,14 +3066,16 @@ const DETAIL_MAPS = {
       "용인": "용인시",
       "화성": "화성시",
       "안양": "안양시",
-      "하남": "하남시"
+      "하남": "하남시",
+      "동탄": "동탄구"
     },
     // Fallback marker positions for cities without SVG district polygons
     markerOverrides: {
       "안양": {x:285, y:335},
-      "하남": {x:381, y:330}
+      "하남": {x:381, y:330},
+      "동탄": {x:279, y:448}
     },
-    cities: ["고양","성남","수원","용인","화성","안양","하남"]
+    cities: ["고양","성남","수원","용인","화성","안양","하남","동탄"]
   }
 };
 
@@ -3097,7 +3099,7 @@ const EN_NAMES = {
   "마포":"MAPO","부산":"BUSAN","송파":"SONGPA","수원":"SUWON","용인":"YONGIN",
   "영등포":"YEONGDEUNGPO","인천":"INCHEON","고양":"GOYANG","화성":"HWASEONG",
   "중구":"JUNGGU","성남":"SEONGNAM","경기":"GYEONGGI",
-  "강서":"GANGSEO","안양":"ANYANG","창원":"CHANGWON","하남":"HANAM"
+  "강서":"GANGSEO","안양":"ANYANG","창원":"CHANGWON","하남":"HANAM","동탄":"DONGTAN"
 };
 
 let regionData = {};
@@ -3116,7 +3118,7 @@ let isPanning = false, panStartX = 0, panStartY = 0;
 let detailSelectedCity = null;
 let activeTab = "national";
 let glowRegion = null; // currently glowing region name (e.g. "대구")
-const ALL_REGIONS = ["강남","서초","성동","마포","송파","중구","영등포","강서","고양","화성","성남","수원","용인","안양","하남","부산","대구","대전","인천","창원"];
+const ALL_REGIONS = ["강남","서초","성동","마포","송파","중구","영등포","강서","고양","화성","성남","수원","용인","안양","하남","동탄","부산","대구","대전","인천","창원"];
 const REGIONAL_CITIES = ["마포","서초","영등포","대구","수원","성남"];
 
 // ── Clock ──
@@ -3179,7 +3181,7 @@ const GAS_MEMBERS_URL = API_URL.replace("action=getData", "action=getChapterMemb
 const CHAPTER_ALIAS = {"D100":"디백"};
 // 챕터사이즈 시트에 빠진 챕터의 기존 멤버 수 (make_report.py SUPPLEMENT 와 동일 · 2026-06-01 활동중 명단)
 const SIZE_SUPPLEMENT = {"스타":{region:"수원",count:32}, "오메가":{region:"안양",count:37}, "온리원":{region:"서초",count:31}};
-// 지역 → 챕터 마스터 활동중 챕터(2026_08월, 96개). 등록 0건이어도 챕터 목록에 0으로 표시
+// 지역 → 챕터 마스터 활동중 챕터(2026_08월, 96개) + 동탄 하이브(런칭 예정, 2026-09-14 사전 등록). 등록 0건이어도 챕터 목록에 0으로 표시
 const CHAPTER_ROSTER = {
   "강남":["D100","굿","더강남","마스터","미다스","블리스","스마트","어썸","엑설런트","올그린","올인원","위너스","이노베이션","찬스","큐브","프리마","플러스","하모니","해피","헬퍼스"],
   "서초":["더블유","라인","로얄","메디컬","메이저","아너스","엑스퍼트","오리진","온리원","챌린지","프라미스"],
@@ -3196,6 +3198,7 @@ const CHAPTER_ROSTER = {
   "용인":["오렌지"],
   "안양":["오메가"],
   "하남":["시그니아"],
+  "동탄":["하이브"],
   "부산":["오션","자이언츠","파이어니어"],
   "대구":["글로리","레전드","미라클","슈프림","스카이","어메이징","엘리트","원더풀","월드","판타스틱","퍼펙트","피닉스"],
   "대전":["CEO","라온","리더"],
