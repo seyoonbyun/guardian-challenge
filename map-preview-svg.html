@@ -3711,7 +3711,7 @@ function renderDetailMap(key){
       if(el){
         const inner = el.querySelector(".district");
         const target = inner || el;
-        if(regionData[city]) target.classList.add("has-data");
+        if(city in regionData) target.classList.add("has-data"); // 0건 지역(신규 하남 등)도 챌린지 지역이면 테두리 표시
         else target.classList.remove("has-data");
       }
     });
