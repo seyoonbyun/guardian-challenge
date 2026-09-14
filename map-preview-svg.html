@@ -3179,6 +3179,29 @@ const GAS_MEMBERS_URL = API_URL.replace("action=getData", "action=getChapterMemb
 const CHAPTER_ALIAS = {"D100":"디백"};
 // 챕터사이즈 시트에 빠진 챕터의 기존 멤버 수 (make_report.py SUPPLEMENT 와 동일 · 2026-06-01 활동중 명단)
 const SIZE_SUPPLEMENT = {"스타":{region:"수원",count:32}, "오메가":{region:"안양",count:37}, "온리원":{region:"서초",count:31}};
+// 지역 → 챕터 마스터 활동중 챕터(2026_08월, 96개). 등록 0건이어도 챕터 목록에 0으로 표시
+const CHAPTER_ROSTER = {
+  "강남":["D100","굿","더강남","마스터","미다스","블리스","스마트","어썸","엑설런트","올그린","올인원","위너스","이노베이션","찬스","큐브","프리마","플러스","하모니","해피","헬퍼스"],
+  "서초":["더블유","라인","로얄","메디컬","메이저","아너스","엑스퍼트","오리진","온리원","챌린지","프라미스"],
+  "성동":["브레이크스루","포레스트"],
+  "마포":["나이스","매트릭스","맥스","스톤웍스","애티튜드","유니콘","제우스","케이","타이탄","탑클래스","프레젠트"],
+  "송파":["트라이브"],
+  "중구":["아름"],
+  "영등포":["골든","그로우","레버리지","밀리언","시너지","에이스","챔피언","트러스트","퍼스트","프라임","프로페셔널"],
+  "강서":["컴퍼니"],
+  "고양":["선샤인","최강"],
+  "화성":["토파즈"],
+  "성남":["그랜드","더유니언","드림컴트루","에피소드"],
+  "수원":["가온","럭키","메모리","스타","알파","유니크","크라운","하나"],
+  "용인":["오렌지"],
+  "안양":["오메가"],
+  "하남":["시그니아"],
+  "부산":["오션","자이언츠","파이어니어"],
+  "대구":["글로리","레전드","미라클","슈프림","스카이","어메이징","엘리트","원더풀","월드","판타스틱","퍼펙트","피닉스"],
+  "대전":["CEO","라온","리더"],
+  "인천":["히어로"],
+  "창원":["뱅가드"]
+};
 let sizeSnapshot = "";
 
 async function loadChapterSizes(){
@@ -3273,6 +3296,15 @@ function processRows(rows){
     if(chapter) chaptersByRegion[region][chapter] = (chaptersByRegion[region][chapter]||0) + score;
     if(!chapterMembersByRegion[region]) chapterMembersByRegion[region] = {};
     if(chapter) chapterMembersByRegion[region][chapter] = (chapterMembersByRegion[region][chapter]||0) + 1;
+  });
+  // 등록 0건이어도 지역 패널에 보여야 하는 챕터 (시즌 중 신규 런칭 등)
+  Object.entries(CHAPTER_ROSTER).forEach(([region, chs]) => {
+    if(!chaptersByRegion[region]) chaptersByRegion[region] = {};
+    if(!chapterMembersByRegion[region]) chapterMembersByRegion[region] = {};
+    chs.forEach(ch => {
+      chaptersByRegion[region][ch] = chaptersByRegion[region][ch] || 0;
+      chapterMembersByRegion[region][ch] = chapterMembersByRegion[region][ch] || 0;
+    });
   });
   // Count unique guardians by referrer contact
   const guardianSet = new Set();
@@ -3878,7 +3910,7 @@ function showRegionInDetailPanel(regionName){
   const chapters = chaptersByRegion[regionName] || {};
   const chapterMembers = chapterMembersByRegion[regionName] || {};
   const sortedChapters = Object.entries(chapters).sort((a,b)=>b[1]-a[1]);
-  const maxVal = sortedChapters.length ? sortedChapters[0][1] : 1;
+  const maxVal = (sortedChapters.length && sortedChapters[0][1]) || 1;
 
   let html = '<div class="dsr-header">SELECTED REGION</div>';
   html += '<div class="dsr-name">'+en+'</div>';
@@ -3967,7 +3999,7 @@ function openMobileRegionModal(regionName){
   const chapters = chaptersByRegion[regionName] || {};
   const chapterMembers = chapterMembersByRegion[regionName] || {};
   const sortedChapters = Object.entries(chapters).sort((a,b)=>b[1]-a[1]);
-  const maxVal = sortedChapters.length ? sortedChapters[0][1] : 1;
+  const maxVal = (sortedChapters.length && sortedChapters[0][1]) || 1;
   document.getElementById("mrChaptersList").innerHTML = sortedChapters.map(([name,cnt])=>{
     const members = chapterMembers[name]||0;
     return '<div class="mr-ch-item" data-chapter="'+name+'"><div class="mr-ch-name">'+name+'</div><div class="mr-ch-bar"><div class="mr-ch-fill" style="width:'+(cnt/maxVal)*100+'%"></div></div><div class="mr-ch-count">'+members+'명 '+cnt+'점<span class="ch-rate">'+chapterRate(name, members)+'</span></div></div>';
