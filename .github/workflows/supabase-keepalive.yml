@@ -1,41 +1,98 @@
 name: supabase-keepalive
 
-# Supabase 무료 플랜은 7일간 활동이 없으면 프로젝트를 일시정지한다(2026-08-28 실제 발생,
-# 사이트가 GAS 폴백으로 조용히 넘어가 두 달간 몰랐다). 매일 한 번 guardians 를 읽어 깨워 둔다.
-# - 실패하면(=일시정지·장애) 런이 빨갛게 끝나고 GitHub 가 저장소 주인에게 메일을 보낸다.
+# 매시간: Supabase 를 깨우고(무료 플랜 7일 비활동 일시정지 방지 — 2026-08-28 실제 발생),
+# Supabase 에만 있고 구글시트에 없는 등록을 시트 저장 기능(GAS addData)으로 채운다.
+# - 기준은 Supabase. 기록을 지울 때는 Supabase 에서 먼저 지울 것(시트만 지우면 다음 대조 때 다시 들어간다).
+# - 시트에만 있는 건, 한 번에 20건 넘게 빠진 경우, Supabase·GAS 응답 실패 → 런 실패(GitHub 가 저장소 주인에게 메일).
 # - 공개 저장소는 60일간 활동이 없으면 예약 워크플로가 꺼진다 → 매 실행마다 자기 자신을 enable 해 타이머를 초기화.
-# - anon 키는 사이트 HTML 에 이미 공개된 값이라 challenge.html 에서 읽는다(키 교체 시 자동 반영).
+# - Supabase anon 키·GAS 주소는 사이트 HTML 에 이미 공개된 값이라 challenge.html 에서 읽는다.
 
 on:
   schedule:
-    - cron: '0 0 * * *'   # 매일 09:00 KST
+    - cron: '17 * * * *'   # 매시 17분
   workflow_dispatch:
 
 permissions:
   contents: read
   actions: write
 
+concurrency:
+  group: supabase-keepalive
+  cancel-in-progress: false
+
 jobs:
-  ping:
+  sync:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Supabase 읽기
+      - name: Supabase 깨우기 + 시트 대조
         run: |
-          URL=$(grep -oE 'https://[a-z0-9]+\.supabase\.co' challenge.html | head -1)
-          KEY=$(grep -oE 'SUPABASE_KEY = "[^"]+"' challenge.html | head -1 | sed -E 's/.*"([^"]+)"/\1/')
-          test -n "$URL" && test -n "$KEY" || { echo "challenge.html 에서 Supabase URL/키를 못 찾음"; exit 1; }
-          for i in 1 2 3; do
-            CODE=$(curl -s -o body.json -w '%{http_code}' \
-              -H "apikey: $KEY" -H "Authorization: Bearer $KEY" \
-              "$URL/rest/v1/guardians?select=id&limit=1")
-            echo "시도 $i: HTTP $CODE"
-            [ "$CODE" = "200" ] && { cat body.json; echo; exit 0; }
-            sleep 30
-          done
-          echo "::error::Supabase 응답 실패(HTTP $CODE) — 일시정지 여부를 대시보드에서 확인할 것"
-          exit 1
+          python3 - <<'PY'
+          import json, re, sys, time, urllib.parse, urllib.request
+
+          html = open("challenge.html", encoding="utf-8").read()
+          SB_URL = re.search(r'https://[a-z0-9]+\.supabase\.co', html).group(0)
+          SB_KEY = re.search(r'SUPABASE_KEY = "([^"]+)"', html).group(1)
+          GAS = re.search(r'GAS_API_URL = "([^"?]+)', html).group(1)
+          MAX_ADD = 20
+
+          def get(url, headers=None, tries=3):
+              for i in range(tries):
+                  try:
+                      req = urllib.request.Request(url, headers=headers or {})
+                      with urllib.request.urlopen(req, timeout=60) as r:
+                          return json.loads(r.read().decode("utf-8"))
+                  except Exception as e:
+                      print(f"  시도 {i+1} 실패: {e}")
+                      time.sleep(20)
+              raise SystemExit(f"::error::응답 실패: {url.split('?')[0]}")
+
+          h = {"apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY}
+          sb, off = [], 0
+          while True:
+              page = get(f"{SB_URL}/rest/v1/guardians?select=*&order=id&limit=1000&offset={off}", h)
+              sb += page
+              if len(page) < 1000:
+                  break
+              off += 1000
+          sheet = get(GAS + "?action=getData")
+          print(f"Supabase {len(sb)}건 / 시트 {len(sheet)}건")
+
+          sheet_keys = {str(d.get("uniqueKey", "")).strip() for d in sheet}
+          sb_keys = {str(r.get("unique_key", "")).strip() for r in sb}
+          missing = sorted([r for r in sb if str(r["unique_key"]).strip() not in sheet_keys], key=lambda r: r["created_at"])
+          sheet_only = [d for d in sheet if str(d.get("uniqueKey", "")).strip() not in sb_keys]
+
+          problems = []
+          if len(missing) > MAX_ADD:
+              problems.append(f"시트에 빠진 건이 {len(missing)}건 — 이상 징후라 자동 추가하지 않음")
+          else:
+              for r in missing:
+                  q = {
+                      "action": "addData", "createdAt": r["created_at"],
+                      "referrerName": r["referrer_name"], "referrerRegion": r["referrer_region"],
+                      "referrerChapter": r["referrer_chapter"], "referrerContact": r["referrer_contact"],
+                      "newMemberName": r["new_member_name"], "newMemberContact": r["new_member_contact"],
+                      "newMemberChapter": r["new_member_chapter"],
+                      "joinedMember": "true" if r["joined_member"] else "false",
+                      "g2fType": r["g2f_type"] or "", "score": str(r["score"]), "uniqueKey": r["unique_key"],
+                  }
+                  res = get(GAS + "?" + urllib.parse.urlencode(q))
+                  ok = res.get("success") or res.get("error") == "DUPLICATE_DATA"
+                  print(f"  시트 추가 {'OK' if ok else 'FAIL'}: {r['created_at']} {r['referrer_name']} → {r['new_member_name']} {res}")
+                  if not ok:
+                      problems.append(f"시트 추가 실패: {r['unique_key']} {res}")
+
+          for d in sheet_only:
+              problems.append(f"시트에만 있음(Supabase 없음): {d.get('createdAt')} {d.get('referrerName')} → {d.get('newMemberName')}")
+
+          if problems:
+              for p in problems:
+                  print("::error::" + p)
+              sys.exit(1)
+          print("대조 완료 — 차이 없음" if not missing else f"대조 완료 — 시트에 {len(missing)}건 채움")
+          PY
 
       - name: 예약 워크플로 60일 비활성 타이머 초기화
         if: always()
