@@ -341,13 +341,13 @@ async function submitForm(){
   const data = {
     action: "addData",
     createdAt: new Date().toLocaleString("ko-KR",{timeZone:"Asia/Seoul",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false}),
-    referrerName: form.querySelector("[name=myName]").value,
-    referrerRegion: form.querySelector("[name=myRegion]").value,
-    referrerChapter: form.querySelector("[name=myChapter]").value,
-    referrerContact: form.querySelector("[name=myContact]").value,
+    referrerName: form.querySelector("[name=myName]").value.trim(),
+    referrerRegion: form.querySelector("[name=myRegion]").value.trim(),
+    referrerChapter: form.querySelector("[name=myChapter]").value.trim(),
+    referrerContact: form.querySelector("[name=myContact]").value.trim(),
     newMemberName: newMemberName,
     newMemberContact: newMemberContact,
-    newMemberChapter: form.querySelector("[name=newMemberChapter]").value,
+    newMemberChapter: form.querySelector("[name=newMemberChapter]").value.trim(),
     joinedMember: joinedMember ? "true" : "false",
     g2fType: g2fType,
     score: score,
@@ -378,6 +378,16 @@ async function submitForm(){
     unique_key: data.uniqueKey
   };
 
+  // GAS write (Google Sheet) — 예전엔 숨은 iframe 을 1초 뒤 지우고 2초 뒤 이동해서 응답이 늦으면 요청이 끊겼다(2026-10 누락 4건).
+  // keepalive 로 보내 페이지를 떠나도 끝까지 전송하고, 응답(최대 10초)을 기다린 뒤 이동한다.
+  const params = new URLSearchParams(data);
+  const gasUrl = "https://script.google.com/macros/s/AKfycbysr8Ur6HiwmM3suSHrhiyUl9-zYryB_luyhQOXpDyULv83PEbWL1umV1LzTOTYC-3JrQ/exec?" + params.toString();
+  const gasDone = Promise.race([
+    fetch(gasUrl, { mode: "no-cors", keepalive: true }).then(()=>true, ()=>false),
+    new Promise(resolve => setTimeout(()=>resolve(false), 10000))
+  ]);
+
+  let sbOk = false;
   try {
     const sbRes = await fetch(SUPABASE_URL + "/rest/v1/guardians", {
       method: "POST",
@@ -390,25 +400,25 @@ async function submitForm(){
       body: JSON.stringify(sbPayload)
     });
     if(!sbRes.ok) throw new Error("Supabase insert failed: " + sbRes.status);
+    sbOk = true;
   } catch(e) {
     console.warn("Supabase insert error:", e);
   }
 
-  // GAS write (fire-and-forget backup to keep Google Sheet updated)
-  const params = new URLSearchParams(data);
-  const gasUrl = "https://script.google.com/macros/s/AKfycbysr8Ur6HiwmM3suSHrhiyUl9-zYryB_luyhQOXpDyULv83PEbWL1umV1LzTOTYC-3JrQ/exec?" + params.toString();
-  const iframe = document.createElement("iframe");
-  iframe.style.display = "none";
-  iframe.src = gasUrl;
-  document.body.appendChild(iframe);
+  const gasOk = await gasDone;
+  if(!gasOk) console.warn("GAS write not confirmed (timeout or network error)");
+
+  if(!sbOk && !gasOk){
+    showToast("저장에 실패했습니다. 잠시 후 다시 시도해주세요.", "error");
+    btn.disabled = false;
+    btn.innerHTML = '+1 챌린지 참가 <span class="arrow">&rarr;</span>';
+    return;
+  }
 
   const scoreMsg = score === 2 ? "2점 (90G2F 해당)" : score === 1 ? "1점" : "0점";
   showToast("정보가 성공적으로 기록되었습니다! 점수: " + scoreMsg + " | 대시보드로 이동합니다.", "success");
   form.reset();
-  setTimeout(()=>{ if(document.body.contains(iframe)) document.body.removeChild(iframe); }, 1000);
   setTimeout(()=>{ window.location.href = "/dashboard"; }, 2000);
-  btn.disabled = false;
-  btn.innerHTML = '+1 챌린지 참가 <span class="arrow">&rarr;</span>';
 }
 </script>
 <div style="position:fixed;bottom:12px;right:20px;font-size:9px;font-weight:700;letter-spacing:1.5px;color:#444;text-transform:uppercase;z-index:9999;">Created by Joy Byun</div>
