@@ -1,7 +1,7 @@
 // 자동 생성 파일 — BNI Connect 등록 기준으로 지역·챕터가 추가된다 (automation/connect_sync).
 // 손으로 고쳐도 되지만 형식(JSON)은 지킬 것. invite 드롭다운과 대시보드 챕터 명단이 이 파일을 읽는다.
 window.BNI_CHAPTERS = {
- "updated": "2026-11-11T17:40:00+09:00",
+ "updated": "2026-11-11T17:36:03+09:00",
  "source": "BNI Connect 챕터 보기/관리 (활동중) — automation/connect_sync/sync_chapters.py",
  "regions": [
   {
@@ -172,6 +172,7 @@ window.BNI_CHAPTERS = {
   "원더풀",
   "월드",
   "위너스",
+  "윈윈",
   "유니콘",
   "유니크",
   "이노베이션",
@@ -201,6 +202,7 @@ window.BNI_CHAPTERS = {
   "프로페셔널",
   "프리마",
   "플러스",
+  "피너클",
   "피닉스",
   "하나",
   "하모니",
@@ -303,6 +305,7 @@ window.BNI_CHAPTERS = {
    "메모리",
    "스타",
    "알파",
+   "윈윈",
    "유니크",
    "크라운",
    "하나"
@@ -311,7 +314,8 @@ window.BNI_CHAPTERS = {
    "오렌지"
   ],
   "안양": [
-   "오메가"
+   "오메가",
+   "피너클"
   ],
   "하남": [
    "시그니아"
