@@ -3004,6 +3004,7 @@ body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#fff;overflow:hi
 <!-- Hover info box for national map -->
 <div class="map-hover-box" id="mapHoverBox"></div>
 
+<script src="/chapters.js"></script>
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbysr8Ur6HiwmM3suSHrhiyUl9-zYryB_luyhQOXpDyULv83PEbWL1umV1LzTOTYC-3JrQ/exec?action=getData";
 
@@ -3205,6 +3206,18 @@ const CHAPTER_ROSTER = {
   "인천":["히어로"],
   "창원":["뱅가드"]
 };
+// chapters.js(BNI Connect 등록 기준 자동 생성)가 있으면 위 명단 대신 그것을 쓴다. 못 읽으면 위 명단 그대로.
+(function(){
+  const d = window.BNI_CHAPTERS;
+  if(!d || !d.roster || !Object.keys(d.roster).length) return;
+  Object.keys(CHAPTER_ROSTER).forEach(k => delete CHAPTER_ROSTER[k]);
+  Object.assign(CHAPTER_ROSTER, d.roster);
+  // 지도에 아직 자리가 없는 신규 지역도 지역 목록·챕터 명단에는 바로 나오게 한다
+  (d.regions || []).forEach(r => {
+    if(!ALL_REGIONS.includes(r.value)) ALL_REGIONS.push(r.value);
+    if(r.en && !EN_NAMES[r.value]) EN_NAMES[r.value] = r.en;
+  });
+})();
 let sizeSnapshot = "";
 
 async function loadChapterSizes(){
@@ -3281,7 +3294,9 @@ function processRows(rows){
   ALL_REGIONS.forEach(r => { regionData[r] = 0; regionMemberCount[r] = 0; });
   rows.forEach(r => {
     const region = (r.myRegion || r.referrerRegion || "").trim();
-    const chapter = (r.myChapter || r.referrerChapter || "").trim();
+    const chapterRaw = (r.myChapter || r.referrerChapter || "").trim();
+    // 영문명으로 먼저 올라갔다가 한글명으로 바뀐 챕터는 한글명 쪽으로 합산 (chapters.js alias)
+    const chapter = (window.BNI_CHAPTERS && window.BNI_CHAPTERS.alias && window.BNI_CHAPTERS.alias[chapterRaw]) || chapterRaw;
     if(!region) return;
 
     const memberType = (r.memberType || r.g2fType || "").trim();

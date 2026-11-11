@@ -260,6 +260,25 @@ select.form-input option{background:#111;color:#fff;}
   <span id="toastMsg"></span>
 </div>
 
+<script src="/chapters.js"></script>
+<script>
+// 지역·챕터 드롭다운을 chapters.js 로 채운다 (BNI Connect 등록 기준 자동 생성 — automation/connect_sync).
+// 파일을 못 읽거나 비어 있으면 위 HTML 에 들어 있는 기본 목록을 그대로 쓴다.
+(function(){
+  const d = window.BNI_CHAPTERS;
+  if(!d || !Array.isArray(d.regions) || !d.regions.length || !Array.isArray(d.chapters) || !d.chapters.length) return;
+  function fill(id, items){
+    const sel = document.getElementById(id);
+    if(!sel) return;
+    sel.length = 1; // "선택해주세요" 만 남긴다
+    items.forEach(it => sel.add(new Option(it.label, it.value)));
+  }
+  fill("myRegion", d.regions);
+  const chapters = d.chapters.map(c => ({label:c, value:c}));
+  fill("myChapter", chapters);
+  fill("newMemberChapter", chapters);
+})();
+</script>
 <script>
 function updateClock(){
   const now = new Date();
