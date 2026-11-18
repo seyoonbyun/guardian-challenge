@@ -1,7 +1,7 @@
 // 자동 생성 파일 — BNI Connect 등록 기준으로 지역·챕터가 추가된다 (automation/connect_sync).
 // 손으로 고쳐도 되지만 형식(JSON)은 지킬 것. invite 드롭다운과 대시보드 챕터 명단이 이 파일을 읽는다.
 window.BNI_CHAPTERS = {
- "updated": "2026-11-18T13:32:46+09:00",
+ "updated": "2026-11-18T16:55:27+09:00",
  "source": "BNI Connect 챕터 보기/관리 (활동중) — automation/connect_sync/sync_chapters.py",
  "regions": [
   {
@@ -103,11 +103,6 @@ window.BNI_CHAPTERS = {
    "value": "하남",
    "label": "하남",
    "en": "HANAM"
-  },
-  {
-   "value": "동탄",
-   "label": "동탄",
-   "en": "DONGTAN"
   }
  ],
  "chapters": [
@@ -291,7 +286,8 @@ window.BNI_CHAPTERS = {
    "최강"
   ],
   "화성": [
-   "토파즈"
+   "토파즈",
+   "하이브"
   ],
   "성남": [
    "그랜드",
@@ -319,9 +315,6 @@ window.BNI_CHAPTERS = {
   ],
   "하남": [
    "시그니아"
-  ],
-  "동탄": [
-   "하이브"
   ],
   "부산": [
    "오션",
@@ -358,6 +351,7 @@ window.BNI_CHAPTERS = {
  "region_alias": {
   "성동": "서울 동북부",
   "송파": "서울 동부",
-  "강서": "서울 서부"
+  "강서": "서울 서부",
+  "동탄": "화성"
  }
 };

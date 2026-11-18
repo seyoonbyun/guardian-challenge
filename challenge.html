@@ -308,7 +308,7 @@ function processData(rows, chapterMemberMap, memberSnapshotDate){
   let totalScoreSum = 0;
 
   // 옛 지역 저장값 → 지금 지역 (2026-11-16 Connect 서울 지역 개편)
-  const REGION_ALIAS = {"성동":"서울 동북부","송파":"서울 동부","강서":"서울 서부"};
+  const REGION_ALIAS = {"성동":"서울 동북부","송파":"서울 동부","강서":"서울 서부","동탄":"화성"};
 
   rows.forEach(r => {
     // 90G2F check: 복수 선택 지원 (쉼표 구분)
