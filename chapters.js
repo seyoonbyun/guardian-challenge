@@ -1,7 +1,7 @@
 // 자동 생성 파일 — BNI Connect 등록 기준으로 지역·챕터가 추가된다 (automation/connect_sync).
 // 손으로 고쳐도 되지만 형식(JSON)은 지킬 것. invite 드롭다운과 대시보드 챕터 명단이 이 파일을 읽는다.
 window.BNI_CHAPTERS = {
- "updated": "2026-11-11T17:36:03+09:00",
+ "updated": "2026-11-18T13:32:46+09:00",
  "source": "BNI Connect 챕터 보기/관리 (활동중) — automation/connect_sync/sync_chapters.py",
  "regions": [
   {
@@ -25,9 +25,9 @@ window.BNI_CHAPTERS = {
    "en": "GANGNAM"
   },
   {
-   "value": "강서",
-   "label": "강서",
-   "en": "GANGSEO"
+   "value": "서울 서부",
+   "label": "서울 서부",
+   "en": "SEOUL WEST"
   },
   {
    "value": "고양",
@@ -55,9 +55,9 @@ window.BNI_CHAPTERS = {
    "en": "SEOCHO"
   },
   {
-   "value": "성동",
-   "label": "성동",
-   "en": "SEONGDONG"
+   "value": "서울 동북부",
+   "label": "서울 동북부",
+   "en": "SEOUL NE"
   },
   {
    "value": "성남",
@@ -70,9 +70,9 @@ window.BNI_CHAPTERS = {
    "en": "JUNGGU"
   },
   {
-   "value": "송파",
-   "label": "송파",
-   "en": "SONGPA"
+   "value": "서울 동부",
+   "label": "서울 동부",
+   "en": "SEOUL EAST"
   },
   {
    "value": "수원",
@@ -247,7 +247,7 @@ window.BNI_CHAPTERS = {
    "챌린지",
    "프라미스"
   ],
-  "성동": [
+  "서울 동북부": [
    "브레이크스루",
    "포레스트"
   ],
@@ -264,7 +264,7 @@ window.BNI_CHAPTERS = {
    "탑클래스",
    "프레젠트"
   ],
-  "송파": [
+  "서울 동부": [
    "트라이브"
   ],
   "중구": [
@@ -283,7 +283,7 @@ window.BNI_CHAPTERS = {
    "프라임",
    "프로페셔널"
   ],
-  "강서": [
+  "서울 서부": [
    "컴퍼니"
   ],
   "고양": [
@@ -354,5 +354,10 @@ window.BNI_CHAPTERS = {
    "뱅가드"
   ]
  },
- "alias": {}
+ "alias": {},
+ "region_alias": {
+  "성동": "서울 동북부",
+  "송파": "서울 동부",
+  "강서": "서울 서부"
+ }
 };

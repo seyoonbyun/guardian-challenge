@@ -3046,15 +3046,15 @@ const DETAIL_MAPS = {
     districtMap: {
       "강남": "s-Gangnam-gu",
       "서초": "s-Seocho-gu",
-      "성동": "s-Seongdong-gu",
+      "서울 동북부": "s-Seongdong-gu",
       "마포": "s-Mapo-gu",
-      "송파": "s-Songpa-gu",
+      "서울 동부": "s-Songpa-gu",
       "중구": "s-Jung-gu",
       "영등포": "s-Yeongdeungpo-gu_1_",
-      "강서": "s-Gangseo-gu"
+      "서울 서부": "s-Gangseo-gu"
     },
     // Cities that belong to this detail map (removed from national)
-    cities: ["강남","서초","성동","마포","송파","중구","영등포","강서"]
+    cities: ["강남","서초","서울 동북부","마포","서울 동부","중구","영등포","서울 서부"]
   },
   "gyeonggi": {
     title: "GYEONGGI",
@@ -3096,11 +3096,11 @@ const PROVINCE_CITY_MAP = {
 };
 
 const EN_NAMES = {
-  "강남":"GANGNAM","대구":"DAEGU","대전":"DAEJEON","서초":"SEOCHO","성동":"SEONGDONG",
-  "마포":"MAPO","부산":"BUSAN","송파":"SONGPA","수원":"SUWON","용인":"YONGIN",
+  "강남":"GANGNAM","대구":"DAEGU","대전":"DAEJEON","서초":"SEOCHO","서울 동북부":"SEOUL NE",
+  "마포":"MAPO","부산":"BUSAN","서울 동부":"SEOUL EAST","수원":"SUWON","용인":"YONGIN",
   "영등포":"YEONGDEUNGPO","인천":"INCHEON","고양":"GOYANG","화성":"HWASEONG",
   "중구":"JUNGGU","성남":"SEONGNAM","경기":"GYEONGGI",
-  "강서":"GANGSEO","안양":"ANYANG","창원":"CHANGWON","하남":"HANAM","동탄":"DONGTAN"
+  "서울 서부":"SEOUL WEST","안양":"ANYANG","창원":"CHANGWON","하남":"HANAM","동탄":"DONGTAN"
 };
 
 let regionData = {};
@@ -3112,15 +3112,18 @@ let totalGuardians = 0;
 let rawRows = [];
 let chapterSize = {};   // 챕터명 → 기존 멤버 수 (챕터사이즈 시트)
 let regionSize = {};    // 지역명 → 기존 멤버 수 합계
-let selectedRegion = "송파";
+let selectedRegion = "서울 동부";
 let zoomLevel = 1;
 let panX = 0, panY = 0;
 let isPanning = false, panStartX = 0, panStartY = 0;
 let detailSelectedCity = null;
 let activeTab = "national";
 let glowRegion = null; // currently glowing region name (e.g. "대구")
-const ALL_REGIONS = ["강남","서초","성동","마포","송파","중구","영등포","강서","고양","화성","성남","수원","용인","안양","하남","동탄","부산","대구","대전","인천","창원"];
+const ALL_REGIONS = ["강남","서초","서울 동북부","마포","서울 동부","중구","영등포","서울 서부","고양","화성","성남","수원","용인","안양","하남","동탄","부산","대구","대전","인천","창원"];
 const REGIONAL_CITIES = ["마포","서초","영등포","대구","수원","성남"];
+// 옛 지역 저장값 → 지금 지역 (2026-11-16 Connect 서울 지역 개편). 옛 값으로 저장된 등록도 새 지역으로 합산한다.
+const REGION_ALIAS = {"성동":"서울 동북부","송파":"서울 동부","강서":"서울 서부"};
+function normRegion(v){ v = (v || "").trim(); return REGION_ALIAS[v] || v; }
 
 // ── Clock ──
 function updateClock(){
@@ -3186,12 +3189,12 @@ const SIZE_SUPPLEMENT = {"스타":{region:"수원",count:32}, "오메가":{regio
 const CHAPTER_ROSTER = {
   "강남":["D100","굿","더강남","마스터","미다스","블리스","스마트","어썸","엑설런트","올그린","올인원","위너스","이노베이션","찬스","큐브","프리마","플러스","하모니","해피","헬퍼스"],
   "서초":["더블유","라인","로얄","메디컬","메이저","아너스","엑스퍼트","오리진","온리원","챌린지","프라미스"],
-  "성동":["브레이크스루","포레스트"],
+  "서울 동북부":["브레이크스루","포레스트"],
   "마포":["나이스","매트릭스","맥스","스톤웍스","애티튜드","유니콘","제우스","케이","타이탄","탑클래스","프레젠트"],
-  "송파":["트라이브"],
+  "서울 동부":["트라이브"],
   "중구":["아름"],
   "영등포":["골든","그로우","레버리지","밀리언","시너지","에이스","챔피언","트러스트","퍼스트","프라임","프로페셔널"],
-  "강서":["컴퍼니"],
+  "서울 서부":["컴퍼니"],
   "고양":["선샤인","최강"],
   "화성":["토파즈"],
   "성남":["그랜드","더유니언","드림컴트루","에피소드"],
@@ -3212,6 +3215,7 @@ const CHAPTER_ROSTER = {
   if(!d || !d.roster || !Object.keys(d.roster).length) return;
   Object.keys(CHAPTER_ROSTER).forEach(k => delete CHAPTER_ROSTER[k]);
   Object.assign(CHAPTER_ROSTER, d.roster);
+  if(d.region_alias) Object.assign(REGION_ALIAS, d.region_alias);
   // 지도에 아직 자리가 없는 신규 지역도 지역 목록·챕터 명단에는 바로 나오게 한다
   (d.regions || []).forEach(r => {
     if(!ALL_REGIONS.includes(r.value)) ALL_REGIONS.push(r.value);
@@ -3228,7 +3232,8 @@ async function loadChapterSizes(){
     (data.chapters || []).forEach(c => {
       if(!c.chapter || !(c.memberCount > 0)) return;
       cs[c.chapter] = c.memberCount;
-      rs[c.region] = (rs[c.region]||0) + c.memberCount;
+      const rg = normRegion(c.region);
+      rs[rg] = (rs[rg]||0) + c.memberCount;
     });
     if(!Object.keys(cs).length) return false;
     Object.entries(SIZE_SUPPLEMENT).forEach(([ch, s]) => {
@@ -3285,6 +3290,8 @@ function mapSupabaseRow(r) {
 }
 
 function processRows(rows){
+  // 옛 지역 값으로 저장된 등록을 지금 지역 이름으로 맞춘다 (아래 모든 집계·명단이 이 값을 읽는다)
+  rows.forEach(r => { ["myRegion","referrerRegion"].forEach(k => { if(r[k]) r[k] = normRegion(r[k]); }); });
   rawRows = rows;
   regionData = {};
   regionMemberCount = {};

@@ -307,6 +307,9 @@ function processData(rows, chapterMemberMap, memberSnapshotDate){
   let totalRecruits = 0;
   let totalScoreSum = 0;
 
+  // 옛 지역 저장값 → 지금 지역 (2026-11-16 Connect 서울 지역 개편)
+  const REGION_ALIAS = {"성동":"서울 동북부","송파":"서울 동부","강서":"서울 서부"};
+
   rows.forEach(r => {
     // 90G2F check: 복수 선택 지원 (쉼표 구분)
     const mType = (r.memberType || r.g2fType || "").trim();
@@ -314,7 +317,8 @@ function processData(rows, chapterMemberMap, memberSnapshotDate){
     const score = r.score ? Number(r.score) : (is90G2F ? 2 : 1);
     const referrer = (r.referrerName || r.myName || "").trim();
     const chapter = (r.referrerChapter || r.myChapter || "").trim();
-    const region = (r.referrerRegion || r.myRegion || "").trim();
+    const regionRaw = (r.referrerRegion || r.myRegion || "").trim();
+    const region = REGION_ALIAS[regionRaw] || regionRaw;
     const createdAt = r.createdAt || r.timestamp || "";
 
     if(!referrer) return;
