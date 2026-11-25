@@ -315,78 +315,12 @@ document.querySelectorAll("#is90Born, #isGlobal, #isSecondGenOwner, #isFranchise
   });
 });
 
-// ── 입력 진단 (2026-11-25, PMC-24) ──────────────────────────────────────────
-// 이름 끝 글자가 빠진 채 저장되는 증상의 원인을 잡기 위한 기록 장치. 화면 동작은 바꾸지 않는다.
-// 제출할 때 브라우저 종류와 두 이름 칸의 입력 과정(조합 글자가 생기고 확정되거나 사라진 순서)을
-// Supabase invite_diag 표에 남긴다(쓰기 전용). 실패해도 등록에는 영향이 없다. 원인이 잡히면 지운다.
-var __inviteDiag = (function(){
-  var T0 = Date.now(), F = {};
-  try{
-    ["myName","newMemberName"].forEach(function(id){
-      var el = document.getElementById(id); if(!el) return;
-      var s = F[id] = {peak:"", del:0, ev:[], lastKey:"", left:""};
-      function push(t, x){
-        if(s.ev.length >= 80) s.ev.shift();
-        s.ev.push([Date.now()-T0, t, (x && x.data != null) ? String(x.data).slice(0,8) : "", String(el.value).slice(0,24), (x && x.isComposing) ? 1 : 0, (x && x.inputType) ? x.inputType : ""]);
-      }
-      ["compositionstart","compositionupdate","compositionend","input","focus","blur","change"].forEach(function(t){
-        el.addEventListener(t, function(x){
-          try{
-            if(t === "input"){
-              if(x.inputType && x.inputType.indexOf("delete") === 0){ if(s.foc && document.hasFocus()) s.del++; else s.auto = (s.auto||0) + 1; }
-              if(el.value.length > s.peak.length || (el.value.length === s.peak.length && el.value !== s.peak)){ s.peak = el.value; s.del = 0; }
-            }
-            if(t === "focus"){ s.lastKey = ""; s.foc = true; }
-            if(t === "blur"){ s.left = s.lastKey; s.foc = false; }
-            push(t, x);
-          }catch(e){}
-        });
-      });
-      el.addEventListener("keydown", function(x){
-        try{
-          var k = (x.key === "Process") ? ("Process:" + (x.code || "")) : x.key;
-          if(k.length > 1 || x.ctrlKey || x.altKey || x.metaKey){ s.lastKey = "key:" + k; push("key:" + k, x); }
-        }catch(e){}
-      });
-    });
-    document.addEventListener("mousedown", function(x){
-      try{ var a = document.activeElement; if(a && F[a.id]) F[a.id].lastKey = "mouse:" + (x.target.id || x.target.tagName); }catch(e){}
-    }, true);
-    window.addEventListener("blur", function(){
-      try{ var a = document.activeElement; if(a && F[a.id]){ F[a.id].lastKey = "window-blur"; F[a.id].ev.push([Date.now()-T0, "window-blur", "", String(a.value).slice(0,24), 0, ""]); } }catch(e){}
-    });
-  }catch(e){}
-  return {
-    send: function(url, key, uniqueKey){
-      try{
-        var fields = {}, lost = false;
-        Object.keys(F).forEach(function(id){
-          var el = document.getElementById(id), s = F[id], fin = el ? String(el.value).trim() : "", peak = String(s.peak).trim();
-          // 쳤던 글자(가장 길었던 값)가 지우는 키 없이 제출 값에서 빠졌으면 누락으로 표시
-          var l = (peak.length > fin.length && peak.indexOf(fin) === 0 && (s.del === 0 || (s.auto||0) > 0));
-          if(l) lost = true;
-          var g = (window.__nameGuard && window.__nameGuard[id]) || 0;
-          fields[id] = {final: fin, peak: peak, del: s.del, auto: s.auto||0, restored: g, left: s.left, lost: l, ev: s.ev};
-        });
-        var detail = {v: 1, ms: Date.now()-T0, lang: navigator.language, platform: navigator.platform,
-          scr: [window.innerWidth, window.innerHeight, window.devicePixelRatio], touch: navigator.maxTouchPoints || 0, fields: fields};
-        fetch(url + "/rest/v1/invite_diag", {
-          method: "POST", keepalive: true,
-          headers: {"apikey": key, "Authorization": "Bearer " + key, "Content-Type": "application/json", "Prefer": "return=minimal"},
-          body: JSON.stringify({unique_key: uniqueKey, lost: lost, ua: String(navigator.userAgent).slice(0,500), detail: detail})
-        }).catch(function(){});
-      }catch(e){}
-    }
-  };
-})();
-
 // ── 이름 끝 글자 보호 (2026-11-25, PMC-24) ─────────────────────────────────────
 // 원인: 한글 마지막 글자가 조합 중(밑줄 상태)일 때 다른 창으로 넘어가면, 브라우저가 칸을 떠난 "뒤에"
 // 그 글자를 지우는 입력(deleteContentBackward)을 스스로 내보낸다(11-25 14:59 기록: 이주석 → 이주).
 // 칸에 커서가 없을 때는 사람이 글자를 지울 수 없으므로, 그때 끝 글자 하나가 지워지면 직전 값으로 되돌린다.
 (function(){
   try{
-    window.__nameGuard = {};
     ["myName","newMemberName"].forEach(function(id){
       var el = document.getElementById(id); if(!el) return;
       var foc = (document.activeElement === el), prev = el.value;
@@ -398,7 +332,6 @@ var __inviteDiag = (function(){
           var away = (!foc || !document.hasFocus());
           if(away && x && x.inputType === "deleteContentBackward" && prev.length === v.length + 1 && prev.indexOf(v) === 0){
             el.value = prev;
-            window.__nameGuard[id] = (window.__nameGuard[id] || 0) + 1;
             return;
           }
           prev = v;
@@ -488,9 +421,6 @@ async function submitForm(){
     score: data.score,
     unique_key: data.uniqueKey
   };
-
-  // 입력 진단 기록 (PMC-24) — 실패해도 등록에는 영향 없음
-  __inviteDiag.send(SUPABASE_URL, SUPABASE_KEY, data.uniqueKey);
 
   // GAS write (Google Sheet) — 예전엔 숨은 iframe 을 1초 뒤 지우고 2초 뒤 이동해서 응답이 늦으면 요청이 끊겼다(2026-10 누락 4건).
   // keepalive 로 보내 페이지를 떠나도 끝까지 전송하고, 응답(최대 10초)을 기다린 뒤 이동한다.
