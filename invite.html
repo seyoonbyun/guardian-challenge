@@ -333,11 +333,11 @@ var __inviteDiag = (function(){
         el.addEventListener(t, function(x){
           try{
             if(t === "input"){
-              if(x.inputType && x.inputType.indexOf("delete") === 0) s.del++;
+              if(x.inputType && x.inputType.indexOf("delete") === 0){ if(s.foc && document.hasFocus()) s.del++; else s.auto = (s.auto||0) + 1; }
               if(el.value.length > s.peak.length || (el.value.length === s.peak.length && el.value !== s.peak)){ s.peak = el.value; s.del = 0; }
             }
-            if(t === "focus") s.lastKey = "";
-            if(t === "blur") s.left = s.lastKey;
+            if(t === "focus"){ s.lastKey = ""; s.foc = true; }
+            if(t === "blur"){ s.left = s.lastKey; s.foc = false; }
             push(t, x);
           }catch(e){}
         });
@@ -363,9 +363,10 @@ var __inviteDiag = (function(){
         Object.keys(F).forEach(function(id){
           var el = document.getElementById(id), s = F[id], fin = el ? String(el.value).trim() : "", peak = String(s.peak).trim();
           // 쳤던 글자(가장 길었던 값)가 지우는 키 없이 제출 값에서 빠졌으면 누락으로 표시
-          var l = (peak.length > fin.length && peak.indexOf(fin) === 0 && s.del === 0);
+          var l = (peak.length > fin.length && peak.indexOf(fin) === 0 && (s.del === 0 || (s.auto||0) > 0));
           if(l) lost = true;
-          fields[id] = {final: fin, peak: peak, del: s.del, left: s.left, lost: l, ev: s.ev};
+          var g = (window.__nameGuard && window.__nameGuard[id]) || 0;
+          fields[id] = {final: fin, peak: peak, del: s.del, auto: s.auto||0, restored: g, left: s.left, lost: l, ev: s.ev};
         });
         var detail = {v: 1, ms: Date.now()-T0, lang: navigator.language, platform: navigator.platform,
           scr: [window.innerWidth, window.innerHeight, window.devicePixelRatio], touch: navigator.maxTouchPoints || 0, fields: fields};
@@ -377,6 +378,34 @@ var __inviteDiag = (function(){
       }catch(e){}
     }
   };
+})();
+
+// ── 이름 끝 글자 보호 (2026-11-25, PMC-24) ─────────────────────────────────────
+// 원인: 한글 마지막 글자가 조합 중(밑줄 상태)일 때 다른 창으로 넘어가면, 브라우저가 칸을 떠난 "뒤에"
+// 그 글자를 지우는 입력(deleteContentBackward)을 스스로 내보낸다(11-25 14:59 기록: 이주석 → 이주).
+// 칸에 커서가 없을 때는 사람이 글자를 지울 수 없으므로, 그때 끝 글자 하나가 지워지면 직전 값으로 되돌린다.
+(function(){
+  try{
+    window.__nameGuard = {};
+    ["myName","newMemberName"].forEach(function(id){
+      var el = document.getElementById(id); if(!el) return;
+      var foc = (document.activeElement === el), prev = el.value;
+      el.addEventListener("focus", function(){ foc = true; prev = el.value; });
+      el.addEventListener("blur", function(){ foc = false; });
+      el.addEventListener("input", function(x){
+        try{
+          var v = el.value;
+          var away = (!foc || !document.hasFocus());
+          if(away && x && x.inputType === "deleteContentBackward" && prev.length === v.length + 1 && prev.indexOf(v) === 0){
+            el.value = prev;
+            window.__nameGuard[id] = (window.__nameGuard[id] || 0) + 1;
+            return;
+          }
+          prev = v;
+        }catch(e){}
+      });
+    });
+  }catch(e){}
 })();
 
 async function submitForm(){
